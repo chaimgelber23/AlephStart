@@ -1,0 +1,228 @@
+// ==========================================
+// CORE TYPES FOR ALEPHSTART
+// ==========================================
+
+// --- Skill Types ---
+export type SkillType = 'letter' | 'vowel' | 'rule' | 'word' | 'prayer';
+
+export interface Skill {
+  id: string;
+  type: SkillType;
+  level: number;
+  sortOrder: number;
+  hebrew: string;
+  hebrewWithNikud?: string;
+  nameEnglish: string;
+  sound?: string;
+  mnemonic?: string;
+  confusableWith?: string; // ID of confusable letter
+  audioUrl?: string;
+  imageUrl?: string;
+  description?: string;
+  teachingNotes?: string;
+}
+
+// --- Letter & Vowel Data ---
+export interface Letter {
+  id: string;
+  hebrew: string;
+  name: string;
+  sound: string;
+  transliteration: string;
+  mnemonic: string;
+  confusableWith?: string;
+  confusableHint?: string;
+  audioUrl: string;
+  isFinalForm: boolean;
+  baseLetterOf?: string; // for sofit letters
+  hasDagesh?: boolean;
+  dageshSound?: string;
+}
+
+export interface Vowel {
+  id: string;
+  hebrew: string;
+  name: string;
+  sound: string;
+  soundGroup: 'ah' | 'eh' | 'ee' | 'oh' | 'oo' | 'shva' | 'chataf';
+  color: string;
+  transliteration: string;
+  audioUrl: string;
+  description: string;
+}
+
+// --- Lesson Types ---
+export interface Lesson {
+  id: string;
+  level: number;
+  sortOrder: number;
+  title: string;
+  description: string;
+  skillIds: string[];
+  estimatedMinutes: number;
+  prerequisiteLessonId?: string;
+}
+
+// --- Practice Types ---
+export type PracticeType =
+  | 'tap_to_hear'
+  | 'choose_sound'
+  | 'choose_letter'
+  | 'spot_difference'
+  | 'build_syllable'
+  | 'read_word'
+  | 'read_line';
+
+export interface PracticeItem {
+  id: string;
+  skillId: string;
+  lessonId: string;
+  type: PracticeType;
+  promptHebrew: string;
+  promptHebrewNikud?: string;
+  promptAudioUrl?: string;
+  correctAnswer: string;
+  distractors: string[];
+  difficulty: number;
+  tags: string[];
+}
+
+export type AttemptResult = 'correct' | 'incorrect' | 'skipped';
+
+export interface Attempt {
+  id: string;
+  practiceItemId: string;
+  result: AttemptResult;
+  responseTimeMs: number;
+  userAnswer?: string;
+  createdAt: Date;
+}
+
+// --- Prayer / Siddur Types ---
+export interface Prayer {
+  id: string;
+  slug: string;
+  nameHebrew: string;
+  nameEnglish: string;
+  category: string;
+  sortOrder: number;
+  whenSaid: string;
+  whySaid: string;
+  inspirationText: string;
+  requiredLevel: number;
+  estimatedReadSeconds: number;
+  sections: PrayerSection[];
+}
+
+export interface PrayerSection {
+  id: string;
+  sortOrder: number;
+  hebrewText: string; // with nekudot
+  transliteration: string;
+  translation: string;
+  audioUrl?: string;
+  slowAudioUrl?: string;
+  wordTimings?: WordTiming[];
+  notes?: string;
+}
+
+export interface WordTiming {
+  word: string;
+  startMs: number;
+  endMs: number;
+}
+
+// --- User & Progress Types ---
+export type Nusach = 'ashkenaz' | 'sefard' | 'edot';
+export type TransliterationMode = 'full' | 'faded' | 'tap' | 'off';
+export type LearningGoal = 'daven' | 'learn' | 'explore' | 'all';
+export type HebrewLevel = 'none' | 'some_letters' | 'read_slow' | 'read_improve';
+
+export interface UserProfile {
+  id?: string;
+  displayName?: string;
+  email?: string;
+  currentLevel: number;
+  nusach: Nusach;
+  dailyGoalMinutes: number;
+  transliterationMode: TransliterationMode;
+  audioSpeed: number;
+  streakDays: number;
+  longestStreak: number;
+  lastPracticeDate?: string;
+  totalStudyMinutes: number;
+  totalWordsMastered: number;
+  learningGoal: LearningGoal;
+  hebrewLevel: HebrewLevel;
+  onboardingComplete: boolean;
+}
+
+export interface SkillProgress {
+  skillId: string;
+  masteryLevel: number; // 0.0 to 1.0
+  timesPracticed: number;
+  timesCorrect: number;
+  lastPracticed?: Date;
+}
+
+export interface LessonProgress {
+  lessonId: string;
+  status: 'locked' | 'available' | 'in_progress' | 'completed';
+  score?: number;
+  completedAt?: Date;
+}
+
+export interface PrayerProgress {
+  prayerId: string;
+  status: 'locked' | 'available' | 'learning' | 'mastered';
+  listenComplete: boolean;
+  echoComplete: boolean;
+  readComplete: boolean;
+  bestWpm?: number;
+  lastPracticed?: Date;
+}
+
+export interface DailySession {
+  date: string;
+  minutesStudied: number;
+  itemsReviewed: number;
+  itemsCorrect: number;
+  newSkillsLearned: number;
+}
+
+export type MilestoneType =
+  | 'first_letter'
+  | 'half_alephbet'
+  | 'full_alephbet'
+  | 'first_word'
+  | 'first_prayer'
+  | 'shema_reader'
+  | 'bracha_master'
+  | 'shul_ready'
+  | 'independent_davener';
+
+export interface Milestone {
+  type: MilestoneType;
+  earnedAt: Date;
+}
+
+// --- Practice Session State ---
+export interface PracticeSession {
+  items: PracticeItem[];
+  currentIndex: number;
+  attempts: Attempt[];
+  startedAt: Date;
+  isComplete: boolean;
+}
+
+// --- FSRS Card State ---
+export interface CardReview {
+  practiceItemId: string;
+  difficulty: number;
+  stability: number;
+  dueDate: Date;
+  lastReview?: Date;
+  reps: number;
+  lapses: number;
+  state: 'new' | 'learning' | 'review' | 'relearning';
+}
