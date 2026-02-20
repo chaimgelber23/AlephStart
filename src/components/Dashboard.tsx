@@ -1,14 +1,22 @@
 'use client';
 
+import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useUserStore } from '@/stores/userStore';
 import { useAuthStore } from '@/stores/authStore';
 import { ProgressBar } from '@/components/ui/ProgressBar';
+import { BottomNav } from '@/components/ui/BottomNav';
 import { BootcampCard } from '@/components/bootcamp/BootcampCard';
 import { LETTERS } from '@/lib/content/letters';
 import { CORE_VOWELS } from '@/lib/content/vowels';
 import { PRAYERS } from '@/lib/content/prayers';
+import {
+  STREAK_ENCOURAGEMENTS,
+  getRandomStreakEncouragement,
+  getDailyInspiration,
+  formatWithName,
+} from '@/lib/content/encouragements';
 
 export function Dashboard() {
   const profile = useUserStore((s) => s.profile);
@@ -27,15 +35,26 @@ export function Dashboard() {
   const masteredVowels = 0; // TODO: track vowel progress separately
   const vowelProgress = masteredVowels / totalVowels;
 
-  // Greeting based on time of day
+  // Personalized greeting based on time of day
+  const userName = profile.displayName?.trim() || '';
   const hour = new Date().getHours();
-  const greeting =
+  const baseGreeting =
     hour < 12 ? 'Boker Tov' : hour < 18 ? 'Tzohorayim Tovim' : "Erev Tov";
+  const greeting = userName ? `${baseGreeting}, ${userName}` : baseGreeting;
   const greetingHebrew =
     hour < 12 ? 'בּוֹקֶר טוֹב' : hour < 18 ? 'צָהֳרַיִם טוֹבִים' : 'עֶרֶב טוֹב';
 
+  // Rotating encouragement for streak banner (random per page load)
+  const [streakMessage, setStreakMessage] = useState(STREAK_ENCOURAGEMENTS[0]);
+  useEffect(() => {
+    setStreakMessage(getRandomStreakEncouragement());
+  }, []);
+
+  // Daily inspiration quote (consistent throughout the day)
+  const dailyQuote = useMemo(() => getDailyInspiration(), []);
+
   return (
-    <div className="min-h-screen pb-24">
+    <div className="min-h-screen">
       {/* Header */}
       <div className="bg-[#1B4965] text-white px-6 py-8 rounded-b-3xl">
         <motion.div
@@ -72,7 +91,9 @@ export function Dashboard() {
               <div>
                 <p className="text-sm font-medium">{profile.streakDays} Day Streak</p>
                 <p className="text-xs text-white/70">
-                  כָּל הַתְחָלוֹת קָשׁוֹת — All beginnings are hard
+                  <span dir="rtl" className="font-[var(--font-hebrew-serif)]">{streakMessage.hebrew}</span>
+                  {' — '}
+                  {formatWithName(streakMessage.english, userName)}
                 </p>
               </div>
             </div>
@@ -246,50 +267,16 @@ export function Dashboard() {
             dir="rtl"
             className="font-[var(--font-hebrew-serif)] text-xl text-[#1B4965] leading-relaxed"
           >
-            לֹא עָלֶיךָ הַמְּלָאכָה לִגְמֹר
+            {dailyQuote.hebrew}
           </p>
           <p className="text-sm text-gray-600 mt-2 italic">
-            &ldquo;You are not required to finish the work, but neither are you free to stop trying.&rdquo;
+            &ldquo;{dailyQuote.english}&rdquo;
           </p>
-          <p className="text-xs text-gray-400 mt-1">— Pirkei Avot 2:16</p>
+          <p className="text-xs text-gray-400 mt-1">— {dailyQuote.source}</p>
         </motion.div>
       </div>
 
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3">
-        <div className="max-w-md mx-auto flex justify-around">
-          <NavItem href="/" icon="🏠" label="Home" active />
-          <NavItem href="/learn" icon="📚" label="Learn" />
-          <NavItem href="/practice" icon="✏️" label="Practice" />
-          <NavItem href="/siddur" icon="📖" label="Siddur" />
-          <NavItem href={authStatus === 'authenticated' ? '/settings' : '/login'} icon="⚙️" label="Settings" />
-        </div>
-      </nav>
+      <BottomNav />
     </div>
-  );
-}
-
-function NavItem({
-  href,
-  icon,
-  label,
-  active = false,
-}: {
-  href: string;
-  icon: string;
-  label: string;
-  active?: boolean;
-}) {
-  return (
-    <Link
-      href={href}
-      className={`
-        flex flex-col items-center gap-1 px-4 py-1
-        ${active ? 'text-[#1B4965]' : 'text-gray-400'}
-      `}
-    >
-      <span className="text-xl">{icon}</span>
-      <span className="text-xs font-medium">{label}</span>
-    </Link>
   );
 }

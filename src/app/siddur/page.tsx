@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { BottomNav } from '@/components/ui/BottomNav';
 import { getTefillahPrayers, getBrachotPrayers } from '@/lib/content/prayers';
 import { useUserStore } from '@/stores/userStore';
 import type { Prayer } from '@/types';
@@ -392,28 +393,7 @@ function PrayerList({ onSelect }: { onSelect: (prayer: Prayer) => void }) {
         </div>
       </div>
 
-      {/* Bottom nav */}
-      <div className="h-20" />
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3">
-        <div className="max-w-md mx-auto flex justify-around">
-          <Link href="/" className="flex flex-col items-center gap-1 px-4 py-1 text-gray-400">
-            <span className="text-xl">🏠</span>
-            <span className="text-xs font-medium">Home</span>
-          </Link>
-          <Link href="/learn" className="flex flex-col items-center gap-1 px-4 py-1 text-gray-400">
-            <span className="text-xl">📚</span>
-            <span className="text-xs font-medium">Learn</span>
-          </Link>
-          <Link href="/practice" className="flex flex-col items-center gap-1 px-4 py-1 text-gray-400">
-            <span className="text-xl">✏️</span>
-            <span className="text-xs font-medium">Practice</span>
-          </Link>
-          <Link href="/siddur" className="flex flex-col items-center gap-1 px-4 py-1 text-[#1B4965]">
-            <span className="text-xl">📖</span>
-            <span className="text-xs font-medium">Siddur</span>
-          </Link>
-        </div>
-      </nav>
+      <BottomNav />
     </div>
   );
 }

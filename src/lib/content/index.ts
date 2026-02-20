@@ -3,3 +3,4 @@ export { VOWELS, CORE_VOWELS, CHATAF_VOWELS, VOWEL_COLORS, getVowelById, getVowe
 export { PRAYERS, getPrayerBySlug, getPrayersByCategory, getTefillahPrayers, getBrachotPrayers } from './prayers';
 export { BOOTCAMP_DAYS, getBootcampDay, getBootcampLettersThroughDay, getBootcampVowelsThroughDay } from './bootcampDays';
 export { BOOTCAMP_VOCAB, getBootcampVocabByCategory, getBootcampVocabByDay, getBootcampVocabById } from './bootcampVocab';
+export { STREAK_ENCOURAGEMENTS, DAILY_INSPIRATIONS, getRandomStreakEncouragement, getDailyInspiration, formatWithName } from './encouragements';
