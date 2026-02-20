@@ -35,6 +35,7 @@ export default function BootcampDayPage() {
     isDayAvailable,
   } = useBootcampStore();
   const { updateSkillProgress, recordPractice, checkAndUpdateStreak, earnMilestone, hasMilestone } = useUserStore();
+  const pronunciation = useUserStore((s) => s.profile.pronunciation);
 
   // Determine starting phase
   const hasReview = dayNumber > 1;
@@ -392,7 +393,7 @@ export default function BootcampDayPage() {
                   </h2>
                 </div>
 
-                <LetterCard letter={currentLetter} isActive />
+                <LetterCard letter={currentLetter} isActive pronunciation={pronunciation} />
 
                 {/* Cultural mnemonic */}
                 {culturalMnemonic && (

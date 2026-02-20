@@ -44,7 +44,7 @@ export function BootcampCard() {
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-gradient-to-br from-[#C6973F]/10 to-[#C6973F]/5 border-2 border-[#C6973F]/30 rounded-2xl p-6 hover:shadow-md transition-shadow cursor-pointer"
+          className="bg-gradient-to-br from-[#C6973F]/8 to-[#C6973F]/3 border border-[#C6973F]/15 rounded-2xl p-5 shadow-sm hover:shadow-md transition-all cursor-pointer"
         >
           <div className="flex items-start gap-3">
             <div className="w-12 h-12 bg-[#C6973F] rounded-xl flex items-center justify-center flex-shrink-0">

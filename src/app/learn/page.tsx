@@ -10,7 +10,12 @@ import { AudioButton } from '@/components/ui/AudioButton';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { MilestoneToast } from '@/components/ui/MilestoneToast';
 import { track } from '@/lib/analytics';
-import type { Letter, MilestoneType } from '@/types';
+import type { Letter, MilestoneType, Pronunciation } from '@/types';
+
+const PRONUNCIATION_SUFFIX: Record<Pronunciation, string> = {
+  modern: '',
+  american: '-american',
+};
 
 // Group letters into lessons of 3
 const LESSON_SIZE = 3;
@@ -24,6 +29,7 @@ const totalLessons = Math.ceil(LETTERS.length / LESSON_SIZE);
 type Phase = 'teach' | 'drill' | 'review' | 'complete';
 
 export default function LearnPage() {
+  const pronunciation = useUserStore((s) => s.profile.pronunciation);
   const learnSession = useUserStore((s) => s.learnSession);
   const saveLearnSession = useUserStore((s) => s.saveLearnSession);
   const clearLearnSession = useUserStore((s) => s.clearLearnSession);
@@ -249,7 +255,7 @@ export default function LearnPage() {
                 </h2>
               </div>
 
-              <LetterCard letter={currentTeachLetter} isActive />
+              <LetterCard letter={currentTeachLetter} isActive pronunciation={pronunciation} />
 
               <button
                 onClick={handleTeachNext}
@@ -290,7 +296,7 @@ export default function LearnPage() {
               {/* Audio hint */}
               <div className="flex justify-center">
                 <AudioButton
-                  audioUrl={drillCorrectLetter.audioUrl}
+                  audioUrl={`/audio/letters/${drillCorrectLetter.id}${PRONUNCIATION_SUFFIX[pronunciation]}.mp3`}
                   label="Hear the sound"
                   size="sm"
                   variant="outline"
