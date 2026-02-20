@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { RequireAuth } from '@/components/RequireAuth';
 import { useAuthStore } from '@/stores/authStore';
 import { useUserStore } from '@/stores/userStore';
-import type { Nusach, TransliterationMode } from '@/types';
+import type { Nusach, Pronunciation, TransliterationMode } from '@/types';
 
 export default function SettingsPage() {
   return (
@@ -237,6 +237,35 @@ function SettingsContent() {
                     }`}
                   >
                     {n === 'ashkenaz' ? 'Ashkenaz' : n === 'sefard' ? 'Sefard' : 'Edot'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Pronunciation */}
+            <div>
+              <label className="block text-sm font-medium text-[#2D3142] mb-1">
+                Audio Pronunciation
+              </label>
+              <p className="text-xs text-gray-400 mb-2">
+                How should prayers sound when you tap Listen?
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {([
+                  { value: 'modern' as const, label: 'Modern Israeli', desc: 'Shabbat, Baruch' },
+                  { value: 'american' as const, label: 'American Shul', desc: 'Shabbos, Boruch' },
+                ] as { value: Pronunciation; label: string; desc: string }[]).map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => updateProfile({ pronunciation: opt.value })}
+                    className={`px-3 py-2.5 rounded-xl text-sm font-medium border-2 transition-colors text-left ${
+                      profile.pronunciation === opt.value
+                        ? 'border-[#1B4965] bg-[#1B4965]/5 text-[#1B4965]'
+                        : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                    }`}
+                  >
+                    <span className="block">{opt.label}</span>
+                    <span className="text-xs font-normal text-gray-400">{opt.desc}</span>
                   </button>
                 ))}
               </div>

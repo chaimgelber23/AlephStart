@@ -11,6 +11,11 @@ import type {
   LearningGoal,
   HebrewLevel,
   Nusach,
+  LearnSession,
+  CoachingPreferences,
+  SectionCoachingProgress,
+  CoachingFeedback,
+  CoachingPhase,
 } from '@/types';
 
 interface UserState {
@@ -38,6 +43,12 @@ interface UserState {
 
   // Streaks
   checkAndUpdateStreak: () => void;
+  useStreakFreeze: () => boolean;
+
+  // Learn session resume
+  learnSession: LearnSession | null;
+  saveLearnSession: (session: LearnSession) => void;
+  clearLearnSession: () => void;
 
   // Milestones
   milestones: Milestone[];
@@ -46,11 +57,24 @@ interface UserState {
 
   // Onboarding
   completeOnboarding: (goal: LearningGoal, level: HebrewLevel, nusach: Nusach, dailyMinutes: number) => void;
+
+  // Coaching
+  coachingPreferences: CoachingPreferences;
+  updateCoachingPreferences: (updates: Partial<CoachingPreferences>) => void;
+  applyCoachingFeedback: (feedback: CoachingFeedback) => void;
+  sectionProgress: Record<string, SectionCoachingProgress>;
+  updateSectionProgress: (key: string, updates: Partial<SectionCoachingProgress>) => void;
+  markSectionCoached: (prayerId: string, sectionId: string) => void;
+  isSectionCoached: (prayerId: string, sectionId: string) => boolean;
+  isPrayerFullyCoached: (prayerId: string, sectionIds: string[]) => boolean;
+  getSectionStep: (prayerId: string, sectionId: string) => CoachingPhase | null;
+  hasUsedCoaching: boolean;
 }
 
 const DEFAULT_PROFILE: UserProfile = {
   currentLevel: 1,
   nusach: 'ashkenaz',
+  pronunciation: 'modern',
   dailyGoalMinutes: 5,
   transliterationMode: 'full',
   audioSpeed: 1.0,
@@ -61,9 +85,38 @@ const DEFAULT_PROFILE: UserProfile = {
   learningGoal: 'daven',
   hebrewLevel: 'none',
   onboardingComplete: false,
+  streakFreezes: 1,
 };
 
 const getTodayString = () => new Date().toISOString().split('T')[0];
+
+/** Get ISO week string like "2026-W08" for weekly freeze grants */
+function getISOWeek(d: Date): string {
+  const jan4 = new Date(d.getFullYear(), 0, 4);
+  const dayOfYear = Math.ceil((d.getTime() - jan4.getTime()) / 86400000) + jan4.getDay();
+  const week = Math.ceil(dayOfYear / 7);
+  return `${d.getFullYear()}-W${String(week).padStart(2, '0')}`;
+}
+
+/** Count days between two ISO date strings */
+function daysBetween(from: string, to: string): number {
+  const a = new Date(from + 'T00:00:00');
+  const b = new Date(to + 'T00:00:00');
+  return Math.round((b.getTime() - a.getTime()) / 86400000);
+}
+
+/** Check if the missed day between lastPractice and today was a Shabbat (Saturday) */
+function wasMissedDayShabbat(lastPractice: string, today: string): boolean {
+  const last = new Date(lastPractice + 'T00:00:00');
+  const end = new Date(today + 'T00:00:00');
+  const d = new Date(last);
+  d.setDate(d.getDate() + 1);
+  while (d < end) {
+    if (d.getDay() === 6) return true; // Saturday
+    d.setDate(d.getDate() + 1);
+  }
+  return false;
+}
 
 const DEFAULT_SESSION: DailySession = {
   date: getTodayString(),
@@ -182,7 +235,7 @@ export const useUserStore = create<UserState>()(
           };
         }),
 
-      // Streaks
+      // Streaks (with Shabbat grace period + freeze support)
       checkAndUpdateStreak: () =>
         set((state) => {
           const today = getTodayString();
@@ -190,11 +243,19 @@ export const useUserStore = create<UserState>()(
 
           if (lastPractice === today) return state; // Already practiced today
 
-          const yesterday = new Date();
+          const now = new Date();
+          const yesterday = new Date(now);
           yesterday.setDate(yesterday.getDate() - 1);
           const yesterdayStr = yesterday.toISOString().split('T')[0];
 
           let newStreak = state.profile.streakDays;
+          let freezes = state.profile.streakFreezes ?? 1;
+
+          // Grant a free freeze each week (Sunday)
+          const weekStr = getISOWeek(now);
+          if (weekStr !== state.profile.lastStreakFreezeWeek && freezes < 2) {
+            freezes = Math.min(freezes + 1, 2);
+          }
 
           if (lastPractice === yesterdayStr) {
             // Practiced yesterday — continue streak
@@ -203,9 +264,20 @@ export const useUserStore = create<UserState>()(
             // First time ever
             newStreak = 1;
           } else {
-            // Missed a day (or more) — reset streak
-            // TODO: Check for Shabbat/YT grace period
-            newStreak = 1;
+            // Missed day(s) — check for Shabbat grace or use freeze
+            const missedDays = daysBetween(lastPractice, today);
+
+            if (missedDays <= 2 && wasMissedDayShabbat(lastPractice, today)) {
+              // Shabbat grace — streak continues
+              newStreak += 1;
+            } else if (missedDays === 2 && freezes > 0) {
+              // Auto-use a freeze for 1 missed day
+              freezes -= 1;
+              newStreak += 1;
+            } else {
+              // Streak broken
+              newStreak = 1;
+            }
           }
 
           return {
@@ -214,9 +286,30 @@ export const useUserStore = create<UserState>()(
               streakDays: newStreak,
               longestStreak: Math.max(newStreak, state.profile.longestStreak),
               lastPracticeDate: today,
+              streakFreezes: freezes,
+              lastStreakFreezeWeek: getISOWeek(now),
             },
           };
         }),
+
+      useStreakFreeze: () => {
+        const state = get();
+        if ((state.profile.streakFreezes ?? 0) <= 0) return false;
+        set({
+          profile: {
+            ...state.profile,
+            streakFreezes: (state.profile.streakFreezes ?? 0) - 1,
+          },
+        });
+        return true;
+      },
+
+      // Learn session resume
+      learnSession: null,
+
+      saveLearnSession: (session) => set({ learnSession: session }),
+
+      clearLearnSession: () => set({ learnSession: null }),
 
       // Milestones
       milestones: [],
@@ -245,6 +338,101 @@ export const useUserStore = create<UserState>()(
             onboardingComplete: true,
           },
         })),
+
+      // Coaching
+      coachingPreferences: {
+        listenCount: 3,
+        followAlongCount: 2,
+        sayTogetherCount: 2,
+        initialSpeed: 0.75,
+        showTranslationDuringPractice: true,
+        skipContextCard: false,
+      },
+
+      updateCoachingPreferences: (updates) =>
+        set((state) => ({
+          coachingPreferences: { ...state.coachingPreferences, ...updates },
+        })),
+
+      applyCoachingFeedback: (feedback) =>
+        set((state) => {
+          const prefs = { ...state.coachingPreferences };
+
+          if (feedback.paceRating === 'too_slow') {
+            prefs.initialSpeed = Math.min(prefs.initialSpeed + 0.1, 1.0);
+          } else if (feedback.paceRating === 'too_fast') {
+            prefs.initialSpeed = Math.max(prefs.initialSpeed - 0.1, 0.5);
+          }
+
+          if (feedback.listenCountRating === 'fewer') {
+            prefs.listenCount = Math.max(prefs.listenCount - 1, 1);
+          } else if (feedback.listenCountRating === 'more') {
+            prefs.listenCount = Math.min(prefs.listenCount + 1, 5);
+          }
+
+          if (
+            !feedback.helpfulAspects.includes('translation') &&
+            !feedback.helpfulAspects.includes('all')
+          ) {
+            prefs.showTranslationDuringPractice = false;
+          }
+
+          return { coachingPreferences: prefs };
+        }),
+
+      sectionProgress: {},
+
+      updateSectionProgress: (key, updates) =>
+        set((state) => {
+          const defaults: SectionCoachingProgress = {
+            coachingComplete: false,
+            currentStep: 'listen' as CoachingPhase,
+            listenCount: 0,
+            lastPracticed: '',
+          };
+          const existing = state.sectionProgress[key] || defaults;
+          return {
+            sectionProgress: {
+              ...state.sectionProgress,
+              [key]: { ...existing, ...updates },
+            },
+          };
+        }),
+
+      markSectionCoached: (prayerId, sectionId) =>
+        set((state) => {
+          const key = `${prayerId}:${sectionId}`;
+          return {
+            hasUsedCoaching: true,
+            sectionProgress: {
+              ...state.sectionProgress,
+              [key]: {
+                ...(state.sectionProgress[key] || { listenCount: 0, currentStep: 'listen' as CoachingPhase }),
+                coachingComplete: true,
+                lastPracticed: new Date().toISOString().split('T')[0],
+              },
+            },
+          };
+        }),
+
+      isSectionCoached: (prayerId, sectionId) => {
+        const key = `${prayerId}:${sectionId}`;
+        return get().sectionProgress[key]?.coachingComplete === true;
+      },
+
+      isPrayerFullyCoached: (prayerId, sectionIds) => {
+        const state = get();
+        return sectionIds.every(
+          (sid) => state.sectionProgress[`${prayerId}:${sid}`]?.coachingComplete === true
+        );
+      },
+
+      getSectionStep: (prayerId, sectionId) => {
+        const key = `${prayerId}:${sectionId}`;
+        return get().sectionProgress[key]?.currentStep || null;
+      },
+
+      hasUsedCoaching: false,
     }),
     {
       name: 'alephstart-user',

@@ -6,6 +6,7 @@ import Link from 'next/link';
 import confetti from 'canvas-confetti';
 import { useBootcampStore } from '@/stores/bootcampStore';
 import { useUserStore } from '@/stores/userStore';
+import { track } from '@/lib/analytics';
 
 export default function BootcampGraduationPage() {
   const { isBootcampComplete } = useBootcampStore();
@@ -25,6 +26,7 @@ export default function BootcampGraduationPage() {
       if (!hasMilestone('full_alephbet')) {
         earnMilestone('full_alephbet');
       }
+      track('bootcamp_complete');
     }
 
     // Grand confetti

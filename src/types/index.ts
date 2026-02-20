@@ -134,6 +134,7 @@ export interface WordTiming {
 
 // --- User & Progress Types ---
 export type Nusach = 'ashkenaz' | 'sefard' | 'edot';
+export type Pronunciation = 'modern' | 'american';
 export type TransliterationMode = 'full' | 'faded' | 'tap' | 'off';
 export type LearningGoal = 'daven' | 'learn' | 'explore' | 'all';
 export type HebrewLevel = 'none' | 'some_letters' | 'read_slow' | 'read_improve';
@@ -144,6 +145,7 @@ export interface UserProfile {
   email?: string;
   currentLevel: number;
   nusach: Nusach;
+  pronunciation: Pronunciation;
   dailyGoalMinutes: number;
   transliterationMode: TransliterationMode;
   audioSpeed: number;
@@ -155,6 +157,26 @@ export interface UserProfile {
   learningGoal: LearningGoal;
   hebrewLevel: HebrewLevel;
   onboardingComplete: boolean;
+  // Streak freeze
+  streakFreezes: number; // available freezes (max 2)
+  lastStreakFreezeWeek?: string; // ISO week string for weekly freeze grant
+}
+
+export interface DailyQuest {
+  id: string;
+  label: string;
+  target: number;
+  current: number;
+  completed: boolean;
+}
+
+export interface LearnSession {
+  currentLesson: number;
+  phase: 'teach' | 'drill' | 'complete';
+  teachIndex: number;
+  drillIndex: number;
+  drillScore: number;
+  savedAt: string;
 }
 
 export interface SkillProgress {
@@ -222,6 +244,38 @@ export interface PracticeSession {
   attempts: Attempt[];
   startedAt: Date;
   isComplete: boolean;
+}
+
+// --- Coaching Types ---
+export type CoachingPhase =
+  | 'context'
+  | 'listen'
+  | 'follow_along'
+  | 'say_together'
+  | 'try_yourself'
+  | 'section_complete'
+  | 'feedback';
+
+export interface CoachingPreferences {
+  listenCount: number;         // default 3, range 1-5
+  followAlongCount: number;    // default 2, range 1-3
+  sayTogetherCount: number;    // default 2, range 1-3
+  initialSpeed: number;        // default 0.75
+  showTranslationDuringPractice: boolean;
+  skipContextCard: boolean;
+}
+
+export interface SectionCoachingProgress {
+  coachingComplete: boolean;
+  currentStep: CoachingPhase;
+  listenCount: number;
+  lastPracticed: string;
+}
+
+export interface CoachingFeedback {
+  paceRating: 'too_slow' | 'just_right' | 'too_fast';
+  listenCountRating: 'fewer' | 'perfect' | 'more';
+  helpfulAspects: ('hearing' | 'transliteration' | 'translation' | 'all')[];
 }
 
 // --- FSRS Card State ---

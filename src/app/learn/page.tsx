@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useUserStore } from '@/stores/userStore';
@@ -9,6 +9,7 @@ import { LetterCard } from '@/components/learn/LetterCard';
 import { AudioButton } from '@/components/ui/AudioButton';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { MilestoneToast } from '@/components/ui/MilestoneToast';
+import { track } from '@/lib/analytics';
 import type { Letter, MilestoneType } from '@/types';
 
 // Group letters into lessons of 3
@@ -23,6 +24,10 @@ const totalLessons = Math.ceil(LETTERS.length / LESSON_SIZE);
 type Phase = 'teach' | 'drill' | 'review' | 'complete';
 
 export default function LearnPage() {
+  const learnSession = useUserStore((s) => s.learnSession);
+  const saveLearnSession = useUserStore((s) => s.saveLearnSession);
+  const clearLearnSession = useUserStore((s) => s.clearLearnSession);
+
   const [currentLesson, setCurrentLesson] = useState(0);
   const [phase, setPhase] = useState<Phase>('teach');
   const [teachIndex, setTeachIndex] = useState(0);
@@ -32,6 +37,45 @@ export default function LearnPage() {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
   const [milestone, setMilestone] = useState<MilestoneType | null>(null);
+  const [showResumePrompt, setShowResumePrompt] = useState(false);
+
+  // Check for saved session on mount
+  useEffect(() => {
+    if (learnSession && learnSession.phase !== 'complete') {
+      setShowResumePrompt(true);
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const resumeSession = () => {
+    if (learnSession) {
+      setCurrentLesson(learnSession.currentLesson);
+      setPhase(learnSession.phase === 'complete' ? 'teach' : learnSession.phase);
+      setTeachIndex(learnSession.teachIndex);
+      setDrillIndex(learnSession.drillIndex);
+      setDrillScore(learnSession.drillScore);
+      track('lesson_resumed', { lesson: learnSession.currentLesson });
+    }
+    setShowResumePrompt(false);
+  };
+
+  const startFresh = () => {
+    clearLearnSession();
+    setShowResumePrompt(false);
+  };
+
+  // Save session state on meaningful changes
+  useEffect(() => {
+    if (phase !== 'complete' && !showResumePrompt) {
+      saveLearnSession({
+        currentLesson,
+        phase: phase as 'teach' | 'drill' | 'complete',
+        teachIndex,
+        drillIndex,
+        drillScore,
+        savedAt: new Date().toISOString(),
+      });
+    }
+  }, [currentLesson, phase, teachIndex, drillIndex, drillScore, showResumePrompt, saveLearnSession]);
 
   const updateSkillProgress = useUserStore((s) => s.updateSkillProgress);
   const recordPractice = useUserStore((s) => s.recordPractice);
@@ -103,6 +147,8 @@ export default function LearnPage() {
           earnMilestone('full_alephbet');
           setMilestone('full_alephbet');
         }
+        track('lesson_complete', { lesson: currentLesson, score: drillScore, total: drillTotal + 1 });
+        clearLearnSession();
         setPhase('complete');
       }
     }, 1200);
@@ -117,6 +163,41 @@ export default function LearnPage() {
       setDrillIndex(0);
     }
   };
+
+  // Resume prompt overlay
+  if (showResumePrompt && learnSession) {
+    const resumeLetters = getLessonLetters(learnSession.currentLesson);
+    return (
+      <div className="min-h-screen bg-[#FEFDFB] flex items-center justify-center px-6">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="bg-white rounded-2xl border border-gray-100 shadow-md p-8 max-w-sm w-full text-center space-y-4"
+        >
+          <p className="text-4xl">📖</p>
+          <h2 className="text-xl font-bold text-[#2D3142]">Welcome back!</h2>
+          <p className="text-sm text-gray-500">
+            You were on Lesson {learnSession.currentLesson + 1} — learning{' '}
+            {resumeLetters.map((l) => l.name).join(', ')}
+          </p>
+          <div className="space-y-2 pt-2">
+            <button
+              onClick={resumeSession}
+              className="w-full bg-[#1B4965] text-white py-3.5 rounded-xl font-medium hover:bg-[#163d55] transition-colors"
+            >
+              Continue Where I Left Off
+            </button>
+            <button
+              onClick={startFresh}
+              className="w-full border-2 border-gray-200 text-gray-600 py-3 rounded-xl font-medium hover:border-[#1B4965] transition-colors"
+            >
+              Start from Beginning
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#FEFDFB]">

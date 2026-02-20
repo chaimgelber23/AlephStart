@@ -1,26 +1,43 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { BottomNav } from '@/components/ui/BottomNav';
 import { getTefillahPrayers, getBrachotPrayers } from '@/lib/content/prayers';
+import { DAVENING_LEVELS } from '@/lib/content/davening-levels';
+import { useAudio } from '@/hooks/useAudio';
 import { useUserStore } from '@/stores/userStore';
+import { CoachingOverlay } from '@/components/siddur/CoachingOverlay';
 import type { Prayer } from '@/types';
 
 type Tab = 'tefillah' | 'brachot';
 
 export default function SiddurPage() {
   const [selectedPrayer, setSelectedPrayer] = useState<Prayer | null>(null);
-  const [mode, setMode] = useState<'listen' | 'read'>('listen');
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const [highlightedWordIndex, setHighlightedWordIndex] = useState(-1);
   const [showTransliteration, setShowTransliteration] = useState(true);
   const [showTranslation, setShowTranslation] = useState(false);
+  const [showCoaching, setShowCoaching] = useState(false);
+  const [dismissedBanner, setDismissedBanner] = useState(false);
+
+  const pronunciation = useUserStore((s) => s.profile.pronunciation);
+  const audioSpeed = useUserStore((s) => s.profile.audioSpeed);
+  const updateProfile = useUserStore((s) => s.updateProfile);
+  const hasUsedCoaching = useUserStore((s) => s.hasUsedCoaching);
+  const isPrayerFullyCoached = useUserStore((s) => s.isPrayerFullyCoached);
+  const audioOptions = useMemo(() => ({ speed: audioSpeed, pronunciation }), [audioSpeed, pronunciation]);
+  const { play, stop, isPlaying, isLoading } = useAudio(audioOptions);
 
   if (!selectedPrayer) {
     return <PrayerList onSelect={setSelectedPrayer} />;
   }
+
+  // Check if this prayer has been fully coached
+  const sectionIds = selectedPrayer.sections.map((s) => s.id);
+  const isCoached = isPrayerFullyCoached(selectedPrayer.id, sectionIds);
+  const showFirstTimeBanner = !hasUsedCoaching && !isCoached && !dismissedBanner;
 
   const currentSection = selectedPrayer.sections[currentSectionIndex];
   const words = currentSection?.hebrewText.split(' ') || [];
@@ -68,6 +85,31 @@ export default function SiddurPage() {
       </div>
 
       <div className="max-w-md mx-auto px-6 py-6 space-y-6">
+        {/* First-time coaching banner */}
+        {showFirstTimeBanner && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-[#C6973F]/10 border border-[#C6973F]/20 rounded-2xl p-4 flex items-center gap-3"
+          >
+            <span className="text-xl">&#x1F393;</span>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-[#2D3142]">First time?</p>
+              <p className="text-xs text-gray-500">
+                Tap &quot;Coach&quot; below to learn this step by step
+              </p>
+            </div>
+            <button
+              onClick={() => setDismissedBanner(true)}
+              className="text-gray-400 hover:text-gray-600 p-1"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M18 6L6 18M6 6l12 12" />
+              </svg>
+            </button>
+          </motion.div>
+        )}
+
         {/* Prayer Context Card */}
         {currentSectionIndex === 0 && (
           <motion.div
@@ -76,7 +118,7 @@ export default function SiddurPage() {
             className="bg-[#1B4965]/5 rounded-2xl p-5"
           >
             <div className="flex items-start gap-3">
-              <span className="text-2xl mt-0.5">💡</span>
+              <span className="text-2xl mt-0.5">&#x1F4A1;</span>
               <div>
                 <p className="text-sm font-medium text-[#1B4965]">
                   When: {selectedPrayer.whenSaid}
@@ -84,33 +126,55 @@ export default function SiddurPage() {
                 <p className="text-sm text-gray-600 mt-2">
                   {selectedPrayer.inspirationText}
                 </p>
+                {selectedPrayer.whySaid && (
+                  <p className="text-sm text-gray-500 mt-2 italic">
+                    {selectedPrayer.whySaid}
+                  </p>
+                )}
               </div>
             </div>
           </motion.div>
         )}
 
-        {/* Mode Toggle */}
-        <div className="flex gap-2 bg-gray-100 rounded-xl p-1">
+        {/* Listen Controls */}
+        <div className="space-y-2">
           <button
-            onClick={() => setMode('listen')}
-            className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-              mode === 'listen'
-                ? 'bg-white text-[#1B4965] shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
+            onClick={() => {
+              if (isPlaying) {
+                stop();
+              } else if (currentSection) {
+                const text = pronunciation === 'american'
+                  ? currentSection.transliteration
+                  : currentSection.hebrewText;
+                const audioMode = pronunciation === 'american' ? 'transliteration' : 'hebrew';
+                play(text, audioMode, audioSpeed, selectedPrayer.id, currentSection.id);
+              }
+            }}
+            disabled={isLoading}
+            className={`w-full py-3 rounded-xl text-sm font-medium transition-all ${
+              isPlaying
+                ? 'bg-[#C17767] text-white'
+                : isLoading
+                ? 'bg-gray-200 text-gray-400'
+                : 'bg-[#1B4965] text-white hover:bg-[#163d55]'
             }`}
           >
-            👂 Listen
+            {isLoading ? 'Loading...' : isPlaying ? '⏹ Stop' : '▶ Listen'}
           </button>
-          <button
-            onClick={() => setMode('read')}
-            className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-              mode === 'read'
-                ? 'bg-white text-[#1B4965] shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            📖 Read
-          </button>
+          <div className="flex items-center gap-3 px-1">
+            <span className="text-xs text-gray-400 w-8">🐢</span>
+            <input
+              type="range"
+              min={0.5}
+              max={2}
+              step={0.25}
+              value={audioSpeed}
+              onChange={(e) => updateProfile({ audioSpeed: parseFloat(e.target.value) })}
+              className="flex-1 accent-[#1B4965] h-1.5"
+            />
+            <span className="text-xs text-gray-400 w-8 text-right">🐇</span>
+            <span className="text-xs font-medium text-[#1B4965] w-10 text-right">{audioSpeed}x</span>
+          </div>
         </div>
 
         {/* Hebrew Text Display */}
@@ -153,26 +217,27 @@ export default function SiddurPage() {
               </div>
             </div>
 
-            {/* Transliteration */}
-            {showTransliteration && currentSection?.transliteration && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-center text-base text-gray-400 mt-4 italic"
-              >
-                {currentSection.transliteration}
-              </motion.p>
+            {/* Transliteration — right under Hebrew so users can pronounce it */}
+            {currentSection?.transliteration && (
+              <div className="mt-2 text-center">
+                <p className="text-[10px] uppercase tracking-widest text-[#1B4965]/40 font-semibold mb-0.5">How to say it</p>
+                <p className="text-lg text-[#1B4965]/70 italic font-medium">
+                  {currentSection.transliteration}
+                </p>
+              </div>
             )}
 
+            {/* Divider */}
+            <div className="mt-4 mb-2 border-t border-gray-100" />
+
             {/* Translation */}
-            {showTranslation && currentSection?.translation && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-center text-base text-gray-500 mt-3"
-              >
-                {currentSection.translation}
-              </motion.p>
+            {currentSection?.translation && (
+              <div className="text-center">
+                <p className="text-[10px] uppercase tracking-widest text-[#1B4965]/40 font-semibold mb-0.5">What it means</p>
+                <p className="text-sm text-gray-400">
+                  {currentSection.translation}
+                </p>
+              </div>
             )}
 
             {/* Word-level notes */}
@@ -235,41 +300,93 @@ export default function SiddurPage() {
           </button>
         </div>
 
-        {/* Toggle buttons */}
-        <div className="flex gap-3">
-          <button
-            onClick={() => setShowTransliteration(!showTransliteration)}
-            className={`flex-1 py-2.5 rounded-xl text-sm font-medium border-2 transition-colors ${
-              showTransliteration
-                ? 'border-[#1B4965] text-[#1B4965] bg-[#1B4965]/5'
-                : 'border-gray-200 text-gray-400'
-            }`}
-          >
-            Transliteration {showTransliteration ? 'ON' : 'OFF'}
-          </button>
-          <button
-            onClick={() => setShowTranslation(!showTranslation)}
-            className={`flex-1 py-2.5 rounded-xl text-sm font-medium border-2 transition-colors ${
-              showTranslation
-                ? 'border-[#1B4965] text-[#1B4965] bg-[#1B4965]/5'
-                : 'border-gray-200 text-gray-400'
-            }`}
-          >
-            Translation {showTranslation ? 'ON' : 'OFF'}
-          </button>
-        </div>
       </div>
+
+      {/* Coach me floating button */}
+      <motion.button
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ delay: 0.5 }}
+        onClick={() => { stop(); setShowCoaching(true); }}
+        className="fixed bottom-24 right-6 bg-[#C6973F] text-white px-5 py-3 rounded-full shadow-lg hover:bg-[#b8892f] active:scale-95 transition-all flex items-center gap-2 z-20"
+      >
+        <span className="text-base">&#x1F393;</span>
+        <span className="text-sm font-medium">Coach</span>
+      </motion.button>
+
+      {/* Coaching overlay */}
+      <AnimatePresence>
+        {showCoaching && (
+          <CoachingOverlay
+            prayer={selectedPrayer}
+            initialSectionIndex={currentSectionIndex}
+            onClose={() => setShowCoaching(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
+  );
+}
+
+function PrayerCard({ prayer, onSelect }: { prayer: Prayer; onSelect: (p: Prayer) => void }) {
+  const isPrayerCoached = useUserStore((s) =>
+    s.isPrayerFullyCoached(prayer.id, prayer.sections.map((sec) => sec.id))
+  );
+
+  return (
+    <button
+      onClick={() => onSelect(prayer)}
+      className="w-full rounded-2xl border bg-white border-gray-100 hover:shadow-md hover:border-[#5FA8D3]/30 cursor-pointer p-4 text-left transition-all"
+    >
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
+            isPrayerCoached
+              ? 'bg-[#4A7C59]/10 text-[#4A7C59]'
+              : 'bg-[#1B4965]/10 text-[#1B4965]'
+          }`}>
+            {isPrayerCoached ? (
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+            ) : (
+              prayer.sortOrder
+            )}
+          </div>
+          <div>
+            <h3 className="font-semibold text-[#2D3142] text-sm">{prayer.nameEnglish}</h3>
+            <p dir="rtl" className="font-[var(--font-hebrew-serif)] text-base text-gray-500">
+              {prayer.nameHebrew}
+            </p>
+          </div>
+        </div>
+        <span className="text-gray-300 text-lg">→</span>
+      </div>
+      {prayer.sections.length > 4 && (
+        <div className="mt-2 flex items-center gap-2 ml-11">
+          <span className="text-xs bg-[#1B4965]/5 text-[#1B4965] px-2 py-0.5 rounded-full font-medium">
+            {prayer.sections.length} sections
+          </span>
+          {prayer.estimatedReadSeconds >= 60 && (
+            <span className="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full">
+              ~{Math.ceil(prayer.estimatedReadSeconds / 60)} min
+            </span>
+          )}
+        </div>
+      )}
+    </button>
   );
 }
 
 function PrayerList({ onSelect }: { onSelect: (prayer: Prayer) => void }) {
   const [activeTab, setActiveTab] = useState<Tab>('tefillah');
-  const userLevel = useUserStore((s) => s.profile.currentLevel);
+  const [expandedLevel, setExpandedLevel] = useState<number>(1);
 
   const tefillahPrayers = getTefillahPrayers();
   const brachotPrayers = getBrachotPrayers();
-  const prayers = activeTab === 'tefillah' ? tefillahPrayers : brachotPrayers;
+
+  // Build a map of prayerId -> Prayer for quick lookup
+  const prayerMap = new Map(tefillahPrayers.map((p) => [p.id, p]));
 
   return (
     <div className="min-h-screen bg-[#FEFDFB]">
@@ -281,7 +398,7 @@ function PrayerList({ onSelect }: { onSelect: (prayer: Prayer) => void }) {
           </Link>
           <h1 className="text-2xl font-bold mt-2">Your Siddur</h1>
           <p className="text-[#5FA8D3] text-sm mt-1">
-            Learn each prayer and bracha step by step
+            Build up to the full Shacharis, level by level
           </p>
         </div>
       </div>
@@ -297,7 +414,7 @@ function PrayerList({ onSelect }: { onSelect: (prayer: Prayer) => void }) {
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
-            Tefillah
+            Davening
           </button>
           <button
             onClick={() => setActiveTab('brachot')}
@@ -311,86 +428,107 @@ function PrayerList({ onSelect }: { onSelect: (prayer: Prayer) => void }) {
           </button>
         </div>
 
-        {/* Section description */}
-        <p className="text-xs text-gray-400 mb-4 px-1">
-          {activeTab === 'tefillah'
-            ? 'Core prayers of the daily davening — from Modeh Ani to the full Amidah'
-            : 'Blessings over food and drink — know which bracha to say and when'}
-        </p>
+        {activeTab === 'tefillah' ? (
+          <div className="space-y-4">
+            {/* Level progression */}
+            {DAVENING_LEVELS.map((level) => {
+              const isExpanded = expandedLevel === level.level;
+              const levelPrayers = level.prayerIds
+                .map((id) => prayerMap.get(id))
+                .filter(Boolean) as Prayer[];
 
-        {/* Prayer cards */}
-        <div className="space-y-3">
-          {prayers.map((prayer, i) => {
-            const isLocked = userLevel < prayer.requiredLevel;
+              return (
+                <motion.div
+                  key={level.level}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: level.level * 0.05 }}
+                >
+                  {/* Level header */}
+                  <button
+                    onClick={() => setExpandedLevel(isExpanded ? -1 : level.level)}
+                    className="w-full text-left"
+                  >
+                    <div className={`rounded-2xl border-2 p-4 transition-all ${
+                      isExpanded
+                        ? 'border-[#1B4965] bg-[#1B4965]/5'
+                        : 'border-gray-100 bg-white hover:border-gray-200'
+                    }`}>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${
+                            isExpanded
+                              ? 'bg-[#1B4965] text-white'
+                              : 'bg-gray-100 text-gray-500'
+                          }`}>
+                            {level.level}
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-[#2D3142]">{level.title}</h3>
+                            <p className="text-xs text-gray-500">{level.subtitle}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs text-gray-400">{levelPrayers.length} prayers</span>
+                          <span className={`text-gray-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`}>
+                            ▾
+                          </span>
+                        </div>
+                      </div>
 
-            return (
+                      {!isExpanded && (
+                        <p className="text-xs text-gray-400 mt-2 ml-[52px]">
+                          {level.description}
+                        </p>
+                      )}
+                    </div>
+                  </button>
+
+                  {/* Expanded prayers */}
+                  <AnimatePresence>
+                    {isExpanded && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="pt-2 pl-5 border-l-2 border-[#1B4965]/20 ml-7 space-y-2 mt-2">
+                          <p className="text-sm text-gray-600 mb-3 pl-4">
+                            {level.description}
+                          </p>
+                          {levelPrayers.map((prayer) => (
+                            <PrayerCard key={prayer.id} prayer={prayer} onSelect={onSelect} />
+                          ))}
+                        </div>
+                        <p className="text-xs text-[#4A7C59] font-medium mt-3 ml-[52px]">
+                          {level.milestone}
+                        </p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <p className="text-xs text-gray-400 mb-4 px-1">
+              Blessings over food and drink — know which bracha to say and when
+            </p>
+            {brachotPrayers.map((prayer, i) => (
               <motion.div
                 key={prayer.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.04 }}
               >
-                <button
-                  onClick={() => !isLocked && onSelect(prayer)}
-                  disabled={isLocked}
-                  className={`w-full rounded-2xl border p-5 text-left transition-all ${
-                    isLocked
-                      ? 'bg-gray-50 border-gray-100 opacity-70 cursor-not-allowed'
-                      : 'bg-white border-gray-100 hover:shadow-md hover:border-[#5FA8D3]/30 cursor-pointer'
-                  }`}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-4">
-                      {/* Icon / Lock */}
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold ${
-                        isLocked
-                          ? 'bg-gray-200 text-gray-400'
-                          : 'bg-[#1B4965]/10 text-[#1B4965]'
-                      }`}>
-                        {isLocked ? '🔒' : prayer.sortOrder}
-                      </div>
-                      <div>
-                        <h3 className={`font-semibold ${isLocked ? 'text-gray-400' : 'text-[#2D3142]'}`}>
-                          {prayer.nameEnglish}
-                        </h3>
-                        <p
-                          dir="rtl"
-                          className={`font-[var(--font-hebrew-serif)] text-lg mt-0.5 ${
-                            isLocked ? 'text-gray-300' : 'text-gray-500'
-                          }`}
-                        >
-                          {prayer.nameHebrew}
-                        </p>
-                        <p className={`text-xs mt-1 ${isLocked ? 'text-gray-300' : 'text-gray-400'}`}>
-                          {isLocked
-                            ? `Unlocks at Level ${prayer.requiredLevel}`
-                            : prayer.whenSaid}
-                        </p>
-                      </div>
-                    </div>
-                    <span className={`text-xl ${isLocked ? 'text-gray-200' : 'text-gray-300'}`}>
-                      {isLocked ? '' : '→'}
-                    </span>
-                  </div>
-
-                  {/* Sections count badge */}
-                  {!isLocked && prayer.sections.length > 4 && (
-                    <div className="mt-3 flex items-center gap-2">
-                      <span className="text-xs bg-[#1B4965]/5 text-[#1B4965] px-2.5 py-1 rounded-full font-medium">
-                        {prayer.sections.length} sections
-                      </span>
-                      {prayer.estimatedReadSeconds >= 60 && (
-                        <span className="text-xs bg-gray-100 text-gray-500 px-2.5 py-1 rounded-full">
-                          ~{Math.ceil(prayer.estimatedReadSeconds / 60)} min
-                        </span>
-                      )}
-                    </div>
-                  )}
-                </button>
+                <PrayerCard prayer={prayer} onSelect={onSelect} />
               </motion.div>
-            );
-          })}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       <BottomNav />

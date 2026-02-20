@@ -152,7 +152,7 @@ export function WelcomePage() {
                 {([
                   { value: 'ashkenaz' as const, label: 'Ashkenazi', desc: 'European tradition (most common in US)' },
                   { value: 'sefard' as const, label: 'Sephardi / Mizrachi / Chabad', desc: 'Middle Eastern / North African / Chassidic' },
-                  { value: 'ashkenaz' as const, label: "I'm not sure yet", desc: "No problem — we'll use standard pronunciation" },
+                  { value: 'ashkenaz' as const, label: "I'm not sure yet", desc: "No problem — we'll start with Ashkenazi and you can change anytime in Settings" },
                 ]).map((option, i) => (
                   <button
                     key={i}
