@@ -78,28 +78,24 @@ export function Dashboard() {
 
   // Daily quests
   const quests = useMemo(() => {
-    const q: { label: string; done: boolean; icon: string }[] = [];
+    const q: { label: string; done: boolean }[] = [];
     q.push({
       label: `Study ${profile.dailyGoalMinutes} min`,
       done: todayMinutes >= profile.dailyGoalMinutes,
-      icon: '⏱',
     });
     q.push({
       label: 'Practice 5 items',
       done: todayItems >= 5,
-      icon: '✏️',
     });
     if (!bootcampDone && bootcampEnrolled) {
       q.push({
         label: 'Bootcamp session',
         done: false,
-        icon: '🏕️',
       });
     } else {
       q.push({
         label: 'Review in Practice',
         done: todayItems >= 10,
-        icon: '🧠',
       });
     }
     return q;
@@ -118,7 +114,7 @@ export function Dashboard() {
   return (
     <div className="min-h-screen bg-[#F8F7F4]">
       {/* ── Header ── */}
-      <div className="bg-gradient-to-b from-[#1B4965] to-[#1A3F57] text-white px-6 pt-8 pb-14">
+      <div className="bg-gradient-to-b from-[#1B4965] to-[#1A3F57] text-white px-6 pt-8 pb-6">
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -142,10 +138,10 @@ export function Dashboard() {
 
           {/* Greeting block — left aligned, compact */}
           <div className="space-y-1">
-            <h1 className="text-[28px] font-bold leading-tight tracking-tight">{greeting}</h1>
+            <h1 className="text-2xl font-bold leading-tight tracking-tight">{greeting}</h1>
             <p
               dir="rtl"
-              className="font-[var(--font-hebrew-serif)] text-[17px] text-white/50"
+              className="font-[var(--font-hebrew-serif)] text-2xl text-white/50"
             >
               {greetingHebrew}
             </p>
@@ -154,7 +150,6 @@ export function Dashboard() {
           {/* Stats row — streak + daily goal side by side */}
           <div className="flex items-center gap-3 mt-5">
             <div className="flex items-center gap-2 bg-white/[0.08] backdrop-blur-sm rounded-xl px-4 py-2.5 flex-1">
-              <span className="text-base">🔥</span>
               <div>
                 <p className="text-[13px] font-semibold leading-tight">
                   {profile.streakDays} {profile.streakDays === 1 ? 'day' : 'days'}
@@ -205,8 +200,8 @@ export function Dashboard() {
         </motion.div>
       </div>
 
-      {/* ── Main Content ── overlapping the header */}
-      <div className="max-w-md mx-auto px-5 -mt-8 pb-24 space-y-3.5">
+      {/* ── Main Content ── */}
+      <div className="max-w-md mx-auto px-5 pt-4 pb-24 space-y-3.5">
         {/* Welcome back banner */}
         {showWelcomeBack && (
           <motion.div
@@ -318,6 +313,30 @@ export function Dashboard() {
           </>
         )}
 
+        {/* Learn Prayers */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.12 }}
+        >
+          <Link href="/siddur">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100/80 p-4 hover:shadow-md transition-all flex items-center gap-4">
+              <div className="bg-[#C6973F]/8 w-11 h-11 rounded-xl flex items-center justify-center shrink-0">
+                <span className="text-[#C6973F] font-bold text-lg font-[var(--font-hebrew-serif)]">ש</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[15px] font-semibold text-[#2D3142]">Learn Prayers</p>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  Practice davening with audio and transliteration
+                </p>
+              </div>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" strokeWidth="2" className="shrink-0">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </div>
+          </Link>
+        </motion.div>
+
         {/* Today's Goals */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -345,7 +364,6 @@ export function Dashboard() {
                     </svg>
                   )}
                 </div>
-                <span className="text-[13px]">{q.icon}</span>
                 <span className={`text-[13px] ${q.done ? 'text-gray-300 line-through' : 'text-[#2D3142] font-medium'}`}>
                   {q.label}
                 </span>
