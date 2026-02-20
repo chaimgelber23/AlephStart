@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { useUserStore } from '@/stores/userStore';
+import { useAuthStore } from '@/stores/authStore';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { LETTERS } from '@/lib/content/letters';
 import { CORE_VOWELS } from '@/lib/content/vowels';
@@ -12,6 +13,7 @@ export function Dashboard() {
   const profile = useUserStore((s) => s.profile);
   const skillProgress = useUserStore((s) => s.skillProgress);
   const milestones = useUserStore((s) => s.milestones);
+  const authStatus = useAuthStore((s) => s.status);
 
   // Calculate overall progress
   const totalLetters = LETTERS.length;
@@ -40,7 +42,21 @@ export function Dashboard() {
           animate={{ opacity: 1, y: 0 }}
           className="max-w-md mx-auto"
         >
-          <p className="text-[#5FA8D3] text-sm font-medium">{greeting}</p>
+          <div className="flex items-center justify-between">
+            <p className="text-[#5FA8D3] text-sm font-medium">{greeting}</p>
+            {authStatus === 'authenticated' && (
+              <Link
+                href="/settings"
+                className="text-[#5FA8D3] hover:text-white transition-colors"
+                aria-label="Settings"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </Link>
+            )}
+          </div>
           <h1
             dir="rtl"
             className="font-[var(--font-hebrew-serif)] text-3xl mt-1"
@@ -65,6 +81,27 @@ export function Dashboard() {
 
       {/* Main Content */}
       <div className="max-w-md mx-auto px-6 -mt-4 space-y-6">
+        {/* Auth Banner for unsigned users */}
+        {authStatus === 'unauthenticated' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-2xl border border-[#5FA8D3]/30 p-4 flex items-center gap-4"
+          >
+            <div className="text-2xl">☁️</div>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-[#2D3142]">Save your progress</p>
+              <p className="text-xs text-gray-500">Sync across devices with a free account</p>
+            </div>
+            <Link
+              href="/signup"
+              className="px-4 py-2 rounded-xl bg-[#1B4965] text-white text-xs font-medium hover:bg-[#163d55] transition-colors whitespace-nowrap"
+            >
+              Sign Up
+            </Link>
+          </motion.div>
+        )}
+
         {/* Continue Learning Card */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -215,6 +252,7 @@ export function Dashboard() {
           <NavItem href="/learn" icon="📚" label="Learn" />
           <NavItem href="/practice" icon="✏️" label="Practice" />
           <NavItem href="/siddur" icon="📖" label="Siddur" />
+          <NavItem href={authStatus === 'authenticated' ? '/settings' : '/login'} icon="⚙️" label="Settings" />
         </div>
       </nav>
     </div>

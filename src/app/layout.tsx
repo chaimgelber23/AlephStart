@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Noto_Serif_Hebrew, Noto_Sans_Hebrew } from "next/font/google";
+import { Analytics } from "@vercel/analytics/react";
+import { AuthProvider } from "@/components/AuthProvider";
 import "./globals.css";
 
 const inter = Inter({
@@ -48,7 +50,8 @@ export default function RootLayout({
           font-sans antialiased bg-[#FEFDFB] text-[#2D3142] min-h-screen
         `}
       >
-        {children}
+        <AuthProvider>{children}</AuthProvider>
+        <Analytics />
       </body>
     </html>
   );
