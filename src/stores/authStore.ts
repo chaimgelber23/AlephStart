@@ -52,7 +52,6 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
       password,
       options: {
         data: { display_name: displayName },
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     });
     return { error: error?.message ?? null };

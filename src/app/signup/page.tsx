@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useAuthStore } from '@/stores/authStore';
@@ -13,8 +14,8 @@ export default function SignUpPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
   const signUp = useAuthStore((s) => s.signUp);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,40 +39,9 @@ export default function SignUpPage() {
       setLoading(false);
     } else {
       track('signup');
-      setSuccess(true);
-      setLoading(false);
+      router.push('/');
     }
   };
-
-  if (success) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="w-full max-w-md"
-        >
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 text-center space-y-4">
-            <div className="text-5xl">✉️</div>
-            <h2 className="text-2xl font-bold text-[#2D3142]">Check Your Email</h2>
-            <p className="text-gray-600">
-              We sent a verification link to <strong>{email}</strong>. Click the link to
-              activate your account.
-            </p>
-            <p className="text-sm text-gray-400">
-              Didn&apos;t get it? Check your spam folder.
-            </p>
-            <Link
-              href="/login"
-              className="inline-block mt-4 text-[#1B4965] font-medium hover:underline"
-            >
-              Back to Sign In
-            </Link>
-          </div>
-        </motion.div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12">
