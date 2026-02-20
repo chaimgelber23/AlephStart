@@ -51,6 +51,47 @@ const MILESTONE_DATA: Record<MilestoneType, { title: string; message: string; ic
     message: "You can daven on your own. This is an extraordinary accomplishment.",
     icon: '🏆',
   },
+  // Bootcamp milestones
+  bootcamp_day1: {
+    title: 'Day 1 Complete!',
+    message: "You learned 5 letters and 2 vowels. You're reading Hebrew syllables!",
+    icon: '🔥',
+  },
+  bootcamp_day2: {
+    title: 'Day 2 Complete!',
+    message: 'You can read the bracha formula — words Jews have been saying for thousands of years.',
+    icon: '🔥',
+  },
+  bootcamp_day3: {
+    title: 'Day 3 Complete!',
+    message: 'You read the complete bracha formula. You can say a bracha in Hebrew!',
+    icon: '🔥',
+  },
+  bootcamp_day4: {
+    title: 'Day 4 Complete!',
+    message: 'You know the entire Aleph-Bet! Every letter, every vowel. You read Modeh Ani today.',
+    icon: '🔥',
+  },
+  bootcamp_day5: {
+    title: 'Day 5 Complete!',
+    message: 'You read the Shema. You read brachot. You can read Hebrew.',
+    icon: '🔥',
+  },
+  bootcamp_complete: {
+    title: 'Bootcamp Graduate!',
+    message: 'In just 5 sessions, you went from zero to reading Hebrew. You\'ve joined a 3,000-year tradition.',
+    icon: '🎓',
+  },
+  bootcamp_first_word: {
+    title: 'First Bootcamp Word!',
+    message: 'You just read your first Hebrew word in bootcamp. The journey has begun.',
+    icon: '✨',
+  },
+  bootcamp_50_words: {
+    title: '50 Words!',
+    message: "You can read 50 Hebrew words. That's enough to follow along with basic prayers.",
+    icon: '📚',
+  },
 };
 
 interface MilestoneToastProps {

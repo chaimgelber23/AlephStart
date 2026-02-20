@@ -199,7 +199,16 @@ export type MilestoneType =
   | 'shema_reader'
   | 'bracha_master'
   | 'shul_ready'
-  | 'independent_davener';
+  | 'independent_davener'
+  // Bootcamp milestones
+  | 'bootcamp_day1'
+  | 'bootcamp_day2'
+  | 'bootcamp_day3'
+  | 'bootcamp_day4'
+  | 'bootcamp_day5'
+  | 'bootcamp_complete'
+  | 'bootcamp_first_word'
+  | 'bootcamp_50_words';
 
 export interface Milestone {
   type: MilestoneType;
@@ -225,4 +234,109 @@ export interface CardReview {
   reps: number;
   lapses: number;
   state: 'new' | 'learning' | 'review' | 'relearning';
+}
+
+// ==========================================
+// BOOTCAMP TYPES
+// ==========================================
+
+export type BootcampDayNumber = 1 | 2 | 3 | 4 | 5;
+
+export type BootcampVocabCategory =
+  | 'greetings'
+  | 'brachot'
+  | 'shabbat'
+  | 'holidays'
+  | 'prayer'
+  | 'torah'
+  | 'lifecycle'
+  | 'daily_life';
+
+export interface BootcampVocabWord {
+  id: string;
+  hebrew: string;
+  transliteration: string;
+  translation: string;
+  category: BootcampVocabCategory;
+  audioUrl: string;
+  letterIds: string[];
+  vowelIds: string[];
+  dayIntroduced: BootcampDayNumber;
+  difficulty: number; // 1-5
+  culturalNote?: string;
+}
+
+export interface BootcampLetterGroup {
+  letterIds: string[];
+  twinPair?: { withDagesh: string; withoutDagesh: string; hint: string };
+  culturalMnemonics: Record<string, string>; // letterId -> mnemonic
+}
+
+export interface BootcampVowelGroup {
+  vowelIds: string[];
+  soundLabel: string;
+  color: string;
+  teachingNote: string;
+}
+
+export interface BootcampSyllable {
+  hebrew: string;
+  transliteration: string;
+  letterId: string;
+  vowelId: string;
+  audioUrl: string;
+}
+
+export interface BootcampPracticeWord {
+  hebrew: string;
+  transliteration: string;
+  translation: string;
+  audioUrl: string;
+  source?: string; // e.g. 'Modeh Ani', 'Shema'
+}
+
+export interface BootcampCulminatingReading {
+  title: string;
+  description: string;
+  lines: {
+    hebrew: string;
+    transliteration: string;
+    translation: string;
+    audioUrl: string;
+  }[];
+}
+
+export interface BootcampDay {
+  day: BootcampDayNumber;
+  title: string;
+  subtitle: string;
+  estimatedMinutes: number;
+  letterGroups: BootcampLetterGroup[];
+  vowelGroups: BootcampVowelGroup[];
+  syllables: BootcampSyllable[];
+  vocabWordIds: string[];
+  practiceWords: BootcampPracticeWord[];
+  culminatingReading: BootcampCulminatingReading;
+  reviewLetterIds?: string[];
+  reviewVowelIds?: string[];
+}
+
+export interface BootcampDayProgress {
+  day: BootcampDayNumber;
+  status: 'locked' | 'available' | 'in_progress' | 'completed';
+  teachPhaseComplete: boolean;
+  drillScore?: number;
+  drillTotal?: number;
+  syllablesComplete: boolean;
+  wordsComplete: boolean;
+  readingComplete: boolean;
+  completedAt?: string;
+}
+
+export interface BootcampProgress {
+  enrolled: boolean;
+  enrolledAt?: string;
+  currentDay: BootcampDayNumber;
+  dayProgress: Record<number, BootcampDayProgress>;
+  completedAt?: string;
 }

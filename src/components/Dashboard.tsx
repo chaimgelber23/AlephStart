@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useUserStore } from '@/stores/userStore';
 import { useAuthStore } from '@/stores/authStore';
 import { ProgressBar } from '@/components/ui/ProgressBar';
+import { BootcampCard } from '@/components/bootcamp/BootcampCard';
 import { LETTERS } from '@/lib/content/letters';
 import { CORE_VOWELS } from '@/lib/content/vowels';
 import { PRAYERS } from '@/lib/content/prayers';
@@ -138,6 +139,15 @@ export function Dashboard() {
               />
             </div>
           </Link>
+        </motion.div>
+
+        {/* Bootcamp Card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.15 }}
+        >
+          <BootcampCard />
         </motion.div>
 
         {/* Quick Stats */}
