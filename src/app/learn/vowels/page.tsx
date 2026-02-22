@@ -10,7 +10,17 @@ import { AudioButton } from '@/components/ui/AudioButton';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { MilestoneToast } from '@/components/ui/MilestoneToast';
 import { track } from '@/lib/analytics';
-import type { Vowel, MilestoneType } from '@/types';
+import type { Vowel, MilestoneType, Pronunciation, VoiceGender } from '@/types';
+
+const PRONUNCIATION_SUFFIX: Record<Pronunciation, string> = {
+  modern: '',
+  american: '-american',
+};
+
+const GENDER_SUFFIX: Record<VoiceGender, string> = {
+  male: '',
+  female: '-female',
+};
 
 // Group vowels by sound family (matches vowels.ts order)
 const VOWEL_LESSONS: { label: string; vowelIds: string[] }[] = [
@@ -36,6 +46,8 @@ function getLessonVowels(lessonIndex: number): Vowel[] {
 type Phase = 'teach' | 'drill' | 'complete';
 
 export default function VowelLearnPage() {
+  const pronunciation = useUserStore((s) => s.profile.pronunciation);
+  const voiceGender = useUserStore((s) => s.profile.voiceGender) || 'male';
   const vowelLearnSession = useUserStore((s) => s.vowelLearnSession);
   const saveVowelLearnSession = useUserStore((s) => s.saveVowelLearnSession);
   const clearVowelLearnSession = useUserStore((s) => s.clearVowelLearnSession);
@@ -250,7 +262,7 @@ export default function VowelLearnPage() {
                 </h2>
               </div>
 
-              <VowelCard vowel={currentTeachVowel} isActive />
+              <VowelCard vowel={currentTeachVowel} isActive pronunciation={pronunciation} />
 
               <button
                 onClick={handleTeachNext}
@@ -294,7 +306,7 @@ export default function VowelLearnPage() {
               {/* Audio hint */}
               <div className="flex justify-center">
                 <AudioButton
-                  audioUrl={drillCorrectVowel.audioUrl}
+                  audioUrl={`/audio/vowels/${drillCorrectVowel.id}-sound${PRONUNCIATION_SUFFIX[pronunciation]}${GENDER_SUFFIX[voiceGender]}.mp3`}
                   label="Hear the sound"
                   size="sm"
                   variant="outline"

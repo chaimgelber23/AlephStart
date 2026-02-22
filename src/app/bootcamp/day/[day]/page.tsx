@@ -470,7 +470,7 @@ export default function BootcampDayPage() {
                   </div>
                 )}
 
-                <VowelCard vowel={currentVowel} isActive />
+                <VowelCard vowel={currentVowel} isActive pronunciation={pronunciation} />
 
                 <button
                   onClick={handleNextVowel}
