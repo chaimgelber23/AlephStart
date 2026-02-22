@@ -3,11 +3,17 @@
 import { motion } from 'framer-motion';
 import { HebrewText } from '@/components/ui/HebrewText';
 import { AudioButton } from '@/components/ui/AudioButton';
-import type { Letter, Pronunciation } from '@/types';
+import { useUserStore } from '@/stores/userStore';
+import type { Letter, Pronunciation, VoiceGender } from '@/types';
 
 const PRONUNCIATION_SUFFIX: Record<Pronunciation, string> = {
   modern: '',
   american: '-american',
+};
+
+const GENDER_SUFFIX: Record<VoiceGender, string> = {
+  male: '',
+  female: '-female',
 };
 
 interface LetterCardProps {
@@ -27,9 +33,11 @@ export function LetterCard({
   pronunciation = 'modern',
   onTap,
 }: LetterCardProps) {
+  const voiceGender = useUserStore((s) => s.profile.voiceGender) || 'male';
   const suffix = PRONUNCIATION_SUFFIX[pronunciation] ?? '';
-  const nameAudioUrl = `/audio/letters/${letter.id}${suffix}.mp3`;
-  const soundAudioUrl = `/audio/letters/${letter.id}-sound${suffix}.mp3`;
+  const gSuffix = GENDER_SUFFIX[voiceGender] ?? '';
+  const nameAudioUrl = `/audio/letters/${letter.id}${suffix}${gSuffix}.mp3`;
+  const soundAudioUrl = `/audio/letters/${letter.id}-sound${suffix}${gSuffix}.mp3`;
 
   return (
     <motion.div
@@ -65,6 +73,9 @@ export function LetterCard({
               onClick={(e) => {
                 e.stopPropagation();
                 const audio = new Audio(nameAudioUrl);
+                audio.onerror = () => {
+                  if (gSuffix) new Audio(`/audio/letters/${letter.id}${suffix}.mp3`).play().catch(() => {});
+                };
                 audio.play().catch(() => {});
               }}
               className="flex items-center gap-1.5 bg-[#1B4965] text-white text-sm font-medium px-4 py-2.5 rounded-xl hover:bg-[#163d55] active:scale-95 transition-all"
@@ -78,6 +89,9 @@ export function LetterCard({
               onClick={(e) => {
                 e.stopPropagation();
                 const audio = new Audio(soundAudioUrl);
+                audio.onerror = () => {
+                  if (gSuffix) new Audio(`/audio/letters/${letter.id}-sound${suffix}.mp3`).play().catch(() => {});
+                };
                 audio.play().catch(() => {});
               }}
               className="flex items-center gap-1.5 border-2 border-[#1B4965] text-[#1B4965] text-sm font-medium px-4 py-2.5 rounded-xl hover:bg-[#1B4965]/5 active:scale-95 transition-all"

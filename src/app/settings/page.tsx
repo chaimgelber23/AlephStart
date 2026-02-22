@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { RequireAuth } from '@/components/RequireAuth';
 import { useAuthStore } from '@/stores/authStore';
 import { useUserStore } from '@/stores/userStore';
-import type { Nusach, Pronunciation, TransliterationMode } from '@/types';
+import type { Nusach, Pronunciation, TransliterationMode, VoiceGender, DisplaySettings } from '@/types';
 
 export default function SettingsPage() {
   return (
@@ -27,6 +27,8 @@ function SettingsContent() {
   const deleteAccount = useAuthStore((s) => s.deleteAccount);
   const profile = useUserStore((s) => s.profile);
   const updateProfile = useUserStore((s) => s.updateProfile);
+  const displaySettings = useUserStore((s) => s.displaySettings);
+  const updateDisplaySettings = useUserStore((s) => s.updateDisplaySettings);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -271,6 +273,34 @@ function SettingsContent() {
               </div>
             </div>
 
+            {/* Voice Gender */}
+            <div>
+              <label className="block text-sm font-medium text-[#2D3142] mb-1">
+                Voice
+              </label>
+              <p className="text-xs text-gray-400 mb-2">
+                Choose a male or female voice for audio playback
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {([
+                  { value: 'male' as const, label: 'Male Voice' },
+                  { value: 'female' as const, label: 'Female Voice' },
+                ] as { value: VoiceGender; label: string }[]).map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => updateProfile({ voiceGender: opt.value })}
+                    className={`px-3 py-2.5 rounded-xl text-sm font-medium border-2 transition-colors ${
+                      profile.voiceGender === opt.value
+                        ? 'border-[#1B4965] bg-[#1B4965]/5 text-[#1B4965]'
+                        : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Daily Goal */}
             <div>
               <label className="block text-sm font-medium text-[#2D3142] mb-2">
@@ -340,6 +370,40 @@ function SettingsContent() {
                 <span>2x</span>
               </div>
             </div>
+          </div>
+        </SettingsSection>
+
+        {/* Display Preferences */}
+        <SettingsSection title="Display Preferences">
+          <p className="text-xs text-gray-400 -mt-2 mb-1">
+            Toggle layers on or off as you gain confidence
+          </p>
+          <div className="space-y-3">
+            {([
+              { key: 'showTransliteration' as keyof DisplaySettings, label: 'Transliteration', desc: 'Romanized pronunciation below Hebrew' },
+              { key: 'showTranslation' as keyof DisplaySettings, label: 'Translation', desc: 'English translation of prayers' },
+              { key: 'showInstructions' as keyof DisplaySettings, label: 'Instructions', desc: 'Physical actions, tips, and notes' },
+              { key: 'showAmudCues' as keyof DisplaySettings, label: 'Amud Cues', desc: 'Who says what (leader vs. congregation)' },
+            ]).map(({ key, label, desc }) => (
+              <div key={key} className="flex items-center justify-between py-2">
+                <div className="flex-1 mr-4">
+                  <p className="text-sm font-medium text-[#2D3142]">{label}</p>
+                  <p className="text-xs text-gray-400">{desc}</p>
+                </div>
+                <button
+                  onClick={() => updateDisplaySettings({ [key]: !displaySettings[key] })}
+                  className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${
+                    displaySettings[key] ? 'bg-[#1B4965]' : 'bg-gray-300'
+                  }`}
+                >
+                  <span
+                    className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                      displaySettings[key] ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </div>
+            ))}
           </div>
         </SettingsSection>
 

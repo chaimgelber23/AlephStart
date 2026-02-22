@@ -1,6 +1,15 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import { useUserStore } from '@/stores/userStore';
+
+/** Insert `-female` before the file extension when voiceGender is female */
+function applyGenderSuffix(url: string, gender: 'male' | 'female'): string {
+  if (gender !== 'female') return url;
+  const dotIdx = url.lastIndexOf('.');
+  if (dotIdx === -1) return url;
+  return `${url.slice(0, dotIdx)}-female${url.slice(dotIdx)}`;
+}
 
 interface AudioButtonProps {
   audioUrl?: string;
@@ -33,10 +42,10 @@ export function AudioButton({
 }: AudioButtonProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const voiceGender = useUserStore((s) => s.profile.voiceGender) || 'male';
 
   const handlePlay = () => {
     if (!audioUrl) {
-      // If no audio URL, still trigger the onPlay callback
       onPlay?.();
       return;
     }
@@ -46,12 +55,25 @@ export function AudioButton({
       audioRef.current.currentTime = 0;
     }
 
-    const audio = new Audio(audioUrl);
+    const genderedUrl = applyGenderSuffix(audioUrl, voiceGender);
+    const audio = new Audio(genderedUrl);
     audioRef.current = audio;
 
     audio.onplay = () => setIsPlaying(true);
     audio.onended = () => setIsPlaying(false);
-    audio.onerror = () => setIsPlaying(false);
+    audio.onerror = () => {
+      // Fallback to original URL if gendered file doesn't exist
+      if (genderedUrl !== audioUrl) {
+        const fallback = new Audio(audioUrl);
+        audioRef.current = fallback;
+        fallback.onplay = () => setIsPlaying(true);
+        fallback.onended = () => setIsPlaying(false);
+        fallback.onerror = () => setIsPlaying(false);
+        fallback.play().catch(() => setIsPlaying(false));
+      } else {
+        setIsPlaying(false);
+      }
+    };
 
     audio.play().catch(() => setIsPlaying(false));
     onPlay?.();

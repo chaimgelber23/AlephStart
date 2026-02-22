@@ -27,6 +27,7 @@ export function CoachingOverlay({
 }: CoachingOverlayProps) {
   const prefs = useUserStore((s) => s.coachingPreferences);
   const pronunciation = useUserStore((s) => s.profile.pronunciation);
+  const voiceGender = useUserStore((s) => s.profile.voiceGender);
   const updateSectionProgress = useUserStore((s) => s.updateSectionProgress);
   const markSectionCoached = useUserStore((s) => s.markSectionCoached);
   const isSectionCoached = useUserStore((s) => s.isSectionCoached);
@@ -63,8 +64,9 @@ export function CoachingOverlay({
       speed: prefs.initialSpeed,
       onEnded: handleAudioEnded,
       pronunciation,
+      voiceGender,
     }),
-    [prefs.initialSpeed, handleAudioEnded, pronunciation]
+    [prefs.initialSpeed, handleAudioEnded, pronunciation, voiceGender]
   );
 
   const { play, stop, isPlaying, isLoading } = useAudio(audioOptions);

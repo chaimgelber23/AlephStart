@@ -37,6 +37,10 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Modeh ani l\'fanecha',
         translation: 'I give thanks before You',
         notes: 'מוֹדֶה = I give thanks. אֲנִי = I. לְפָנֶיךָ = before You.',
+        amud: {
+          role: 'silent_individual',
+          instruction: 'Said immediately upon waking, while still in bed',
+        },
       },
       {
         id: 'modeh-ani-2',
@@ -45,6 +49,10 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Melech chai v\'kayam',
         translation: 'Living and eternal King',
         notes: 'מֶלֶךְ = King. חַי = living. וְקַיָּם = and enduring/eternal.',
+        amud: {
+          role: 'silent_individual',
+          instruction: 'Said immediately upon waking, while still in bed',
+        },
       },
       {
         id: 'modeh-ani-3',
@@ -53,6 +61,10 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'She\'hechezarta bi nishmati',
         translation: 'For You have returned my soul within me',
         notes: 'שֶׁהֶחֱזַרְתָּ = that You returned. בִּי = within me. נִשְׁמָתִי = my soul.',
+        amud: {
+          role: 'silent_individual',
+          instruction: 'Said immediately upon waking, while still in bed',
+        },
       },
       {
         id: 'modeh-ani-4',
@@ -61,6 +73,10 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'B\'chemla raba emunatecha',
         translation: 'With compassion — great is Your faithfulness',
         notes: 'בְּחֶמְלָה = with compassion. רַבָּה = great/abundant. אֱמוּנָתֶךָ = Your faithfulness.',
+        amud: {
+          role: 'silent_individual',
+          instruction: 'Said immediately upon waking, while still in bed',
+        },
       },
     ],
   },
@@ -86,6 +102,11 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Baruch she\'amar v\'hayah ha\'olam, Baruch Hu',
         translation: 'Blessed is He Who spoke and the world came into being, blessed is He',
         notes: 'God created the world through speech — "Let there be light." His word IS reality.',
+        amud: {
+          role: 'both',
+          physicalActions: ['stand'],
+          instruction: 'Stand for this prayer. Hold tzitzit in your hands.',
+        },
       },
       {
         id: 'baruch-sheamar-2',
@@ -94,6 +115,11 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Baruch oseh v\'reishit. Baruch omeir v\'oseh. Baruch gozeir um\'kayeim',
         translation: 'Blessed is He Who makes creation. Blessed is He Who says and does. Blessed is He Who decrees and fulfills',
         notes: 'A series of praises acknowledging different aspects of God\'s creative and sustaining power.',
+        amud: {
+          role: 'both',
+          physicalActions: ['stand'],
+          instruction: 'Stand for this prayer. Hold tzitzit in your hands.',
+        },
       },
       {
         id: 'baruch-sheamar-3',
@@ -101,6 +127,11 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         hebrewText: 'בָּרוּךְ מְרַחֵם עַל הָאָרֶץ. בָּרוּךְ מְרַחֵם עַל הַבְּרִיּוֹת. בָּרוּךְ מְשַׁלֵּם שָׂכָר טוֹב לִירֵאָיו. בָּרוּךְ חַי לָעַד וְקַיָּם לָנֶצַח',
         transliteration: 'Baruch m\'racheim al ha\'aretz. Baruch m\'racheim al hab\'riyot. Baruch m\'shaleim sachar tov lirei\'av. Baruch chai la\'ad v\'kayam lanetzach',
         translation: 'Blessed is He Who has compassion on the earth. Blessed is He Who has compassion on the creatures. Blessed is He Who pays good reward to those who fear Him. Blessed is He Who lives forever and endures eternally',
+        amud: {
+          role: 'both',
+          physicalActions: ['stand'],
+          instruction: 'Stand for this prayer. Hold tzitzit in your hands.',
+        },
       },
       {
         id: 'baruch-sheamar-4',
@@ -109,6 +140,11 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Baruch Atah Adonai Elokeinu Melech ha\'olam, ha\'Eil Av haRachaman, ham\'hulal b\'feh amo, m\'shubach um\'fo\'ar bilshon chasidav va\'avadav. Baruch Atah Adonai, Melech m\'hulal batishbachot',
         translation: 'Blessed are You, Lord our God, King of the universe, the God, merciful Father, praised by the mouth of His people, lauded and glorified by the tongue of His pious ones and servants. Blessed are You, Lord, King Who is praised with songs of praise',
         notes: 'The closing bracha — stand while saying this. Hold your tzitzit together if wearing a tallit.',
+        amud: {
+          role: 'both',
+          physicalActions: ['stand'],
+          instruction: 'Stand for this prayer. Hold tzitzit in your hands.',
+        },
       },
     ],
   },
@@ -134,6 +170,11 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Ashrei yosh\'vei veitecha, od y\'hal\'lucha selah',
         translation: 'Praiseworthy are those who dwell in Your house; they will yet praise You, Selah',
         notes: 'This opening verse (Psalm 84:5) sets the scene — those who are always in God\'s presence are the truly happy ones.',
+        amud: {
+          role: 'both',
+          physicalActions: ['sit'],
+          instruction: 'Sit for Ashrei',
+        },
       },
       {
         id: 'ashrei-intro-2',
@@ -142,6 +183,11 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Ashrei ha\'am shekachah lo, ashrei ha\'am she\'Adonai Elokav',
         translation: 'Praiseworthy is the people for whom this is so; praiseworthy is the people whose God is the Lord',
         notes: 'From Psalm 144:15. We are fortunate that Hashem is our God.',
+        amud: {
+          role: 'both',
+          physicalActions: ['sit'],
+          instruction: 'Sit for Ashrei',
+        },
       },
       {
         id: 'ashrei-aleph',
@@ -150,6 +196,11 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'T\'hilah l\'David. Aromimcha Elokai haMelech, va\'avar\'chah shimcha l\'olam va\'ed',
         translation: 'A psalm of David. I will exalt You, my God the King, and I will bless Your Name forever and ever',
         notes: 'Psalm 145 begins. Each verse starts with a successive letter of the aleph-bet.',
+        amud: {
+          role: 'both',
+          physicalActions: ['sit'],
+          instruction: 'Sit for Ashrei',
+        },
       },
       {
         id: 'ashrei-bet-gimel',
@@ -158,6 +209,11 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'B\'chol yom avar\'cheka, va\'ahal\'lah shimcha l\'olam va\'ed. Gadol Adonai um\'hulal m\'od, v\'ligdulato ein cheiker',
         translation: 'Every day I will bless You, and I will praise Your Name forever. Great is the Lord and much praised, and His greatness is beyond investigation',
         notes: 'ב (Bet) and ג (Gimel) verses — daily praise and acknowledging God\'s infinite greatness.',
+        amud: {
+          role: 'both',
+          physicalActions: ['sit'],
+          instruction: 'Sit for Ashrei',
+        },
       },
       {
         id: 'ashrei-dalet-hei',
@@ -166,6 +222,11 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Dor l\'dor y\'shabach ma\'asecha, ug\'vurotecha yagidu. Hadar k\'vod hodecha, v\'divrei nifl\'otecha asichah',
         translation: 'Each generation will praise Your deeds to the next, and tell of Your mighty acts. The splendor of Your glorious majesty and Your wondrous deeds I will speak of',
         notes: 'ד (Dalet) and ה (Hei) verses — the chain of praise from generation to generation.',
+        amud: {
+          role: 'both',
+          physicalActions: ['sit'],
+          instruction: 'Sit for Ashrei',
+        },
       },
       {
         id: 'ashrei-poteach',
@@ -174,6 +235,11 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Pote\'ach et yadecha, umasbi\'a l\'chol chai ratzon',
         translation: 'You open Your hand and satisfy the desire of every living thing',
         notes: 'This is the key verse of Ashrei — God sustains all life. We say it with extra concentration (kavanah).',
+        amud: {
+          role: 'both',
+          physicalActions: ['sit'],
+          instruction: 'Sit for Ashrei',
+        },
       },
       {
         id: 'ashrei-closing',
@@ -182,6 +248,11 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'T\'hilat Adonai y\'daber pi, vivareich kol basar shem kodsho l\'olam va\'ed. Va\'anachnu n\'vareich Kah me\'atah v\'ad olam, Hal\'luyah',
         translation: 'My mouth will speak the praise of the Lord, and all flesh will bless His holy Name forever. And we will bless God from now until forever, Halleluyah',
         notes: 'The final verse of Psalm 145, followed by Psalm 115:18 as the closing.',
+        amud: {
+          role: 'both',
+          physicalActions: ['sit'],
+          instruction: 'Sit for Ashrei',
+        },
       },
     ],
   },
@@ -363,6 +434,11 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Shma Yisrael, Adonai Elokeinu, Adonai Echad',
         translation: 'Hear O Israel, the Lord is our God, the Lord is One',
         notes: 'שְׁמַע = Hear/Listen. יִשְׂרָאֵל = Israel (all of us). אֶחָד = One.',
+        amud: {
+          role: 'both',
+          physicalActions: ['cover_eyes'],
+          instruction: 'Cover your eyes with your right hand. Everyone says this line together.',
+        },
       },
       {
         id: 'shema-2',
@@ -371,6 +447,10 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Baruch shem k\'vod malchuto l\'olam va\'ed',
         translation: 'Blessed is the Name of His glorious kingdom forever and ever',
         notes: 'This line is said quietly (except on Yom Kippur). It\'s a response to the declaration of God\'s unity.',
+        amud: {
+          role: 'silent_individual',
+          instruction: 'Said quietly, in a whisper',
+        },
       },
       {
         id: 'shema-3',
@@ -379,6 +459,10 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'V\'ahavta et Adonai Elokecha',
         translation: 'And you shall love the Lord your God',
         notes: 'וְאָהַבְתָּ = And you shall love. This begins the first paragraph of the Shema.',
+        amud: {
+          role: 'silent_individual',
+          instruction: 'Read along silently at your own pace',
+        },
       },
       {
         id: 'shema-4',
@@ -387,6 +471,10 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'B\'chol l\'vav\'cha uv\'chol nafsh\'cha uv\'chol m\'odecha',
         translation: 'With all your heart, with all your soul, and with all your might',
         notes: 'לְבָבְךָ = your heart. נַפְשְׁךָ = your soul. מְאֹדֶךָ = your might/resources.',
+        amud: {
+          role: 'silent_individual',
+          instruction: 'Read along silently at your own pace',
+        },
       },
       {
         id: 'shema-5',
@@ -395,6 +483,10 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'V\'hayu had\'varim ha\'eileh asher anochi m\'tzav\'cha hayom al l\'vavecha',
         translation: 'And these words which I command you today shall be upon your heart',
         notes: 'הַדְּבָרִים = the words/things. הַיּוֹם = today (every day feels like the first time).',
+        amud: {
+          role: 'silent_individual',
+          instruction: 'Read along silently at your own pace',
+        },
       },
       {
         id: 'shema-6',
@@ -403,6 +495,10 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'V\'shinantam l\'vanecha v\'dibarta bam',
         translation: 'And you shall teach them to your children, and speak of them',
         notes: 'וְשִׁנַּנְתָּם = and you shall teach (sharpen). לְבָנֶיךָ = to your children.',
+        amud: {
+          role: 'silent_individual',
+          instruction: 'Read along silently at your own pace',
+        },
       },
       {
         id: 'shema-7',
@@ -411,6 +507,10 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'B\'shiv\'t\'cha b\'veitecha uv\'lecht\'cha vaderech',
         translation: 'When you sit in your house, and when you walk on the way',
         notes: 'בְּבֵיתֶךָ = in your house. בַדֶּרֶךְ = on the road/way.',
+        amud: {
+          role: 'silent_individual',
+          instruction: 'Read along silently at your own pace',
+        },
       },
       {
         id: 'shema-8',
@@ -419,6 +519,10 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Uv\'shoch\'b\'cha uv\'kumecha',
         translation: 'When you lie down and when you rise up',
         notes: 'This is why we say Shema morning and evening — "when you lie down and when you rise up."',
+        amud: {
+          role: 'silent_individual',
+          instruction: 'Read along silently at your own pace',
+        },
       },
     ],
   },
@@ -445,6 +549,11 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Adonai s\'fatai tiftach, ufi yagid t\'hilatecha',
         translation: 'Lord, open my lips, that my mouth may declare Your praise',
         notes: 'Before beginning the Amidah, we ask Hashem to help us pray. Take three steps forward with feet together.',
+        amud: {
+          role: 'silent_individual',
+          physicalActions: ['stand', 'face_west'],
+          instruction: 'Stand with feet together, facing Jerusalem. Take three steps forward before beginning.',
+        },
       },
 
       // -- 1. Avot (Patriarchs) --
@@ -455,6 +564,11 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Baruch Atah Adonai, Elokeinu v\'Elokei avoteinu, Elokei Avraham, Elokei Yitzchak, v\'Elokei Ya\'akov. Ha\'Eil hagadol, hagibor v\'hanora, Eil elyon, gomeil chasadim tovim, v\'koneh hakol, v\'zocheir chasdei avot, u\'meivi go\'eil livnei v\'neihem, l\'ma\'an sh\'mo b\'ahavah. Melech ozeir u\'moshi\'a u\'magein. Baruch Atah Adonai, magein Avraham',
         translation: 'Blessed are You, Lord our God and God of our fathers, God of Abraham, God of Isaac, and God of Jacob. The great, mighty, and awesome God, God Most High, Who bestows beneficial kindnesses, Who is Master of all, Who remembers the piety of the Patriarchs, and brings a redeemer to their children\'s children for His Name\'s sake, with love. King, Helper, Savior, and Shield. Blessed are You, Lord, Shield of Abraham.',
         notes: 'Bracha 1 — Avot (Patriarchs). We invoke our forefathers to connect our prayers to their merit. Each patriarch is mentioned separately because each had a unique relationship with God.',
+        amud: {
+          role: 'silent_individual',
+          physicalActions: ['bow_and_stand'],
+          instruction: 'Bow at "Baruch Atah" and stand straight at "Adonai"',
+        },
       },
 
       // -- 2. Gevurot (God's Might) --
@@ -465,6 +579,9 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Atah gibor l\'olam Adonai, m\'chayeh meitim Atah, rav l\'hoshi\'a. M\'chalkeil chayim b\'chesed, m\'chayeh meitim b\'rachamim rabim, someich noflim, v\'rofei cholim, u\'matir asurim, um\'kayeim emunato lisheinei afar. Mi chamocha ba\'al g\'vurot, umi domeh lach, Melech meimit um\'chayeh u\'matzmi\'ach y\'shuah. V\'ne\'eman Atah l\'hachayot meitim. Baruch Atah Adonai, m\'chayeh hameitim',
         translation: 'You are eternally mighty, Lord; You resurrect the dead, You are powerful to save. He sustains the living with kindness, resurrects the dead with great mercy, supports the fallen, heals the sick, releases the imprisoned, and maintains His faith to those who sleep in the dust. Who is like You, Master of mighty deeds, and who can compare to You, King Who causes death and restores life and causes salvation to sprout. And You are faithful to resurrect the dead. Blessed are You, Lord, Who resurrects the dead.',
         notes: 'Bracha 2 — Gevurot (God\'s Might). Praises God\'s power over life and death. In winter add "mashiv haruach u\'morid hageshem" (Who causes the wind to blow and rain to fall).',
+        amud: {
+          role: 'silent_individual',
+        },
       },
 
       // -- 3. Kedushat Hashem (Holiness of God) --
@@ -475,6 +592,11 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Atah kadosh v\'shimcha kadosh, uk\'doshim b\'chol yom y\'hal\'lucha selah. Baruch Atah Adonai, ha\'Eil hakadosh',
         translation: 'You are holy and Your Name is holy, and the holy ones praise You every day, Selah. Blessed are You, Lord, the holy God.',
         notes: 'Bracha 3 — Kedushat Hashem (God\'s Holiness). When davening with a minyan, the chazzan\'s repetition includes the full Kedushah here (Kadosh, kadosh, kadosh...).',
+        amud: {
+          role: 'both',
+          physicalActions: ['rise_on_toes'],
+          instruction: 'Rise on toes three times at "Kadosh, Kadosh, Kadosh"',
+        },
       },
 
       // -- 4. Binah / Da'at (Knowledge) --
@@ -485,6 +607,9 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Atah chonein l\'adam da\'at, um\'lameid le\'enosh binah. Choneinu me\'it\'cha dei\'ah, binah v\'haskeil. Baruch Atah Adonai, chonein hada\'at',
         translation: 'You graciously grant man knowledge and teach mortals understanding. Grant us from You knowledge, understanding, and wisdom. Blessed are You, Lord, gracious Giver of knowledge.',
         notes: 'Bracha 4 — Da\'at (Knowledge). First of the 13 middle blessings (requests). We begin by asking for wisdom, because without understanding we cannot even know what to ask for.',
+        amud: {
+          role: 'silent_individual',
+        },
       },
 
       // -- 5. Teshuvah (Repentance) --
@@ -495,6 +620,9 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Hashiveinu Avinu l\'Toratecha, v\'karveinu Malkeinu la\'avodatecha, v\'hachazireinu bi\'tshuvah sh\'leimah l\'fanecha. Baruch Atah Adonai, harotzeh bi\'tshuvah',
         translation: 'Return us, our Father, to Your Torah, and draw us near, our King, to Your service, and bring us back in complete repentance before You. Blessed are You, Lord, Who desires repentance.',
         notes: 'Bracha 5 — Teshuvah (Repentance). After asking for wisdom, we ask for the ability to return to God. Note we call God both "Father" (closeness) and "King" (majesty).',
+        amud: {
+          role: 'silent_individual',
+        },
       },
 
       // -- 6. Selichah (Forgiveness) --
@@ -505,6 +633,9 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'S\'lach lanu Avinu ki chatanu, m\'chal lanu Malkeinu ki fashanu, ki mocheil v\'solei\'ach Atah. Baruch Atah Adonai, chanun hamarbeh lislo\'ach',
         translation: 'Forgive us, our Father, for we have sinned; pardon us, our King, for we have transgressed; for You are a pardoner and forgiver. Blessed are You, Lord, the gracious One Who pardons abundantly.',
         notes: 'Bracha 6 — Selichah (Forgiveness). חָטָאנוּ (sinned) = unintentional; פָשָׁעְנוּ (transgressed) = intentional. God forgives both.',
+        amud: {
+          role: 'silent_individual',
+        },
       },
 
       // -- 7. Ge'ulah (Redemption) --
@@ -515,6 +646,9 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'R\'eih na v\'on\'yeinu, v\'rivah riveinu, ug\'aleinu m\'heirah l\'ma\'an sh\'mecha, ki go\'eil chazak Atah. Baruch Atah Adonai, go\'eil Yisrael',
         translation: 'Look upon our affliction and fight our fight, and redeem us speedily for Your Name\'s sake, for You are a powerful Redeemer. Blessed are You, Lord, Redeemer of Israel.',
         notes: 'Bracha 7 — Ge\'ulah (Redemption). We ask God to see our troubles and rescue us — both individually and as a nation.',
+        amud: {
+          role: 'silent_individual',
+        },
       },
 
       // -- 8. Refu'ah (Healing) --
@@ -525,6 +659,9 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'R\'fa\'einu Adonai v\'neirafei, hoshi\'einu v\'nivashei\'ah, ki t\'hilateinu Atah, v\'ha\'aleh r\'fuah sh\'leimah l\'chol makoteinu, ki Eil Melech rofei ne\'eman v\'rachaman Atah. Baruch Atah Adonai, rofei cholei amo Yisrael',
         translation: 'Heal us, Lord, and we will be healed; save us and we will be saved, for You are our praise. Bring complete healing to all our ailments, for You, God, King, are a faithful and compassionate Healer. Blessed are You, Lord, Who heals the sick of His people Israel.',
         notes: 'Bracha 8 — Refu\'ah (Healing). You can add personal prayers for sick individuals here by name. "Heal us and we will be healed" is from Jeremiah 17:14.',
+        amud: {
+          role: 'silent_individual',
+        },
       },
 
       // -- 9. Birkat Hashanim (Year's Blessing) --
@@ -535,6 +672,9 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Bareich aleinu Adonai Elokeinu et hashanah hazot v\'et kol minei t\'vuatah l\'tovah, v\'tein b\'rachah al p\'nei ha\'adamah, v\'sab\'einu mituvah, u\'vareich sh\'nateinu kashanim hatovot. Baruch Atah Adonai, m\'vareich hashanim',
         translation: 'Bless this year for us, Lord our God, and all its kinds of produce for good; grant blessing upon the face of the earth, satisfy us from Your goodness, and bless our year like the good years. Blessed are You, Lord, Who blesses the years.',
         notes: 'Bracha 9 — Birkat Hashanim (Prosperity). In winter (Dec 4 – Pesach), we add "v\'tein tal u\'matar livrachah" (grant dew and rain for blessing).',
+        amud: {
+          role: 'silent_individual',
+        },
       },
 
       // -- 10. Kibbutz Galuyot (Ingathering of Exiles) --
@@ -545,6 +685,9 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'T\'ka b\'shofar gadol l\'cheiruteinu, v\'sa neis l\'kabeitz galuyoteinu, v\'kab\'tzeinu yachad mei\'arba kanfot ha\'aretz. Baruch Atah Adonai, m\'kabeitz nidchei amo Yisrael',
         translation: 'Sound the great shofar for our freedom, raise a banner to gather our exiles, and gather us together from the four corners of the earth. Blessed are You, Lord, Who gathers the dispersed of His people Israel.',
         notes: 'Bracha 10 — Kibbutz Galuyot (Ingathering of Exiles). We pray for all Jews scattered around the world to be gathered back to the Land of Israel.',
+        amud: {
+          role: 'silent_individual',
+        },
       },
 
       // -- 11. Din / Mishpat (Justice) --
@@ -555,6 +698,9 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Hashivah shof\'teinu k\'varishonah, v\'yo\'atzeinu k\'vat\'chilah, v\'haseir mimenu yagon va\'anachah, u\'m\'loch aleinu Atah Adonai l\'vad\'cha, b\'chesed uv\'rachamim, v\'tzad\'keinu bamishpat. Baruch Atah Adonai, Melech oheiv tz\'dakah u\'mishpat',
         translation: 'Restore our judges as of old and our counselors as at the beginning; remove from us sorrow and groaning; and reign over us, You alone, Lord, with kindness and compassion, and vindicate us in judgment. Blessed are You, Lord, King Who loves righteousness and justice.',
         notes: 'Bracha 11 — Mishpat (Justice). We pray for righteous leadership and true justice. During the Ten Days of Repentance, say "HaMelech hamishpat" instead.',
+        amud: {
+          role: 'silent_individual',
+        },
       },
 
       // -- 12. Birkat Haminim (Against Slanderers) --
@@ -565,6 +711,9 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'V\'lamal\'shinim al t\'hi tikvah, v\'chol harishah k\'rega toveid, v\'chol oy\'vecha m\'heirah yikaritu, v\'hazeidim m\'heirah t\'aker ut\'shabeir ut\'mageir v\'tachni\'a bimheirah v\'yameinu. Baruch Atah Adonai, shoveir oy\'vim u\'machni\'a zeidim',
         translation: 'And for slanderers let there be no hope; and may all wickedness perish in an instant; and may all Your enemies be speedily cut down. And the insolent, speedily uproot, break, cast down and humble speedily in our days. Blessed are You, Lord, Who breaks enemies and humbles the insolent.',
         notes: 'Bracha 12 — Birkat Haminim. This was the 19th bracha added by Shmuel HaKatan at the request of Rabban Gamliel, making the total 19.',
+        amud: {
+          role: 'silent_individual',
+        },
       },
 
       // -- 13. Tzaddikim (The Righteous) --
@@ -575,6 +724,9 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Al hatzadikim v\'al hachasidim, v\'al ziknei am\'cha beit Yisrael, v\'al pleitat sof\'reihem, v\'al geirei hatzedek v\'aleinu, yehemu na rachamecha Adonai Elokeinu, v\'tein sachar tov l\'chol habot\'chim b\'shimcha be\'emet, v\'sim chelkeinu imahem l\'olam, v\'lo neivosh ki v\'cha vatachnu. Baruch Atah Adonai, mish\'an u\'mivtach latzadikim',
         translation: 'On the righteous, on the pious, on the elders of Your people the House of Israel, on the remnant of their scholars, on the righteous converts, and on us — may Your compassion be aroused, Lord our God. Grant a good reward to all who truly trust in Your Name, and place our lot among them forever, and we will not be ashamed, for in You we trust. Blessed are You, Lord, Support and Trust of the righteous.',
         notes: 'Bracha 13 — Tzaddikim (The Righteous). We pray for all who keep the faith — including righteous converts (geirei tzedek) — and ask to be counted among them.',
+        amud: {
+          role: 'silent_individual',
+        },
       },
 
       // -- 14. Yerushalayim (Jerusalem) --
@@ -585,6 +737,9 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'V\'liYerushalayim ir\'cha b\'rachamim tashuv, v\'tishkon b\'tochah ka\'asher dibarta, uv\'neh otah b\'karov b\'yameinu binyan olam, v\'kisei David m\'heirah l\'tochah tachin. Baruch Atah Adonai, boneh Yerushalayim',
         translation: 'And to Jerusalem, Your city, return in mercy, and dwell within it as You have spoken; rebuild it soon in our days as an everlasting structure, and the throne of David speedily establish within it. Blessed are You, Lord, Builder of Jerusalem.',
         notes: 'Bracha 14 — Yerushalayim (Jerusalem). We pray for the rebuilding of Jerusalem and the Holy Temple — the heart of the Jewish people.',
+        amud: {
+          role: 'silent_individual',
+        },
       },
 
       // -- 15. Mashiach / David --
@@ -595,6 +750,9 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Et tzemach David avd\'cha m\'heirah tatzmi\'ach, v\'karno tarum bishuatecha, ki lishuatcha kivinu kol hayom. Baruch Atah Adonai, matzmi\'ach keren y\'shuah',
         translation: 'The offspring of Your servant David, speedily cause to flourish, and raise his pride through Your salvation, for we hope for Your salvation all day. Blessed are You, Lord, Who causes the pride of salvation to flourish.',
         notes: 'Bracha 15 — Malchut David (Davidic Kingdom). We pray for the coming of Mashiach (Messiah) from the line of King David.',
+        amud: {
+          role: 'silent_individual',
+        },
       },
 
       // -- 16. Shema Koleinu (Hear Our Prayer) --
@@ -605,6 +763,9 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Sh\'ma koleinu Adonai Elokeinu, chus v\'racheim aleinu, v\'kabeil b\'rachamim uv\'ratzon et t\'filateinu, ki Eil shomei\'a t\'filot v\'tachanumim Atah, u\'mil\'fanecha Malkeinu reikam al t\'shiveinu, ki Atah shomei\'a t\'filat kol peh. Baruch Atah Adonai, shomei\'a t\'filah',
         translation: 'Hear our voice, Lord our God, have pity and compassion upon us, and accept our prayer with mercy and favor, for You are God Who hears prayers and supplications; and from before You, our King, do not turn us away empty-handed, for You hear the prayer of every mouth. Blessed are You, Lord, Who hears prayer.',
         notes: 'Bracha 16 — Shema Koleinu (Hear Our Voice). The last of the 13 middle requests. This is a good place to add any personal prayers in your own words.',
+        amud: {
+          role: 'silent_individual',
+        },
       },
 
       // -- 17. Avodah (Temple Service) --
@@ -615,6 +776,9 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'R\'tzei Adonai Elokeinu b\'am\'cha Yisrael uvi\'t\'filatam, v\'hasheiv et ha\'avodah lidvir beitecha, v\'ishei Yisrael ut\'filatam b\'ahavah t\'kabeil b\'ratzon, us\'hi l\'ratzon tamid avodat Yisrael amecha. Baruch Atah Adonai, hamachazir sh\'chinato l\'Tzion',
         translation: 'Be favorable, Lord our God, toward Your people Israel and their prayer, and restore the service to the Holy of Holies in Your Temple; and the fire-offerings of Israel and their prayer accept with love and favor, and may the service of Your people Israel always be favorable. Blessed are You, Lord, Who restores His Presence to Zion.',
         notes: 'Bracha 17 — Avodah (Temple Service). First of the final three blessings (thanksgiving). We pray for the return of the Temple service.',
+        amud: {
+          role: 'silent_individual',
+        },
       },
 
       // -- 18. Hoda'ah (Thanksgiving) --
@@ -625,6 +789,11 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Modim anachnu lach, sha\'Atah Hu Adonai Elokeinu v\'Elokei avoteinu l\'olam va\'ed, Tzur chayeinu, Magein yish\'einu, Atah Hu l\'dor vador. Nodeh l\'cha un\'sapeir t\'hilatecha, al chayeinu ham\'surim b\'yadecha, v\'al nishmoteinu hap\'kudot lach, v\'al nisecha sheb\'chol yom imanu, v\'al nifl\'otecha v\'tovotecha sheb\'chol eit, erev vavoker v\'tzohorayim. Hatov ki lo chalu rachamecha, v\'ham\'racheim ki lo tamu chasadecha, mei\'olam kivinu lach',
         translation: 'We give thanks to You, for You are the Lord our God and God of our fathers forever and ever. Rock of our lives, Shield of our salvation, You are He in every generation. We will thank You and tell Your praise — for our lives which are entrusted in Your hand, for our souls which are in Your charge, for Your miracles that are with us daily, and for Your wonders and goodness at all times — evening, morning, and afternoon. The Beneficent One, for Your mercies have not ended; the Compassionate One, for Your kindnesses have not ceased — we have always put our hope in You.',
         notes: 'Bracha 18 — Modim (Thanksgiving). We bow at the beginning. This is the moment to feel genuine gratitude for everything — every breath, every miracle we don\'t even notice.',
+        amud: {
+          role: 'silent_individual',
+          physicalActions: ['bow'],
+          instruction: 'Bow at Modim',
+        },
       },
       {
         id: 'se-18-modim-closing',
@@ -633,6 +802,9 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'V\'al kulam yitbarach v\'yitromam shimcha Malkeinu tamid l\'olam va\'ed. V\'chol hachayim yoducha selah, vihal\'lu et shimcha be\'emet, ha\'Eil y\'shuateinu v\'ezrateinu selah. Baruch Atah Adonai, hatov shimcha ul\'cha na\'eh l\'hodot',
         translation: 'And for all these things may Your Name be blessed and exalted, our King, constantly, forever and ever. And all the living will thank You, Selah, and praise Your Name in truth, God of our salvation and help, Selah. Blessed are You, Lord, Whose Name is "The Beneficent One" and to Whom it is fitting to give thanks.',
         notes: 'Continuation of Modim — the closing of the thanksgiving bracha.',
+        amud: {
+          role: 'silent_individual',
+        },
       },
 
       // -- 19. Sim Shalom (Peace) --
@@ -643,6 +815,9 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Sim shalom tovah uv\'rachah, chein vachesed v\'rachamim aleinu v\'al kol Yisrael amecha. Bar\'cheinu Avinu kulanu k\'echad b\'or panecha, ki v\'or panecha natata lanu Adonai Elokeinu Torat chayim v\'ahavat chesed, utz\'dakah uv\'rachah v\'rachamim v\'chayim v\'shalom. V\'tov b\'einecha l\'vareich et am\'cha Yisrael b\'chol eit uv\'chol sha\'ah bishlomecha. Baruch Atah Adonai, ham\'vareich et amo Yisrael bashalom',
         translation: 'Grant peace, goodness, and blessing, grace, kindness, and compassion upon us and upon all Israel Your people. Bless us, our Father, all of us as one, with the light of Your countenance, for by the light of Your countenance You gave us, Lord our God, the Torah of life and a love of kindness, righteousness, blessing, compassion, life, and peace. And may it be good in Your eyes to bless Your people Israel at every time and every hour with Your peace. Blessed are You, Lord, Who blesses His people Israel with peace.',
         notes: 'Bracha 19 — Sim Shalom (Peace). The final bracha. Peace is the vessel that holds all other blessings. At Mincha/Maariv some say "Shalom Rav" instead.',
+        amud: {
+          role: 'silent_individual',
+        },
       },
 
       // -- Closing --
@@ -653,6 +828,9 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Elokai, n\'tzor l\'shoni meira, us\'fatai midabeir mirmah, v\'limkal\'lai nafshi tidom, v\'nafshi ke\'afar lakol tih\'yeh. P\'tach libi b\'Toratecha, uv\'mitzvotecha tirdof nafshi',
         translation: 'My God, guard my tongue from evil and my lips from speaking deceitfully. To those who curse me, let my soul be silent; and let my soul be like dust to everyone. Open my heart to Your Torah, and let my soul pursue Your commandments.',
         notes: 'Personal prayer of Mar bar Ravina (Talmud Berachot 17a). A beautiful moment of personal reflection before stepping back.',
+        amud: {
+          role: 'silent_individual',
+        },
       },
       {
         id: 'se-yihyu',
@@ -661,6 +839,9 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Yih\'yu l\'ratzon imrei fi v\'hegyon libi l\'fanecha, Adonai Tzuri v\'Go\'ali',
         translation: 'May the words of my mouth and the meditation of my heart be acceptable before You, Lord, my Rock and my Redeemer',
         notes: 'From Psalm 19:15. After this, take three steps backward (left, right, left) as if departing from the King\'s presence.',
+        amud: {
+          role: 'silent_individual',
+        },
       },
       {
         id: 'se-oseh-shalom',
@@ -669,6 +850,11 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Oseh shalom bimromav, Hu ya\'aseh shalom aleinu, v\'al kol Yisrael, v\'imru Amein',
         translation: 'He Who makes peace in His heavens, may He make peace upon us and upon all Israel, and say Amen',
         notes: 'The final words of the Amidah. Bow left, right, then forward. Take three steps back, then return to your place.',
+        amud: {
+          role: 'silent_individual',
+          physicalActions: ['three_steps_back'],
+          instruction: 'Take three steps back, bow left, right, and center',
+        },
       },
     ],
   },
@@ -694,6 +880,10 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Aleinu l\'shabei\'ach la\'Adon hakol, lateit g\'dulah l\'Yotzeir b\'reishit, shelo asanu k\'goyei ha\'aratzot, v\'lo samanu k\'mishp\'chot ha\'adamah, shelo sam chelkeinu kahem v\'goraleinu k\'chol hamonam',
         translation: 'It is upon us to praise the Master of all, to ascribe greatness to the Creator of the world, Who has not made us like the nations of the lands, and has not placed us like the families of the earth; Who has not assigned our portion like theirs, nor our lot like all their multitudes',
         notes: 'The first paragraph declares our unique relationship with Hashem.',
+        amud: {
+          role: 'both',
+          physicalActions: ['stand'],
+        },
       },
       {
         id: 'aleinu-2',
@@ -702,6 +892,11 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Va\'anachnu kor\'im u\'mishtachavim u\'modim lifnei Melech Malchei Ham\'lachim, HaKadosh Baruch Hu',
         translation: 'And we bow and prostrate and give thanks before the King of Kings of Kings, the Holy One, blessed is He',
         notes: 'We bow during these words. Some communities fully bow (kneel), others bow from the waist.',
+        amud: {
+          role: 'both',
+          physicalActions: ['stand', 'bow_and_stand'],
+          instruction: 'Bow at "va\'anachnu kor\'im u\'mishtachavim" then stand back up at "lifnei Melech"',
+        },
       },
       {
         id: 'aleinu-3',
@@ -710,6 +905,10 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Shehu noteh shamayim v\'yoseid aretz, u\'moshav y\'karo bashamayim mima\'al, ush\'chinat uzo b\'govhei m\'romim. Hu Elokeinu ein od. Emet Malkeinu efes zulato',
         translation: 'Who stretches out the heavens and establishes the earth, Whose seat of glory is in the heavens above, and Whose powerful Presence is in the loftiest heights. He is our God, there is no other. True is our King, there is nothing besides Him.',
         notes: 'A powerful affirmation that Hashem alone is God.',
+        amud: {
+          role: 'both',
+          physicalActions: ['stand'],
+        },
       },
       {
         id: 'aleinu-4',
@@ -718,6 +917,10 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Al kein n\'kaveh l\'cha Adonai Elokeinu lirot m\'heirah b\'tiferet uzecha, l\'ha\'avir gilulim min ha\'aretz, v\'ha\'elilim karot yikareitun, l\'takein olam b\'malchut Shakai, v\'chol b\'nei vasar yikr\'u vishmecha',
         translation: 'Therefore we put our hope in You, Lord our God, to soon see the glory of Your strength, to remove idols from the earth and false gods will be utterly cut off; to perfect the world through the Almighty\'s kingdom, and all humanity will call upon Your Name',
         notes: 'The second paragraph — our hope for the future. "L\'takein olam" (to perfect the world) is the source of the concept of "Tikkun Olam."',
+        amud: {
+          role: 'both',
+          physicalActions: ['stand'],
+        },
       },
       {
         id: 'aleinu-5',
@@ -726,6 +929,10 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Ki l\'cha tichra kol berech, tishava kol lashon. L\'fanecha Adonai Elokeinu yichr\'u v\'yipolu, v\'lichvod shimcha y\'kar yiteinu. Vikab\'lu chulam et ol malchutecha, v\'timloch aleihem m\'heirah l\'olam va\'ed. Ki hamalchut shel\'cha hi, ul\'olmei ad timloch b\'chavod',
         translation: 'For to You every knee will bow, every tongue will swear. Before You, Lord our God, they will bow and fall, and to the glory of Your Name give honor. And they will all accept the yoke of Your kingdom, and You will reign over them speedily forever. For the kingdom is Yours, and for eternity You will reign in glory.',
         notes: 'The conclusion of Aleinu — a vision of universal recognition of God\'s sovereignty.',
+        amud: {
+          role: 'both',
+          physicalActions: ['stand'],
+        },
       },
     ],
   },
@@ -891,6 +1098,12 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Baruch Atah Adonai Elokeinu Melech ha\'olam, hanotein lasechvi vinah l\'havchin bein yom uvein lailah',
         translation: 'Blessed are You... Who gives the rooster understanding to distinguish between day and night',
         notes: 'The rooster crows at dawn — God gave even animals the wisdom to know when a new day begins.',
+        amud: {
+          role: 'both',
+          instruction: 'The shaliach tzibbur says each bracha aloud and the congregation answers Amen',
+          congregationResponse: 'אָמֵן',
+          congregationResponseTransliteration: 'Amen',
+        },
       },
       {
         id: 'birchos-hashachar-2',
@@ -899,6 +1112,12 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Baruch Atah Adonai Elokeinu Melech ha\'olam, pokei\'ach ivrim',
         translation: 'Blessed are You... Who opens the eyes of the blind',
         notes: 'When you open your eyes each morning — that\'s a miracle. Thank God for the gift of sight.',
+        amud: {
+          role: 'both',
+          instruction: 'The shaliach tzibbur says each bracha aloud and the congregation answers Amen',
+          congregationResponse: 'אָמֵן',
+          congregationResponseTransliteration: 'Amen',
+        },
       },
       {
         id: 'birchos-hashachar-3',
@@ -907,6 +1126,12 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Baruch Atah Adonai Elokeinu Melech ha\'olam, malbish arumim',
         translation: 'Blessed are You... Who clothes the naked',
         notes: 'When you get dressed — thank God that you have clothes to wear.',
+        amud: {
+          role: 'both',
+          instruction: 'The shaliach tzibbur says each bracha aloud and the congregation answers Amen',
+          congregationResponse: 'אָמֵן',
+          congregationResponseTransliteration: 'Amen',
+        },
       },
       {
         id: 'birchos-hashachar-4',
@@ -915,6 +1140,12 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Baruch Atah Adonai Elokeinu Melech ha\'olam, matir asurim',
         translation: 'Blessed are You... Who releases the bound',
         notes: 'When you can move your limbs and stretch — thank God for freedom of movement.',
+        amud: {
+          role: 'both',
+          instruction: 'The shaliach tzibbur says each bracha aloud and the congregation answers Amen',
+          congregationResponse: 'אָמֵן',
+          congregationResponseTransliteration: 'Amen',
+        },
       },
       {
         id: 'birchos-hashachar-5',
@@ -923,6 +1154,12 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Baruch Atah Adonai Elokeinu Melech ha\'olam, zokeif k\'fufim',
         translation: 'Blessed are You... Who straightens the bent',
         notes: 'When you can stand upright — another miracle. Not everyone can do this.',
+        amud: {
+          role: 'both',
+          instruction: 'The shaliach tzibbur says each bracha aloud and the congregation answers Amen',
+          congregationResponse: 'אָמֵן',
+          congregationResponseTransliteration: 'Amen',
+        },
       },
       {
         id: 'birchos-hashachar-6',
@@ -931,6 +1168,12 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Baruch Atah Adonai Elokeinu Melech ha\'olam, hameichin mitz\'adei gaver',
         translation: 'Blessed are You... Who firms man\'s footsteps',
         notes: 'When you take your first steps — God makes it possible for you to walk.',
+        amud: {
+          role: 'both',
+          instruction: 'The shaliach tzibbur says each bracha aloud and the congregation answers Amen',
+          congregationResponse: 'אָמֵן',
+          congregationResponseTransliteration: 'Amen',
+        },
       },
       {
         id: 'birchos-hashachar-7',
@@ -939,6 +1182,12 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Baruch Atah Adonai Elokeinu Melech ha\'olam, she\'asani Yisrael',
         translation: 'Blessed are You... Who has made me a Jew',
         notes: 'We thank God for the privilege of being part of the Jewish people and having the Torah.',
+        amud: {
+          role: 'both',
+          instruction: 'The shaliach tzibbur says each bracha aloud and the congregation answers Amen',
+          congregationResponse: 'אָמֵן',
+          congregationResponseTransliteration: 'Amen',
+        },
       },
     ],
   },
@@ -964,6 +1213,11 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Rachum v\'chanun, chatati l\'fanecha Adonai Elokai, malei rachamim racheim alai v\'kabeil tachanunai',
         translation: 'Compassionate and gracious One, I have sinned before You, Lord my God. Full of mercy, have mercy on me and accept my supplications',
         notes: 'We rest our head on our left arm (or right if not wearing tefillin) during the first part — a posture of vulnerability.',
+        amud: {
+          role: 'silent_individual',
+          physicalActions: ['sit'],
+          instruction: 'Rest your head on your arm (right arm during Shacharit, left during Mincha)',
+        },
       },
       {
         id: 'tachanun-2',
@@ -972,6 +1226,11 @@ const TEFILLAH_PRAYERS: Prayer[] = [
         transliteration: 'Shomeir Yisrael, sh\'mor sh\'eirit Yisrael, v\'al yovad Yisrael ha\'om\'rim Sh\'ma Yisrael',
         translation: 'Guardian of Israel, guard the remnant of Israel; let not Israel perish — those who declare "Hear, O Israel"',
         notes: 'On Mondays and Thursdays, a longer Tachanun (V\'Hu Rachum) is said.',
+        amud: {
+          role: 'silent_individual',
+          physicalActions: ['sit'],
+          instruction: 'Rest your head on your arm (right arm during Shacharit, left during Mincha)',
+        },
       },
     ],
   },
@@ -1378,4 +1637,12 @@ export function getTefillahPrayers(): Prayer[] {
 
 export function getBrachotPrayers(): Prayer[] {
   return getPrayersByCategory('brachot');
+}
+
+export function getAllPrayers(): Prayer[] {
+  return PRAYERS;
+}
+
+export function getPrayerById(id: string): Prayer | undefined {
+  return PRAYERS.find(p => p.id === id);
 }

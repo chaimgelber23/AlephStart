@@ -2,10 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
 
-// Default Hebrew voice — "Rachel" is a good female Hebrew voice
-// You can change this to any ElevenLabs voice ID
-const HEBREW_VOICE_ID = process.env.ELEVENLABS_HEBREW_VOICE_ID || 'XB0fDUnXU5powFXDhCwa'; // Charlotte — multilingual
-const ENGLISH_VOICE_ID = process.env.ELEVENLABS_ENGLISH_VOICE_ID || 'EXAVITQu4vr4xnSDxMaL'; // Sarah — warm English
+// Voice IDs by gender — chosen for warm, authentic sound for Jewish prayer learning
+const VOICE_IDS = {
+  male: {
+    hebrew: process.env.ELEVENLABS_HEBREW_MALE_VOICE_ID || 'JBFqnCBsd6RMkjVDRZzb',   // George — warm, captivating storyteller
+    english: process.env.ELEVENLABS_ENGLISH_MALE_VOICE_ID || 'W1EJxHy9vl73xgPIKgpn',  // Rabbi Shafier — actual rabbi, strong & inviting
+  },
+  female: {
+    hebrew: process.env.ELEVENLABS_HEBREW_FEMALE_VOICE_ID || 'pFZP5JQG7iQjIQuC4Bku',   // Lily — velvety, warm
+    english: process.env.ELEVENLABS_ENGLISH_FEMALE_VOICE_ID || 'hpp4J3VqNfWAUOO0d1Us', // Bella — professional, bright, warm educator
+  },
+} as const;
+
+type VoiceGender = 'male' | 'female';
 
 // In-memory cache to avoid re-generating same audio
 const audioCache = new Map<string, { data: ArrayBuffer; timestamp: number }>();
@@ -28,18 +37,21 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const { text, mode, speed } = await req.json() as {
+  const { text, mode, speed, voiceGender } = await req.json() as {
     text: string;
     mode: 'hebrew' | 'transliteration';
     speed?: number;
+    voiceGender?: VoiceGender;
   };
 
   if (!text || text.length > 5000) {
     return NextResponse.json({ error: 'Text required (max 5000 chars)' }, { status: 400 });
   }
 
-  // Build cache key
-  const cacheKey = `${mode}:${speed || 1}:${text}`;
+  const gender: VoiceGender = voiceGender || 'male';
+
+  // Build cache key (includes gender so male/female get separate caches)
+  const cacheKey = `${gender}:${mode}:${speed || 1}:${text}`;
   cleanCache();
 
   const cached = audioCache.get(cacheKey);
@@ -52,8 +64,9 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  // Choose voice based on mode
-  const voiceId = mode === 'hebrew' ? HEBREW_VOICE_ID : ENGLISH_VOICE_ID;
+  // Choose voice based on mode and gender
+  const voices = VOICE_IDS[gender];
+  const voiceId = mode === 'hebrew' ? voices.hebrew : voices.english;
 
   try {
     const response = await fetch(
@@ -66,12 +79,14 @@ export async function POST(req: NextRequest) {
         },
         body: JSON.stringify({
           text,
-          model_id: 'eleven_multilingual_v2',
+          model_id: 'eleven_v3',
           voice_settings: {
-            stability: 0.75,
-            similarity_boost: 0.75,
+            stability: 0.5,
+            similarity_boost: 0.82,
             speed: speed || 1.0,
           },
+          apply_text_normalization: 'on',
+          ...(mode === 'hebrew' ? { language_code: 'he' } : { language_code: 'en' }),
         }),
       }
     );

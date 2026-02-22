@@ -124,6 +124,7 @@ export interface PrayerSection {
   slowAudioUrl?: string;
   wordTimings?: WordTiming[];
   notes?: string;
+  amud?: AmudAnnotation;
 }
 
 export interface WordTiming {
@@ -132,12 +133,94 @@ export interface WordTiming {
   endMs: number;
 }
 
+// --- Amud / Service Types ---
+
+/** Who says this part of davening */
+export type AmudRole = 'shaliach_tzibbur' | 'congregation' | 'both' | 'silent_individual';
+
+/** Physical actions during davening */
+export type PhysicalAction =
+  | 'stand'
+  | 'sit'
+  | 'bow'
+  | 'bow_and_stand'
+  | 'three_steps_forward'
+  | 'three_steps_back'
+  | 'cover_eyes'
+  | 'face_west'
+  | 'rise_on_toes';
+
+/** Kaddish variant */
+export type KaddishType = 'half' | 'full' | 'mourners' | 'derabanan';
+
+/** Amud metadata — who says it, how, and what the congregation does */
+export interface AmudAnnotation {
+  role: AmudRole;
+  instruction?: string;
+  congregationResponse?: string;
+  congregationResponseTransliteration?: string;
+  physicalActions?: PhysicalAction[];
+  waitForCongregation?: boolean;
+  notes?: string;
+}
+
+/** A single item in a davening service */
+export interface ServiceItem {
+  id: string;
+  prayerId?: string;
+  type: 'prayer' | 'kaddish' | 'instruction' | 'responsive' | 'torah_reading';
+  label: string;
+  labelHebrew?: string;
+  amud: AmudAnnotation;
+  estimatedSeconds?: number;
+  audioUrl?: string;
+}
+
+/** A logical group within a service (e.g. Pesukei D'Zimra) */
+export interface ServiceSegment {
+  id: string;
+  title: string;
+  titleHebrew?: string;
+  description?: string;
+  color: string;
+  items: ServiceItem[];
+}
+
+/** A complete davening service */
+export interface DaveningService {
+  id: string;
+  name: string;
+  nameHebrew: string;
+  type: 'weekday' | 'shabbat' | 'yom_tov';
+  timeOfDay: 'shacharit' | 'mincha' | 'maariv' | 'musaf' | 'kabbalat_shabbat';
+  description: string;
+  estimatedMinutes: number;
+  segments: ServiceSegment[];
+}
+
+/** User's display preferences — the toggle system */
+export interface DisplaySettings {
+  showTransliteration: boolean;
+  showTranslation: boolean;
+  showInstructions: boolean;
+  showAmudCues: boolean;
+}
+
+/** User's position in a service (for "You are here") */
+export interface ServicePosition {
+  serviceId: string;
+  segmentIndex: number;
+  itemIndex: number;
+  lastUpdated: string;
+}
+
 // --- User & Progress Types ---
 export type Nusach = 'ashkenaz' | 'sefard' | 'edot';
 export type Pronunciation = 'modern' | 'american';
 export type TransliterationMode = 'full' | 'faded' | 'tap' | 'off';
 export type LearningGoal = 'daven' | 'learn' | 'explore' | 'all';
 export type HebrewLevel = 'none' | 'some_letters' | 'read_slow' | 'read_improve';
+export type VoiceGender = 'male' | 'female';
 
 export interface UserProfile {
   id?: string;
@@ -157,6 +240,7 @@ export interface UserProfile {
   learningGoal: LearningGoal;
   hebrewLevel: HebrewLevel;
   onboardingComplete: boolean;
+  voiceGender: VoiceGender;
   // Streak freeze
   streakFreezes: number; // available freezes (max 2)
   lastStreakFreezeWeek?: string; // ISO week string for weekly freeze grant

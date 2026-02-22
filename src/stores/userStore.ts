@@ -16,6 +16,8 @@ import type {
   SectionCoachingProgress,
   CoachingFeedback,
   CoachingPhase,
+  DisplaySettings,
+  ServicePosition,
 } from '@/types';
 
 interface UserState {
@@ -50,6 +52,11 @@ interface UserState {
   saveLearnSession: (session: LearnSession) => void;
   clearLearnSession: () => void;
 
+  // Vowel learn session resume
+  vowelLearnSession: LearnSession | null;
+  saveVowelLearnSession: (session: LearnSession) => void;
+  clearVowelLearnSession: () => void;
+
   // Milestones
   milestones: Milestone[];
   earnMilestone: (type: MilestoneType) => void;
@@ -69,6 +76,14 @@ interface UserState {
   isPrayerFullyCoached: (prayerId: string, sectionIds: string[]) => boolean;
   getSectionStep: (prayerId: string, sectionId: string) => CoachingPhase | null;
   hasUsedCoaching: boolean;
+
+  // Display settings (toggle layers)
+  displaySettings: DisplaySettings;
+  updateDisplaySettings: (updates: Partial<DisplaySettings>) => void;
+
+  // Service position ("You are here")
+  servicePosition: Record<string, ServicePosition>;
+  updateServicePosition: (serviceId: string, position: Partial<ServicePosition>) => void;
 }
 
 const DEFAULT_PROFILE: UserProfile = {
@@ -85,6 +100,7 @@ const DEFAULT_PROFILE: UserProfile = {
   learningGoal: 'daven',
   hebrewLevel: 'none',
   onboardingComplete: false,
+  voiceGender: 'male',
   streakFreezes: 1,
 };
 
@@ -311,6 +327,13 @@ export const useUserStore = create<UserState>()(
 
       clearLearnSession: () => set({ learnSession: null }),
 
+      // Vowel learn session resume
+      vowelLearnSession: null,
+
+      saveVowelLearnSession: (session) => set({ vowelLearnSession: session }),
+
+      clearVowelLearnSession: () => set({ vowelLearnSession: null }),
+
       // Milestones
       milestones: [],
 
@@ -433,6 +456,42 @@ export const useUserStore = create<UserState>()(
       },
 
       hasUsedCoaching: false,
+
+      // Display settings (toggle layers)
+      displaySettings: {
+        showTransliteration: true,
+        showTranslation: true,
+        showInstructions: true,
+        showAmudCues: true,
+      },
+
+      updateDisplaySettings: (updates) =>
+        set((state) => ({
+          displaySettings: { ...state.displaySettings, ...updates },
+        })),
+
+      // Service position ("You are here")
+      servicePosition: {},
+
+      updateServicePosition: (serviceId, position) =>
+        set((state) => {
+          const existing = state.servicePosition[serviceId] || {
+            serviceId,
+            segmentIndex: 0,
+            itemIndex: 0,
+            lastUpdated: '',
+          };
+          return {
+            servicePosition: {
+              ...state.servicePosition,
+              [serviceId]: {
+                ...existing,
+                ...position,
+                lastUpdated: new Date().toISOString(),
+              },
+            },
+          };
+        }),
     }),
     {
       name: 'alephstart-user',

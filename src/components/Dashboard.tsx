@@ -10,6 +10,7 @@ import { ProgressBar } from '@/components/ui/ProgressBar';
 import { BottomNav } from '@/components/ui/BottomNav';
 import { BootcampCard } from '@/components/bootcamp/BootcampCard';
 import { LETTERS } from '@/lib/content/letters';
+import { VOWELS } from '@/lib/content/vowels';
 import {
   STREAK_ENCOURAGEMENTS,
   getRandomStreakEncouragement,
@@ -31,6 +32,12 @@ export function Dashboard() {
     (p) => p.masteryLevel >= 0.8
   ).length;
   const letterProgress = masteredLetters / totalLetters;
+
+  // Vowel progress
+  const totalVowels = VOWELS.length;
+  const learnedVowels = VOWELS.filter(
+    (v) => skillProgress[v.id]?.timesPracticed > 0
+  ).length;
 
   // Today's study data
   const today = new Date().toISOString().split('T')[0];
@@ -313,11 +320,37 @@ export function Dashboard() {
           </>
         )}
 
-        {/* Learn Prayers */}
+        {/* Learn Vowels */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.12 }}
+        >
+          <Link href="/learn/vowels">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100/80 p-4 hover:shadow-md transition-all flex items-center gap-4">
+              <div className="bg-[#8B5CF6]/8 w-11 h-11 rounded-xl flex items-center justify-center shrink-0">
+                <span className="text-[#8B5CF6] font-bold text-lg font-[var(--font-hebrew-serif)]">ַ</span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[15px] font-semibold text-[#2D3142]">Learn Vowels</p>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  {learnedVowels === 0
+                    ? 'Master nekudot to read Hebrew'
+                    : `${learnedVowels} of ${totalVowels} learned`}
+                </p>
+              </div>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" strokeWidth="2" className="shrink-0">
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
+            </div>
+          </Link>
+        </motion.div>
+
+        {/* Learn Prayers */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.14 }}
         >
           <Link href="/siddur">
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100/80 p-4 hover:shadow-md transition-all flex items-center gap-4">

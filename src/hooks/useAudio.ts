@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
-import type { Pronunciation } from '@/types';
+import type { Pronunciation, VoiceGender } from '@/types';
 
 type AudioMode = 'hebrew' | 'transliteration';
 
@@ -23,6 +23,7 @@ interface UseAudioOptions {
   speed?: number;
   onEnded?: () => void;
   pronunciation?: Pronunciation;
+  voiceGender?: VoiceGender;
 }
 
 /**
@@ -128,7 +129,7 @@ export function useAudio(options?: UseAudioOptions) {
       const response = await fetch('/api/tts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, mode, speed }),
+        body: JSON.stringify({ text, mode, speed, voiceGender: options?.voiceGender || 'male' }),
       });
 
       if (!response.ok) {
@@ -144,7 +145,7 @@ export function useAudio(options?: UseAudioOptions) {
     } finally {
       setIsLoading(false);
     }
-  }, [stop, options?.speed, options?.pronunciation, playAudioUrl]);
+  }, [stop, options?.speed, options?.pronunciation, options?.voiceGender, playAudioUrl]);
 
   return { play, stop, isPlaying, isLoading, error };
 }
