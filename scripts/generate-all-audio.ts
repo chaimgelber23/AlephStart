@@ -381,9 +381,10 @@ async function generateVowels(styles: ('modern' | 'american')[]) {
       const filePath = path.join(audioDir, fileName);
 
       if (style === 'modern') {
-        // Hebrew vowel sound — use aleph as carrier so TTS pronounces the vowel
-        // Bare nikud marks (like ַ) produce silence; אַ produces "ah"
-        const vowelText = `א${vowel.hebrew}`;
+        // Hebrew vowel sound — use bet with dagesh (בּ) as carrier letter
+        // This is the standard in Hebrew reading education: בַּ = "bah", בִּ = "bee", etc.
+        // Bare nikud marks produce silence; aleph is silent so אַ = just "ah"
+        const vowelText = `בּ${vowel.hebrew}`;
         await generateAndSave(filePath, vowelText, 'he', `${vowel.name} (${vowelText}) — Hebrew`, 'vowel');
       } else {
         // English pronunciation

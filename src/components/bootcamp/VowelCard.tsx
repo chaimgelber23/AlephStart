@@ -25,9 +25,10 @@ export function VowelCard({ vowel, exampleLetter = 'ב', isActive = false, pronu
   const voiceGender = useUserStore((s) => s.profile.voiceGender) || 'male';
   const suffix = PRONUNCIATION_SUFFIX[pronunciation] ?? '';
   const gSuffix = GENDER_SUFFIX[voiceGender] ?? '';
-  const nameAudioUrl = `/audio/vowels/${vowel.id}${suffix}${gSuffix}.mp3`;
-  // Vowels don't have separate -sound files; the vowel audio IS the sound
-  const soundAudioUrl = nameAudioUrl;
+  // "Sound" plays Hebrew vowel (modern style): בַּ, בֶּ, etc.
+  const soundAudioUrl = `/audio/vowels/${vowel.id}${gSuffix}.mp3`;
+  // "Pronounce" plays English name + sound: "Patach. AH."
+  const nameAudioUrl = `/audio/vowels/${vowel.id}-american${gSuffix}.mp3`;
 
   return (
     <motion.div

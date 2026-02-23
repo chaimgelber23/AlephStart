@@ -308,7 +308,7 @@ export default function VowelLearnPage() {
               {/* Audio hint */}
               <div className="flex justify-center">
                 <AudioButton
-                  audioUrl={`/audio/vowels/${drillCorrectVowel.id}${PRONUNCIATION_SUFFIX[pronunciation]}${GENDER_SUFFIX[voiceGender]}.mp3`}
+                  audioUrl={`/audio/vowels/${drillCorrectVowel.id}${GENDER_SUFFIX[voiceGender]}.mp3`}
                   label="Hear the sound"
                   size="sm"
                   variant="outline"

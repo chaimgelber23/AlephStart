@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useUserStore } from '@/stores/userStore';
@@ -92,17 +92,19 @@ export default function LearnPage() {
   const lessonLetters = getLessonLetters(currentLesson);
   const currentTeachLetter = lessonLetters[teachIndex];
 
-  // Generate drill question
-  const generateDrillOptions = useCallback(() => {
+  // Generate drill question — stored in state so options don't reshuffle on re-render
+  const [drillCorrectLetter, setDrillCorrectLetter] = useState(lessonLetters[0] || LETTERS[0]);
+  const [drillOptions, setDrillOptions] = useState<Letter[]>([]);
+
+  useEffect(() => {
     const correct = lessonLetters[drillIndex % lessonLetters.length];
-    // Get 3 random wrong answers from all letters
+    if (!correct) return;
     const others = LETTERS.filter((l) => l.id !== correct.id);
     const shuffled = others.sort(() => Math.random() - 0.5).slice(0, 3);
     const options = [...shuffled, correct].sort(() => Math.random() - 0.5);
-    return { correct, options };
+    setDrillCorrectLetter(correct);
+    setDrillOptions(options);
   }, [lessonLetters, drillIndex]);
-
-  const { correct: drillCorrectLetter, options: drillOptions } = generateDrillOptions();
 
   // Handle teaching phase
   const handleTeachNext = () => {
