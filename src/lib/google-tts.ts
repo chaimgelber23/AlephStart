@@ -59,11 +59,18 @@ function getClient(): TextToSpeechClient {
 }
 
 /**
- * Fix ה׳ → אֲדֹנָי so TTS says "Adonai" instead of "heh".
- * Also handles the ASCII apostrophe variant ה'.
+ * Fix Hebrew text for proper TTS pronunciation:
+ * 1. ה׳ → אֲדֹנָי  (Hashem → Adonai)
+ * 2. אלקינו → אלהינו (kuf → heh in God's names, since texts use kuf as euphemism)
  */
 export function fixHashemForTTS(text: string): string {
-  return text.replace(/ה[׳']/g, 'אֲדֹנָי');
+  // Replace ה׳ with Adonai
+  let fixed = text.replace(/ה[׳']/g, 'אֲדֹנָי');
+  // Replace kuf (ק) with heh (ה) in Elokim/Elokeinu variants
+  // Matches: א + nikud* + ל + nikud* + ק → replace ק with ה
+  // Hebrew combining marks range: U+0591–U+05C7
+  fixed = fixed.replace(/(א[\u0591-\u05C7]*ל[\u0591-\u05C7]*)ק/g, '$1ה');
+  return fixed;
 }
 
 /**

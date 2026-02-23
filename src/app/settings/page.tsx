@@ -253,13 +253,22 @@ function SettingsContent() {
                 Choose who reads the prayers when you tap Listen
               </p>
               <div className="space-y-3">
-                <p className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">
-                  Text-to-Speech
-                </p>
                 <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => updateProfile({ audioSource: 'tts-modern' })}
+                    className={`px-3 py-2.5 rounded-xl text-sm font-medium border-2 transition-colors text-left ${
+                      (profile.audioSource ?? 'tts-modern') === 'tts-modern'
+                        ? 'border-primary bg-primary/5 text-primary'
+                        : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                    }`}
+                  >
+                    <span className="block">TTS Voice</span>
+                    <span className="text-xs font-normal text-gray-400">Modern Israeli</span>
+                  </button>
                   {([
-                    { value: 'tts-modern' as AudioSource, label: 'Modern Israeli', desc: 'Shabbat, Baruch' },
-                    { value: 'tts-american' as AudioSource, label: 'American Shul', desc: 'Shabbos, Boruch' },
+                    { value: 'rabbi-diamond' as AudioSource, label: "R' Diamond" },
+                    { value: 'rabbi-richman' as AudioSource, label: "R' Richman" },
+                    { value: 'rabbi-weiss' as AudioSource, label: "R' Weiss" },
                   ]).map((opt) => (
                     <button
                       key={opt.value}
@@ -271,36 +280,38 @@ function SettingsContent() {
                       }`}
                     >
                       <span className="block">{opt.label}</span>
-                      <span className="text-xs font-normal text-gray-400">{opt.desc}</span>
+                      <span className="text-xs font-normal text-gray-400">Human recording</span>
                     </button>
                   ))}
                 </div>
+                <p className="text-[10px] text-gray-300">
+                  Human recordings available for select prayers (Shema, Yotzer Or, Ahavah Rabbah, Amidah)
+                </p>
+              </div>
+            </div>
 
-                <p className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mt-1">
-                  Human Recordings
-                </p>
-                <p className="text-[10px] text-gray-300 -mt-2">
-                  Available for Shema, Yotzer Or, Ahavah Rabbah, Emet V&apos;Yatziv, and first 3 Amidah brachot
-                </p>
-                <div className="grid grid-cols-3 gap-2">
-                  {([
-                    { value: 'rabbi-diamond' as AudioSource, label: "R' Diamond" },
-                    { value: 'rabbi-richman' as AudioSource, label: "R' Richman" },
-                    { value: 'rabbi-weiss' as AudioSource, label: "R' Weiss" },
-                  ]).map((opt) => (
-                    <button
-                      key={opt.value}
-                      onClick={() => updateProfile({ audioSource: opt.value })}
-                      className={`px-3 py-2.5 rounded-xl text-sm font-medium border-2 transition-colors text-center ${
-                        (profile.audioSource ?? 'tts-modern') === opt.value
-                          ? 'border-primary bg-primary/5 text-primary'
-                          : 'border-gray-200 text-gray-600 hover:border-gray-300'
-                      }`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
+            {/* Voice Gender */}
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-2">
+                Voice
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                {([
+                  { value: 'male' as const, label: 'Male' },
+                  { value: 'female' as const, label: 'Female' },
+                ]).map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => updateProfile({ voiceGender: opt.value })}
+                    className={`px-3 py-2 rounded-xl text-sm font-medium border-2 transition-colors ${
+                      (profile.voiceGender || 'male') === opt.value
+                        ? 'border-primary bg-primary/5 text-primary'
+                        : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
               </div>
             </div>
 

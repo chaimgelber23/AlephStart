@@ -124,10 +124,10 @@ export function VowelCard({ vowel, exampleLetter = 'ב', isActive = false, pronu
         </button>
       </div>
 
-      {/* Description */}
-      <div className="bg-background rounded-xl p-3 w-full">
-        <p className="text-sm text-gray-600 text-center">{vowel.description}</p>
-      </div>
+      {/* Short description — only show when card is active/focused */}
+      {isActive && (
+        <p className="text-xs text-gray-400 text-center px-2">{vowel.description}</p>
+      )}
     </motion.div>
   );
 }

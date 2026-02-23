@@ -104,22 +104,14 @@ export function LetterCard({
             </button>
           </div>
 
-          {/* Mnemonic */}
-          {showMnemonic && letter.mnemonic && (
-            <div className="bg-background rounded-xl p-4 w-full">
-              <p className="text-sm text-gray-600 text-center italic">
-                {letter.mnemonic}
-              </p>
-            </div>
+          {/* Mnemonic — only when actively teaching */}
+          {showMnemonic && isActive && letter.mnemonic && (
+            <p className="text-xs text-gray-400 text-center italic">{letter.mnemonic}</p>
           )}
 
-          {/* Confusable hint */}
-          {letter.confusableHint && (
-            <div className="bg-[#FEF3C7] rounded-xl p-3 w-full">
-              <p className="text-xs text-amber-700 text-center">
-                {letter.confusableHint}
-              </p>
-            </div>
+          {/* Confusable hint — only when actively teaching */}
+          {isActive && letter.confusableHint && (
+            <p className="text-xs text-amber-600 text-center">{letter.confusableHint}</p>
           )}
         </>
       )}

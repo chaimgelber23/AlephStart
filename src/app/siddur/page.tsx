@@ -272,30 +272,11 @@ export default function SiddurPage() {
             </motion.div>
           )}
 
-          {/* Prayer Context Card */}
+          {/* Prayer Context — compact one-liner */}
           {currentSectionIndex === 0 && displaySettings.showInstructions && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-primary/5 rounded-2xl p-5"
-            >
-              <div className="flex items-start gap-3">
-                <span className="text-2xl mt-0.5">&#x1F4A1;</span>
-                <div>
-                  <p className="text-sm font-medium text-primary">
-                    When: {selectedPrayer.whenSaid}
-                  </p>
-                  <p className="text-sm text-gray-600 mt-2">
-                    {selectedPrayer.inspirationText}
-                  </p>
-                  {selectedPrayer.whySaid && (
-                    <p className="text-sm text-gray-500 mt-2 italic">
-                      {selectedPrayer.whySaid}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </motion.div>
+            <p className="text-xs text-gray-400 text-center">
+              {selectedPrayer.whenSaid}
+            </p>
           )}
 
           {/* Amud Badge for current section */}

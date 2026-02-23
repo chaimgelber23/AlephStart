@@ -105,9 +105,13 @@ interface GoogleTTSOptions {
   pitch?: number;
 }
 
-// Fix ה׳ → אֲדֹנָי so TTS says "Adonai" instead of "heh"
+// Fix Hebrew text for proper TTS pronunciation:
+// 1. ה׳ → אֲדֹנָי  (Hashem → Adonai)
+// 2. אלקינו → אלהינו (kuf → heh in God's names)
 function fixHashemForTTS(text: string): string {
-  return text.replace(/ה[׳']/g, 'אֲדֹנָי');
+  let fixed = text.replace(/ה[׳']/g, 'אֲדֹנָי');
+  fixed = fixed.replace(/(א[\u0591-\u05C7]*ל[\u0591-\u05C7]*)ק/g, '$1ה');
+  return fixed;
 }
 
 async function generateHebrewAudio(text: string, opts: GoogleTTSOptions = {}): Promise<Buffer> {
