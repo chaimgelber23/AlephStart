@@ -26,7 +26,8 @@ export function VowelCard({ vowel, exampleLetter = 'ב', isActive = false, pronu
   const suffix = PRONUNCIATION_SUFFIX[pronunciation] ?? '';
   const gSuffix = GENDER_SUFFIX[voiceGender] ?? '';
   const nameAudioUrl = `/audio/vowels/${vowel.id}${suffix}${gSuffix}.mp3`;
-  const soundAudioUrl = `/audio/vowels/${vowel.id}-sound${suffix}${gSuffix}.mp3`;
+  // Vowels don't have separate -sound files; the vowel audio IS the sound
+  const soundAudioUrl = nameAudioUrl;
 
   return (
     <motion.div
@@ -100,13 +101,13 @@ export function VowelCard({ vowel, exampleLetter = 'ב', isActive = false, pronu
             const audio = new Audio(soundAudioUrl);
             audio.onerror = () => {
               if (gSuffix) {
-                const fb = new Audio(`/audio/vowels/${vowel.id}-sound${suffix}.mp3`);
+                const fb = new Audio(`/audio/vowels/${vowel.id}${suffix}.mp3`);
                 fb.onerror = () => {
-                  if (suffix) new Audio(`/audio/vowels/${vowel.id}-sound.mp3`).play().catch(() => {});
+                  if (suffix) new Audio(`/audio/vowels/${vowel.id}.mp3`).play().catch(() => {});
                 };
                 fb.play().catch(() => {});
               } else if (suffix) {
-                new Audio(`/audio/vowels/${vowel.id}-sound.mp3`).play().catch(() => {});
+                new Audio(`/audio/vowels/${vowel.id}.mp3`).play().catch(() => {});
               }
             };
             audio.play().catch(() => {});

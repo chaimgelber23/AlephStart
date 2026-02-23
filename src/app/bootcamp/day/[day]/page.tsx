@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBootcampStore } from '@/stores/bootcampStore';
@@ -52,6 +52,7 @@ export default function BootcampDayPage() {
   const [teachVowelIdx, setTeachVowelIdx] = useState(0);
   const [reviewIdx, setReviewIdx] = useState(0);
   const [reviewAnswer, setReviewAnswer] = useState<string | null>(null);
+  const [reviewOptions, setReviewOptions] = useState<Letter[]>([]);
   const [milestone, setMilestone] = useState<MilestoneType | null>(null);
 
   // Start day on mount
@@ -79,6 +80,18 @@ export default function BootcampDayPage() {
   const reviewLetterIds = dayData.reviewLetterIds || [];
   const reviewLetters = reviewLetterIds.map(getLetterById).filter(Boolean) as Letter[];
   const reviewQuestions = reviewLetters.slice(0, 6); // Max 6 review questions
+
+  // Generate stable review options (don't reshuffle on re-render)
+  useEffect(() => {
+    if (reviewQuestions.length === 0) return;
+    const correct = reviewQuestions[reviewIdx];
+    if (!correct) return;
+    const others = reviewLetters
+      .filter((l) => l.id !== correct.id)
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 3);
+    setReviewOptions([...others, correct].sort(() => Math.random() - 0.5));
+  }, [reviewIdx]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Current teach state
   const currentLetterGroup = dayData.letterGroups[teachLetterGroupIdx];
@@ -288,35 +301,27 @@ export default function BootcampDayPage() {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                {(() => {
-                  const correct = reviewQuestions[reviewIdx];
-                  const others = reviewLetters
-                    .filter((l) => l.id !== correct.id)
-                    .sort(() => Math.random() - 0.5)
-                    .slice(0, 3);
-                  const opts = [...others, correct].sort(() => Math.random() - 0.5);
-                  return opts.map((letter) => {
-                    const isSelected = reviewAnswer === letter.id;
-                    const isCorrect = letter.id === correct.id;
-                    let bgClass = 'bg-white border-gray-200';
-                    if (reviewAnswer) {
-                      if (isCorrect) bgClass = 'bg-success/10 border-success';
-                      else if (isSelected) bgClass = 'bg-error/10 border-error';
-                      else bgClass = 'bg-white border-gray-100 opacity-50';
-                    }
-                    return (
-                      <button
-                        key={letter.id}
-                        onClick={() => handleReviewAnswer(letter.id)}
-                        disabled={!!reviewAnswer}
-                        className={`${bgClass} border-2 rounded-xl p-3 text-center transition-all`}
-                      >
-                        <p className="font-medium text-foreground">{letter.name}</p>
-                        <p className="text-xs text-gray-500">{letter.sound}</p>
-                      </button>
-                    );
-                  });
-                })()}
+                {reviewOptions.map((letter) => {
+                  const isSelected = reviewAnswer === letter.id;
+                  const isCorrect = letter.id === reviewQuestions[reviewIdx]?.id;
+                  let bgClass = 'bg-white border-gray-200';
+                  if (reviewAnswer) {
+                    if (isCorrect) bgClass = 'bg-success/10 border-success';
+                    else if (isSelected) bgClass = 'bg-error/10 border-error';
+                    else bgClass = 'bg-white border-gray-100 opacity-50';
+                  }
+                  return (
+                    <button
+                      key={letter.id}
+                      onClick={() => handleReviewAnswer(letter.id)}
+                      disabled={!!reviewAnswer}
+                      className={`${bgClass} border-2 rounded-xl p-3 text-center transition-all`}
+                    >
+                      <p className="font-medium text-foreground">{letter.name}</p>
+                      <p className="text-xs text-gray-500">{letter.sound}</p>
+                    </button>
+                  );
+                })}
               </div>
             </motion.div>
           )}

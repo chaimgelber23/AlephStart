@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { useUserStore } from '@/stores/userStore';
@@ -111,16 +111,18 @@ export default function VowelLearnPage() {
   const drillsPerLesson = Math.max(6, lessonVowels.length * 3); // at least 6, or 3 per vowel
 
   // Generate drill question — show a vowel mark, pick from 4 name options
-  const generateDrillOptions = useCallback(() => {
+  const [drillCorrectVowel, setDrillCorrectVowel] = useState(lessonVowels[0] || VOWELS[0]);
+  const [drillOptions, setDrillOptions] = useState<typeof VOWELS>([]);
+
+  useEffect(() => {
     const correct = lessonVowels[drillIndex % lessonVowels.length];
-    // Get 3 wrong answers from all vowels (not in current drill)
+    if (!correct) return;
     const others = VOWELS.filter((v) => v.id !== correct.id);
     const shuffled = others.sort(() => Math.random() - 0.5).slice(0, 3);
     const options = [...shuffled, correct].sort(() => Math.random() - 0.5);
-    return { correct, options };
+    setDrillCorrectVowel(correct);
+    setDrillOptions(options);
   }, [lessonVowels, drillIndex]);
-
-  const { correct: drillCorrectVowel, options: drillOptions } = generateDrillOptions();
 
   // Handle teaching phase
   const handleTeachNext = () => {
@@ -306,7 +308,7 @@ export default function VowelLearnPage() {
               {/* Audio hint */}
               <div className="flex justify-center">
                 <AudioButton
-                  audioUrl={`/audio/vowels/${drillCorrectVowel.id}-sound${PRONUNCIATION_SUFFIX[pronunciation]}${GENDER_SUFFIX[voiceGender]}.mp3`}
+                  audioUrl={`/audio/vowels/${drillCorrectVowel.id}${PRONUNCIATION_SUFFIX[pronunciation]}${GENDER_SUFFIX[voiceGender]}.mp3`}
                   label="Hear the sound"
                   size="sm"
                   variant="outline"
