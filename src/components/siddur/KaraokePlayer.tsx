@@ -16,6 +16,7 @@ export function KaraokePlayer({
   isPlaying,
   isLoading,
   isUnavailable,
+  isFullPrayerAudio,
 }: {
   section: PrayerSection;
   prayerId: string;
@@ -28,6 +29,7 @@ export function KaraokePlayer({
   isPlaying: boolean;
   isLoading: boolean;
   isUnavailable?: boolean;
+  isFullPrayerAudio?: boolean;
 }) {
   const displaySettings = useUserStore((s) => s.displaySettings);
   const audioSpeed = useUserStore((s) => s.profile.audioSpeed);
@@ -109,6 +111,13 @@ export function KaraokePlayer({
         {isUnavailable && (
           <p className="text-sm text-gray-400 text-center py-1">
             Audio coming soon
+          </p>
+        )}
+
+        {/* Full prayer recording indicator */}
+        {isFullPrayerAudio && isPlaying && (
+          <p className="text-xs text-primary/60 text-center py-1">
+            Playing full prayer recording
           </p>
         )}
 

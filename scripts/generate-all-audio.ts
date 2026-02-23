@@ -41,7 +41,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import textToSpeech from '@google-cloud/text-to-speech';
+import { TextToSpeechClient } from '@google-cloud/text-to-speech';
 
 // Load .env.local manually (no dotenv dependency needed)
 function loadEnvFile(filePath: string) {
@@ -91,15 +91,15 @@ const GOOGLE_HEBREW_VOICES = {
   female: 'he-IL-Wavenet-A',
 } as const;
 
-let _googleClient: textToSpeech.TextToSpeechClient | null = null;
+let _googleClient: TextToSpeechClient | null = null;
 
-function getGoogleClient(): textToSpeech.TextToSpeechClient {
+function getGoogleClient(): TextToSpeechClient {
   if (!_googleClient) {
     const apiKey = process.env.GOOGLE_TTS_API_KEY;
     if (apiKey) {
-      _googleClient = new textToSpeech.TextToSpeechClient({ apiKey });
+      _googleClient = new TextToSpeechClient({ apiKey });
     } else {
-      _googleClient = new textToSpeech.TextToSpeechClient();
+      _googleClient = new TextToSpeechClient();
     }
   }
   return _googleClient;
@@ -110,12 +110,18 @@ interface GoogleTTSOptions {
   pitch?: number;
 }
 
+// Fix ה׳ → אֲדֹנָי so TTS says "Adonai" instead of "heh"
+function fixHashemForTTS(text: string): string {
+  return text.replace(/ה[׳']/g, 'אֲדֹנָי');
+}
+
 async function generateHebrewAudio(text: string, opts: GoogleTTSOptions = {}): Promise<Buffer> {
   const client = getGoogleClient();
   const voiceName = GOOGLE_HEBREW_VOICES[GENDER];
+  const processedText = fixHashemForTTS(text);
 
   const [response] = await client.synthesizeSpeech({
-    input: { text },
+    input: { text: processedText },
     voice: {
       languageCode: 'he-IL',
       name: voiceName,

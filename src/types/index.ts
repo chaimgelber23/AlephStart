@@ -221,6 +221,7 @@ export type TransliterationMode = 'full' | 'faded' | 'tap' | 'off';
 export type LearningGoal = 'daven' | 'learn' | 'explore' | 'all';
 export type HebrewLevel = 'none' | 'some_letters' | 'read_slow' | 'read_improve';
 export type VoiceGender = 'male' | 'female';
+export type AudioSource = 'tts-modern' | 'tts-american' | 'rabbi-diamond' | 'rabbi-richman' | 'rabbi-weiss';
 
 export interface UserProfile {
   id?: string;
@@ -241,6 +242,7 @@ export interface UserProfile {
   hebrewLevel: HebrewLevel;
   onboardingComplete: boolean;
   voiceGender: VoiceGender;
+  audioSource: AudioSource;
   // Streak freeze
   streakFreezes: number; // available freezes (max 2)
   lastStreakFreezeWeek?: string; // ISO week string for weekly freeze grant

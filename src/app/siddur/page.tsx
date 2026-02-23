@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { BottomNav } from '@/components/ui/BottomNav';
@@ -31,7 +31,7 @@ export default function SiddurPage() {
   const [dismissedBanner, setDismissedBanner] = useState(false);
 
   // Store
-  const pronunciation = useUserStore((s) => s.profile.pronunciation);
+  const audioSource = useUserStore((s) => s.profile.audioSource ?? 'tts-modern');
   const audioSpeed = useUserStore((s) => s.profile.audioSpeed);
   const updateProfile = useUserStore((s) => s.updateProfile);
   const hasUsedCoaching = useUserStore((s) => s.hasUsedCoaching);
@@ -42,9 +42,12 @@ export default function SiddurPage() {
   // Auto-advance state
   const [autoPlayNext, setAutoPlayNext] = useState(false);
 
-  // Audio — auto-advance to next section when audio ends
+  // Track full-prayer state for auto-advance logic
+  const fullPrayerRef = useRef(false);
+
+  // Audio — auto-advance to next section when audio ends (skip for full-prayer recordings)
   const handleAudioEnded = useCallback(() => {
-    if (!selectedPrayer) return;
+    if (!selectedPrayer || fullPrayerRef.current) return;
     const total = selectedPrayer.sections.length;
     setCurrentSectionIndex((prev) => {
       if (prev < total - 1) {
@@ -56,10 +59,13 @@ export default function SiddurPage() {
   }, [selectedPrayer]);
 
   const audioOptions = useMemo(
-    () => ({ speed: audioSpeed, pronunciation, onEnded: handleAudioEnded }),
-    [audioSpeed, pronunciation, handleAudioEnded]
+    () => ({ speed: audioSpeed, audioSource, onEnded: handleAudioEnded }),
+    [audioSpeed, audioSource, handleAudioEnded]
   );
-  const { play, stop, isPlaying, isLoading, isUnavailable, setSpeed } = useAudio(audioOptions);
+  const { play, stop, isPlaying, isLoading, isUnavailable, isFullPrayerAudio, setSpeed } = useAudio(audioOptions);
+
+  // Keep ref in sync for the onEnded callback
+  fullPrayerRef.current = isFullPrayerAudio;
 
   // Current section data
   const currentSection = selectedPrayer?.sections[currentSectionIndex];
@@ -77,17 +83,12 @@ export default function SiddurPage() {
   useEffect(() => {
     if (autoPlayNext && currentSection && selectedPrayer) {
       setAutoPlayNext(false);
-      const text =
-        pronunciation === 'american'
-          ? currentSection.transliteration
-          : currentSection.hebrewText;
-      const audioMode = pronunciation === 'american' ? 'transliteration' : 'hebrew';
       const timer = setTimeout(() => {
-        play(text, audioMode, audioSpeed, selectedPrayer.id, currentSection.id);
+        play(currentSection.hebrewText, 'hebrew', audioSpeed, selectedPrayer.id, currentSection.id);
       }, 300);
       return () => clearTimeout(timer);
     }
-  }, [autoPlayNext, currentSection, selectedPrayer, pronunciation, audioSpeed, play]);
+  }, [autoPlayNext, currentSection, selectedPrayer, audioSpeed, play]);
 
   // Prayer map for AmudMode
   const prayerMap = useMemo(() => {
@@ -154,26 +155,16 @@ export default function SiddurPage() {
     if (isPlaying) {
       stop();
     } else if (currentSection && selectedPrayer) {
-      const text =
-        pronunciation === 'american'
-          ? currentSection.transliteration
-          : currentSection.hebrewText;
-      const audioMode = pronunciation === 'american' ? 'transliteration' : 'hebrew';
-      play(text, audioMode, audioSpeed, selectedPrayer.id, currentSection.id);
+      play(currentSection.hebrewText, 'hebrew', audioSpeed, selectedPrayer.id, currentSection.id);
     }
-  }, [isPlaying, stop, play, currentSection, selectedPrayer, pronunciation, audioSpeed]);
+  }, [isPlaying, stop, play, currentSection, selectedPrayer, audioSpeed]);
 
   const handleReplay = useCallback(() => {
     if (currentSection && selectedPrayer) {
       stop();
-      const text =
-        pronunciation === 'american'
-          ? currentSection.transliteration
-          : currentSection.hebrewText;
-      const audioMode = pronunciation === 'american' ? 'transliteration' : 'hebrew';
-      play(text, audioMode, audioSpeed, selectedPrayer.id, currentSection.id);
+      play(currentSection.hebrewText, 'hebrew', audioSpeed, selectedPrayer.id, currentSection.id);
     }
-  }, [currentSection, selectedPrayer, pronunciation, audioSpeed, stop, play]);
+  }, [currentSection, selectedPrayer, audioSpeed, stop, play]);
 
   const handleSpeedChange = useCallback((newSpeed: number) => {
     updateProfile({ audioSpeed: newSpeed });
@@ -311,8 +302,8 @@ export default function SiddurPage() {
             <KaraokePlayer
               section={currentSection}
               prayerId={selectedPrayer.id}
-              currentWordIndex={currentWordIndex}
-              progress={progress}
+              currentWordIndex={isFullPrayerAudio ? -1 : currentWordIndex}
+              progress={isFullPrayerAudio ? 0 : progress}
               onTogglePlay={handleTogglePlay}
               onReplay={handleReplay}
               onSpeedChange={handleSpeedChange}
@@ -320,6 +311,7 @@ export default function SiddurPage() {
               isPlaying={isPlaying}
               isLoading={isLoading}
               isUnavailable={isUnavailable}
+              isFullPrayerAudio={isFullPrayerAudio}
             />
           )}
 

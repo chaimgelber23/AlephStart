@@ -31,11 +31,11 @@ export function AmudMode({
   const displaySettings = useUserStore((s) => s.displaySettings);
   const updateServicePosition = useUserStore((s) => s.updateServicePosition);
   const audioSpeed = useUserStore((s) => s.profile.audioSpeed);
-  const pronunciation = useUserStore((s) => s.profile.pronunciation);
+  const audioSource = useUserStore((s) => s.profile.audioSource ?? 'tts-modern');
 
   const audioOptions = useMemo(
-    () => ({ speed: audioSpeed, pronunciation }),
-    [audioSpeed, pronunciation]
+    () => ({ speed: audioSpeed, audioSource }),
+    [audioSpeed, audioSource]
   );
   const { play, stop, isPlaying, isLoading, isUnavailable } = useAudio(audioOptions);
 
@@ -108,14 +108,9 @@ export function AmudMode({
       return;
     }
     if (!currentSection) return;
-    const text =
-      pronunciation === 'american'
-        ? currentSection.transliteration
-        : currentSection.hebrewText;
-    const mode = pronunciation === 'american' ? 'transliteration' : 'hebrew';
     play(
-      text,
-      mode as 'hebrew' | 'transliteration',
+      currentSection.hebrewText,
+      'hebrew',
       audioSpeed,
       currentPrayer?.id,
       currentSection.id

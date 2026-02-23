@@ -59,6 +59,14 @@ function getClient(): TextToSpeechClient {
 }
 
 /**
+ * Fix ה׳ → אֲדֹנָי so TTS says "Adonai" instead of "heh".
+ * Also handles the ASCII apostrophe variant ה'.
+ */
+export function fixHashemForTTS(text: string): string {
+  return text.replace(/ה[׳']/g, 'אֲדֹנָי');
+}
+
+/**
  * Generate Hebrew speech audio using Google Cloud TTS.
  * Returns MP3 audio as a Buffer.
  */
@@ -70,8 +78,11 @@ export async function synthesizeHebrew(
   const gender = opts.gender || 'male';
   const voiceName = HEBREW_VOICES[gender];
 
+  // Fix Hashem references for proper pronunciation
+  const processedText = fixHashemForTTS(text);
+
   const [response] = await client.synthesizeSpeech({
-    input: { text },
+    input: { text: processedText },
     voice: {
       languageCode: 'he-IL',
       name: voiceName,

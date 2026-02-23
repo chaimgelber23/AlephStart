@@ -101,6 +101,7 @@ const DEFAULT_PROFILE: UserProfile = {
   hebrewLevel: 'none',
   onboardingComplete: false,
   voiceGender: 'male',
+  audioSource: 'tts-modern',
   streakFreezes: 1,
 };
 
@@ -495,6 +496,19 @@ export const useUserStore = create<UserState>()(
     }),
     {
       name: 'alephstart-user',
+      version: 2,
+      migrate: (persistedState: unknown, version: number) => {
+        const state = persistedState as Record<string, unknown>;
+        if (version < 2) {
+          const profile = (state.profile ?? {}) as Record<string, unknown>;
+          if (!profile.audioSource) {
+            profile.audioSource = profile.pronunciation === 'american'
+              ? 'tts-american'
+              : 'tts-modern';
+          }
+        }
+        return state;
+      },
     }
   )
 );

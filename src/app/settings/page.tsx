@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { RequireAuth } from '@/components/RequireAuth';
 import { useAuthStore } from '@/stores/authStore';
 import { useUserStore } from '@/stores/userStore';
-import type { Nusach, Pronunciation, TransliterationMode, DisplaySettings } from '@/types';
+import type { Nusach, TransliterationMode, DisplaySettings, AudioSource } from '@/types';
 
 export default function SettingsPage() {
   return (
@@ -244,32 +244,63 @@ function SettingsContent() {
               </div>
             </div>
 
-            {/* Pronunciation */}
+            {/* Audio Source */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-1">
-                Audio Pronunciation
+                Audio Source
               </label>
               <p className="text-xs text-gray-400 mb-2">
-                How should prayers sound when you tap Listen?
+                Choose who reads the prayers when you tap Listen
               </p>
-              <div className="grid grid-cols-2 gap-2">
-                {([
-                  { value: 'modern' as const, label: 'Modern Israeli', desc: 'Shabbat, Baruch' },
-                  { value: 'american' as const, label: 'American Shul', desc: 'Shabbos, Boruch' },
-                ] as { value: Pronunciation; label: string; desc: string }[]).map((opt) => (
-                  <button
-                    key={opt.value}
-                    onClick={() => updateProfile({ pronunciation: opt.value })}
-                    className={`px-3 py-2.5 rounded-xl text-sm font-medium border-2 transition-colors text-left ${
-                      profile.pronunciation === opt.value
-                        ? 'border-primary bg-primary/5 text-primary'
-                        : 'border-gray-200 text-gray-600 hover:border-gray-300'
-                    }`}
-                  >
-                    <span className="block">{opt.label}</span>
-                    <span className="text-xs font-normal text-gray-400">{opt.desc}</span>
-                  </button>
-                ))}
+              <div className="space-y-3">
+                <p className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold">
+                  Text-to-Speech
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  {([
+                    { value: 'tts-modern' as AudioSource, label: 'Modern Israeli', desc: 'Shabbat, Baruch' },
+                    { value: 'tts-american' as AudioSource, label: 'American Shul', desc: 'Shabbos, Boruch' },
+                  ]).map((opt) => (
+                    <button
+                      key={opt.value}
+                      onClick={() => updateProfile({ audioSource: opt.value })}
+                      className={`px-3 py-2.5 rounded-xl text-sm font-medium border-2 transition-colors text-left ${
+                        (profile.audioSource ?? 'tts-modern') === opt.value
+                          ? 'border-primary bg-primary/5 text-primary'
+                          : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                      }`}
+                    >
+                      <span className="block">{opt.label}</span>
+                      <span className="text-xs font-normal text-gray-400">{opt.desc}</span>
+                    </button>
+                  ))}
+                </div>
+
+                <p className="text-[10px] uppercase tracking-wider text-gray-400 font-semibold mt-1">
+                  Human Recordings
+                </p>
+                <p className="text-[10px] text-gray-300 -mt-2">
+                  Available for Shema, Yotzer Or, Ahavah Rabbah, Emet V&apos;Yatziv, and first 3 Amidah brachot
+                </p>
+                <div className="grid grid-cols-3 gap-2">
+                  {([
+                    { value: 'rabbi-diamond' as AudioSource, label: "R' Diamond" },
+                    { value: 'rabbi-richman' as AudioSource, label: "R' Richman" },
+                    { value: 'rabbi-weiss' as AudioSource, label: "R' Weiss" },
+                  ]).map((opt) => (
+                    <button
+                      key={opt.value}
+                      onClick={() => updateProfile({ audioSource: opt.value })}
+                      className={`px-3 py-2.5 rounded-xl text-sm font-medium border-2 transition-colors text-center ${
+                        (profile.audioSource ?? 'tts-modern') === opt.value
+                          ? 'border-primary bg-primary/5 text-primary'
+                          : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
