@@ -3,7 +3,7 @@
  *
  * AUDIO ENGINES:
  *   - Hebrew content → Google Cloud TTS (WaveNet he-IL voices — proper pronunciation)
- *   - English content → ElevenLabs (natural English voices for transliteration)
+ *   - English content → Google Cloud TTS (WaveNet en-US voices for transliteration)
  *
  * Usage:
  *   # Generate female audio for everything:
@@ -24,8 +24,7 @@
  *   GENDER=female FORCE=true npx tsx --tsconfig tsconfig.json scripts/generate-all-audio.ts
  *
  * Environment:
- *   ELEVENLABS_API_KEY            (required for English/transliteration audio)
- *   GOOGLE_APPLICATION_CREDENTIALS (required for Hebrew audio — path to service account JSON)
+ *   GOOGLE_APPLICATION_CREDENTIALS (required — path to service account JSON)
  *     OR GOOGLE_TTS_API_KEY       (simpler API key auth for Google Cloud TTS)
  *   GENDER              male | female (required)
  *   STYLE               modern | american | both (default: both)
@@ -63,12 +62,8 @@ function loadEnvFile(filePath: string) {
 loadEnvFile(path.resolve(__dirname, '../.env.local'));
 loadEnvFile(path.resolve(__dirname, '../.env'));
 
-const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
 const HAS_GOOGLE_CREDS = !!(process.env.GOOGLE_APPLICATION_CREDENTIALS || process.env.GOOGLE_TTS_API_KEY);
 
-if (!ELEVENLABS_API_KEY) {
-  console.warn('WARNING: Missing ELEVENLABS_API_KEY — English/transliteration audio will be skipped.');
-}
 if (!HAS_GOOGLE_CREDS) {
   console.error('Missing Google Cloud credentials. Set GOOGLE_APPLICATION_CREDENTIALS or GOOGLE_TTS_API_KEY in .env.local');
   process.exit(1);
@@ -144,92 +139,39 @@ async function generateHebrewAudio(text: string, opts: GoogleTTSOptions = {}): P
   return Buffer.from(response.audioContent);
 }
 
-// ── ElevenLabs TTS (English only) ────────────────────────────────────
+// ── Google Cloud TTS (English) ────────────────────────────────────
 
-const ELEVENLABS_VOICE_IDS = {
-  male: {
-    english: process.env.ELEVENLABS_ENGLISH_MALE_VOICE_ID || 'W1EJxHy9vl73xgPIKgpn',  // Rabbi Shafier
-  },
-  female: {
-    english: process.env.ELEVENLABS_ENGLISH_FEMALE_VOICE_ID || 'hpp4J3VqNfWAUOO0d1Us', // Bella
-  },
+const GOOGLE_ENGLISH_VOICES = {
+  male: 'en-US-Wavenet-D',
+  female: 'en-US-Wavenet-F',
 } as const;
 
-const PRIMARY_MODEL = 'eleven_v3';
-const FALLBACK_MODEL = 'eleven_multilingual_v2';
-let usingFallbackModel = false;
+async function generateEnglishAudio(text: string, opts: GoogleTTSOptions = {}): Promise<Buffer> {
+  const client = getGoogleClient();
+  const voiceName = GOOGLE_ENGLISH_VOICES[GENDER];
 
-interface ElevenLabsOptions {
-  stability?: number;
-  similarity_boost?: number;
-  style?: number;
-  use_speaker_boost?: boolean;
-  speed?: number;
-}
+  const [response] = await client.synthesizeSpeech({
+    input: { text },
+    voice: {
+      languageCode: 'en-US',
+      name: voiceName,
+    },
+    audioConfig: {
+      audioEncoding: 'MP3' as const,
+      speakingRate: opts.speed || 0.9,
+      pitch: opts.pitch || 0,
+      effectsProfileId: ['headphone-class-device'],
+    },
+  });
 
-function snapStabilityForV3(value: number): number {
-  if (value <= 0.25) return 0.0;
-  if (value <= 0.75) return 0.5;
-  return 1.0;
-}
-
-async function generateEnglishAudio(text: string, opts: ElevenLabsOptions = {}): Promise<Buffer> {
-  if (!ELEVENLABS_API_KEY) {
-    throw new Error('ElevenLabs API key not configured');
+  if (!response.audioContent) {
+    throw new Error('Google Cloud TTS returned empty audio (English)');
   }
 
-  const voiceId = ELEVENLABS_VOICE_IDS[GENDER].english;
-  const modelId = usingFallbackModel ? FALLBACK_MODEL : PRIMARY_MODEL;
-  const isV3 = !usingFallbackModel;
-
-  const rawStability = opts.stability ?? 0.65;
-  const stability = isV3 ? snapStabilityForV3(rawStability) : rawStability;
-
-  const voiceSettings: Record<string, unknown> = {
-    stability,
-    similarity_boost: opts.similarity_boost ?? 0.80,
-    speed: opts.speed ?? 0.85,
-  };
-
-  if (!isV3) {
-    voiceSettings.style = opts.style ?? 0.15;
-    voiceSettings.use_speaker_boost = opts.use_speaker_boost ?? true;
+  if (typeof response.audioContent === 'string') {
+    return Buffer.from(response.audioContent, 'base64');
   }
-
-  const body: Record<string, unknown> = {
-    text,
-    model_id: modelId,
-    voice_settings: voiceSettings,
-    apply_text_normalization: 'on',
-    language_code: 'en',
-  };
-
-  const response = await fetch(
-    `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'xi-api-key': ELEVENLABS_API_KEY,
-      },
-      body: JSON.stringify(body),
-    }
-  );
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    if (!usingFallbackModel && (errorText.includes('model') || response.status === 422)) {
-      console.log(`  ⚠ eleven_v3 not available, falling back to eleven_multilingual_v2`);
-      usingFallbackModel = true;
-      return generateEnglishAudio(text, opts);
-    }
-    if (errorText.includes('quota_exceeded')) {
-      quotaExhausted = true;
-    }
-    throw new Error(`ElevenLabs API error ${response.status}: ${errorText}`);
-  }
-
-  return Buffer.from(await response.arrayBuffer());
+  return Buffer.from(response.audioContent);
 }
 
 // ── File suffix helpers ───────────────────────────────────────────────
@@ -260,7 +202,6 @@ async function delay(ms: number) {
 let totalGenerated = 0;
 let totalSkipped = 0;
 let totalErrors = 0;
-let quotaExhausted = false;
 
 // ── Quality presets ──────────────────────────────────────────────────
 
@@ -276,17 +217,17 @@ const GOOGLE_PRESETS = {
   prayer:      { speed: 0.90, pitch: 0 },
 } as const;
 
-// ElevenLabs presets for English content
-const ELEVEN_PRESETS = {
-  letterName: { stability: 1.0, similarity_boost: 0.82, speed: 0.78 },
-  letterSound: { stability: 1.0, similarity_boost: 0.85, speed: 0.65 },
-  letterSilent: { stability: 1.0, similarity_boost: 0.80, speed: 0.72 },
-  vowel: { stability: 1.0, similarity_boost: 0.82, speed: 0.78 },
-  syllable: { stability: 1.0, similarity_boost: 0.82, speed: 0.70 },
-  word: { stability: 0.5, similarity_boost: 0.82, speed: 0.78 },
-  reading: { stability: 0.5, similarity_boost: 0.82, speed: 0.82 },
-  vocab: { stability: 0.5, similarity_boost: 0.82, speed: 0.78 },
-  prayer: { stability: 0.5, similarity_boost: 0.82, speed: 0.85 },
+// Google Cloud TTS speed presets for English content
+const ENGLISH_PRESETS = {
+  letterName:  { speed: 0.85, pitch: 0 },
+  letterSound: { speed: 0.75, pitch: 0 },
+  letterSilent:{ speed: 0.85, pitch: 0 },
+  vowel:       { speed: 0.85, pitch: 0 },
+  syllable:    { speed: 0.80, pitch: 0 },
+  word:        { speed: 0.90, pitch: 0 },
+  reading:     { speed: 0.90, pitch: 0 },
+  vocab:       { speed: 0.90, pitch: 0 },
+  prayer:      { speed: 0.90, pitch: 0 },
 } as const;
 
 // ── Unified generate-and-save ────────────────────────────────────────
@@ -298,11 +239,6 @@ async function generateAndSave(
   label: string,
   presetKey: keyof typeof GOOGLE_PRESETS
 ) {
-  if (quotaExhausted && lang === 'en') {
-    totalErrors++;
-    return;
-  }
-
   if (!FORCE && fs.existsSync(filePath)) {
     totalSkipped++;
     return;
@@ -316,21 +252,16 @@ async function generateAndSave(
       if (lang === 'he') {
         audio = await generateHebrewAudio(text, GOOGLE_PRESETS[presetKey]);
       } else {
-        audio = await generateEnglishAudio(text, ELEVEN_PRESETS[presetKey]);
+        audio = await generateEnglishAudio(text, ENGLISH_PRESETS[presetKey as keyof typeof ENGLISH_PRESETS]);
       }
 
       writeAudio(filePath, audio);
       totalGenerated++;
 
       // Rate limit — Google allows higher QPS but be polite
-      await delay(lang === 'he' ? 200 : 500);
+      await delay(200);
       return;
     } catch (err) {
-      if (quotaExhausted) {
-        console.error(`  ✗ Quota exhausted — stopping English generation.`);
-        totalErrors++;
-        return;
-      }
       if (attempt === 0) {
         console.log(`  ⟳ Retrying...`);
         await delay(1000);
@@ -575,7 +506,7 @@ async function main() {
   console.log(`\n${'='.repeat(60)}`);
   console.log(`  AlephStart Audio Generator`);
   console.log(`  Hebrew:   Google Cloud TTS (WaveNet ${GOOGLE_HEBREW_VOICES[GENDER]})`);
-  console.log(`  English:  ElevenLabs (${PRIMARY_MODEL})`);
+  console.log(`  English:  Google Cloud TTS (WaveNet ${GOOGLE_ENGLISH_VOICES[GENDER]})`);
   console.log(`  Gender:   ${GENDER}`);
   console.log(`  Styles:   ${styles.join(', ')}`);
   console.log(`  Category: ${CATEGORY}`);
@@ -600,9 +531,6 @@ async function main() {
   console.log(`  Generated:  ${totalGenerated}`);
   console.log(`  Skipped:    ${totalSkipped} (already exist)`);
   console.log(`  Errors:     ${totalErrors}`);
-  if (quotaExhausted) {
-    console.log(`  ⚠ ElevenLabs QUOTA EXHAUSTED — English audio may be incomplete`);
-  }
   console.log(`${'='.repeat(60)}\n`);
 }
 
