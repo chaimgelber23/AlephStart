@@ -381,8 +381,10 @@ async function generateVowels(styles: ('modern' | 'american')[]) {
       const filePath = path.join(audioDir, fileName);
 
       if (style === 'modern') {
-        // Hebrew vowel sound — use Google Cloud TTS
-        await generateAndSave(filePath, vowel.hebrew, 'he', `${vowel.name} (${vowel.hebrew}) — Hebrew`, 'vowel');
+        // Hebrew vowel sound — use aleph as carrier so TTS pronounces the vowel
+        // Bare nikud marks (like ַ) produce silence; אַ produces "ah"
+        const vowelText = `א${vowel.hebrew}`;
+        await generateAndSave(filePath, vowelText, 'he', `${vowel.name} (${vowelText}) — Hebrew`, 'vowel');
       } else {
         // English pronunciation
         const text = `${vowel.name}. ${vowel.sound}.`;
