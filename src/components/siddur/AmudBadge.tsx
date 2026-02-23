@@ -3,8 +3,8 @@
 import type { AmudRole } from '@/types';
 
 const ROLE_CONFIG: Record<AmudRole, { label: string; bg: string; text: string }> = {
-  shaliach_tzibbur: { label: 'SAY ALOUD', bg: 'bg-[#1B4965]', text: 'text-white' },
-  congregation: { label: 'CONGREGATION', bg: 'bg-[#4A7C59]/15', text: 'text-[#4A7C59]' },
+  shaliach_tzibbur: { label: 'SAY ALOUD', bg: 'bg-primary', text: 'text-white' },
+  congregation: { label: 'CONGREGATION', bg: 'bg-success/15', text: 'text-success' },
   both: { label: 'EVERYONE', bg: 'bg-[#7C3AED]/15', text: 'text-[#7C3AED]' },
   silent_individual: { label: 'SILENT', bg: 'bg-gray-100', text: 'text-gray-500' },
 };

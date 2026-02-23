@@ -40,18 +40,18 @@ export function ServiceCard({
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.06 }}
       onClick={() => onSelect(service)}
-      className="w-full bg-white rounded-2xl border border-gray-100 hover:shadow-md hover:border-[#5FA8D3]/30 p-5 text-left transition-all"
+      className="w-full bg-white rounded-2xl border border-gray-100 hover:shadow-md hover:border-primary-light/30 p-5 text-left transition-all"
     >
       <div className="flex items-start gap-4">
         {/* Icon */}
-        <div className="w-12 h-12 rounded-xl bg-[#1B4965]/8 flex items-center justify-center text-xl shrink-0">
+        <div className="w-12 h-12 rounded-xl bg-primary/8 flex items-center justify-center text-xl shrink-0">
           {TIME_ICONS[service.timeOfDay] || '📖'}
         </div>
 
         <div className="flex-1 min-w-0">
           {/* Title row */}
           <div className="flex items-center justify-between gap-2">
-            <h3 className="font-bold text-[#2D3142] text-[15px]">{service.name}</h3>
+            <h3 className="font-bold text-foreground text-[15px]">{service.name}</h3>
             <span className="text-xs text-gray-400 whitespace-nowrap">
               ~{service.estimatedMinutes} min
             </span>
@@ -83,11 +83,11 @@ export function ServiceCard({
             <div className="flex items-center gap-2 mt-2">
               <div className="flex-1 h-1 bg-gray-100 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-[#1B4965] rounded-full transition-all"
+                  className="h-full bg-primary rounded-full transition-all"
                   style={{ width: `${progressPercent}%` }}
                 />
               </div>
-              <span className="text-[10px] text-[#1B4965] font-medium">
+              <span className="text-[10px] text-primary font-medium">
                 {progressPercent}%
               </span>
             </div>

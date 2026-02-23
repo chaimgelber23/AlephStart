@@ -97,13 +97,13 @@ export function WordDrill({ words, onComplete }: WordDrillProps) {
             {options.map((opt) => {
               const isSelected = selectedAnswer === opt.transliteration;
               const isCorrectAnswer = opt.transliteration === currentWord.transliteration;
-              let bgColor = 'bg-white border-gray-200 hover:border-[#5FA8D3]';
+              let bgColor = 'bg-white border-gray-200 hover:border-primary-light';
 
               if (selectedAnswer) {
                 if (isCorrectAnswer) {
-                  bgColor = 'bg-[#4A7C59]/10 border-[#4A7C59]';
+                  bgColor = 'bg-success/10 border-success';
                 } else if (isSelected) {
-                  bgColor = 'bg-[#C17767]/10 border-[#C17767]';
+                  bgColor = 'bg-error/10 border-error';
                 } else {
                   bgColor = 'bg-white border-gray-100 opacity-50';
                 }
@@ -120,7 +120,7 @@ export function WordDrill({ words, onComplete }: WordDrillProps) {
                     ${!selectedAnswer ? 'active:scale-[0.97]' : ''}
                   `}
                 >
-                  <p className="font-medium text-[#2D3142]">{opt.transliteration}</p>
+                  <p className="font-medium text-foreground">{opt.transliteration}</p>
                   {selectedAnswer && (
                     <p className="text-xs text-gray-500 mt-1">{opt.translation}</p>
                   )}
@@ -134,7 +134,7 @@ export function WordDrill({ words, onComplete }: WordDrillProps) {
             <motion.p
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className={`text-center font-medium ${isCorrect ? 'text-[#4A7C59]' : 'text-[#C17767]'}`}
+              className={`text-center font-medium ${isCorrect ? 'text-success' : 'text-error'}`}
             >
               {isCorrect ? '✓ Correct!' : `✗ That was "${currentWord.transliteration}" — ${currentWord.translation}`}
             </motion.p>

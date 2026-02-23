@@ -23,21 +23,21 @@ export function BootcampProgressHeader({
       <div className="flex items-center justify-between mb-2">
         <Link
           href="/bootcamp"
-          className="text-sm text-[#1B4965] hover:underline flex items-center gap-1"
+          className="text-sm text-primary hover:underline flex items-center gap-1"
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <polyline points="15 18 9 12 15 6" />
           </svg>
           Back
         </Link>
-        <span className="text-sm font-semibold text-[#2D3142]">
+        <span className="text-sm font-semibold text-foreground">
           Day {dayNumber} of 5
         </span>
         <span className="text-xs text-gray-500">
           {phaseName} {phaseIndex + 1}/{phaseTotal}
         </span>
       </div>
-      <ProgressBar value={overallProgress} size="sm" color="#1B4965" />
+      <ProgressBar value={overallProgress} size="sm" color='var(--primary)' />
     </div>
   );
 }

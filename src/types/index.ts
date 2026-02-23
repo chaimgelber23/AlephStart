@@ -478,3 +478,4 @@ export interface BootcampProgress {
   dayProgress: Record<number, BootcampDayProgress>;
   completedAt?: string;
 }
+

@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { Settings, Play, Check, ChevronRight, X, Sparkles, RefreshCw } from 'lucide-react';
 import { useUserStore } from '@/stores/userStore';
 import { useAuthStore } from '@/stores/authStore';
 import { useBootcampStore } from '@/stores/bootcampStore';
@@ -121,7 +122,7 @@ export function Dashboard() {
   return (
     <div className="min-h-screen bg-[#F8F7F4]">
       {/* ── Header ── */}
-      <div className="bg-gradient-to-b from-[#1B4965] to-[#1A3F57] text-white px-6 pt-8 pb-6">
+      <div className="bg-gradient-to-b from-primary to-[#1A3F57] text-white px-6 pt-8 pb-6">
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
@@ -135,17 +136,14 @@ export function Dashboard() {
                 className="text-white/30 hover:text-white/70 transition-colors p-1"
                 aria-label="Settings"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
-                  <circle cx="12" cy="12" r="3"/>
-                </svg>
+                <Settings className="w-5 h-5" />
               </Link>
             )}
           </div>
 
           {/* Greeting block — left aligned, compact */}
           <div className="space-y-1">
-            <h1 className="text-2xl font-bold leading-tight tracking-tight">{greeting}</h1>
+            <h1 className="text-2xl font-serif font-bold leading-tight tracking-tight">{greeting}</h1>
             <p
               dir="rtl"
               className="font-[var(--font-hebrew-serif)] text-2xl text-white/50"
@@ -171,7 +169,7 @@ export function Dashboard() {
                   <circle cx="18" cy="18" r="14" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="3" />
                   <circle
                     cx="18" cy="18" r="14" fill="none"
-                    stroke={dailyGoalProgress >= 1 ? '#4A7C59' : '#5FA8D3'}
+                    stroke={dailyGoalProgress >= 1 ? 'var(--success)' : 'var(--primary-light)'}
                     strokeWidth="3"
                     strokeLinecap="round"
                     strokeDasharray={`${dailyGoalProgress * 88} 88`}
@@ -214,11 +212,11 @@ export function Dashboard() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-2xl shadow-sm border border-[#C6973F]/15 p-4 flex items-center gap-3"
+            className="bg-white rounded-2xl shadow-sm border border-gold/15 p-4 flex items-center gap-3"
           >
-            <span className="text-2xl">👋</span>
+            <Sparkles className="w-6 h-6 text-gold flex-shrink-0" strokeWidth={1.5} />
             <div className="flex-1">
-              <p className="text-sm font-semibold text-[#2D3142]">
+              <p className="text-sm font-semibold text-foreground">
                 Welcome back{userName ? `, ${userName}` : ''}!
               </p>
               <p className="text-xs text-gray-500 mt-0.5">
@@ -230,9 +228,7 @@ export function Dashboard() {
               className="text-gray-300 hover:text-gray-500 p-1"
               aria-label="Dismiss"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <path d="M18 6L6 18M6 6l12 12" />
-              </svg>
+              <X className="w-4 h-4" />
             </button>
           </motion.div>
         )}
@@ -254,20 +250,18 @@ export function Dashboard() {
             >
               <Link href="/learn">
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100/80 p-4 hover:shadow-md transition-all flex items-center gap-4">
-                  <div className="bg-[#1B4965]/8 w-11 h-11 rounded-xl flex items-center justify-center shrink-0">
-                    <span className="text-[#1B4965] font-bold text-lg font-[var(--font-hebrew-serif)]">א</span>
+                  <div className="bg-primary/8 w-11 h-11 rounded-xl flex items-center justify-center shrink-0">
+                    <span className="text-primary font-bold text-lg font-[var(--font-hebrew-serif)]">א</span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[15px] font-semibold text-[#2D3142]">Individual Lessons</p>
+                    <p className="text-[15px] font-semibold text-foreground">Individual Lessons</p>
                     <p className="text-xs text-gray-400 mt-0.5">
                       {masteredLetters === 0
                         ? 'Learn letters one at a time'
                         : `${masteredLetters} of ${totalLetters} letters mastered`}
                     </p>
                   </div>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" strokeWidth="2" className="shrink-0">
-                    <polyline points="9 18 15 12 9 6" />
-                  </svg>
+                  <ChevronRight className="w-5 h-5 text-gray-300 shrink-0" strokeWidth={2} />
                 </div>
               </Link>
             </motion.div>
@@ -283,25 +277,23 @@ export function Dashboard() {
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-100/80 p-5 hover:shadow-md transition-all">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-[11px] text-[#1B4965] font-semibold uppercase tracking-widest">
+                      <p className="text-[11px] text-primary font-semibold uppercase tracking-widest">
                         Continue Learning
                       </p>
-                      <h2 className="text-lg font-bold text-[#2D3142] mt-1.5">
+                      <h2 className="text-lg font-serif font-bold text-foreground mt-1.5">
                         Level {profile.currentLevel} — Letters
                       </h2>
                       <p className="text-[13px] text-gray-400 mt-0.5">
                         {masteredLetters} of {totalLetters} letters mastered
                       </p>
                     </div>
-                    <div className="bg-[#1B4965] text-white w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-[#1B4965]/25">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                        <polyline points="9 18 15 12 9 6" />
-                      </svg>
+                    <div className="bg-primary text-white w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-primary/25">
+                      <Play className="w-5 h-5" strokeWidth={2.5} fill="currentColor" />
                     </div>
                   </div>
                   <ProgressBar
                     value={letterProgress}
-                    color="#1B4965"
+                    color='var(--primary)'
                     size="sm"
                     className="mt-4"
                   />
@@ -332,16 +324,14 @@ export function Dashboard() {
                 <span className="text-[#8B5CF6] font-bold text-lg font-[var(--font-hebrew-serif)]">ַ</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[15px] font-semibold text-[#2D3142]">Learn Vowels</p>
+                <p className="text-[15px] font-semibold text-foreground">Learn Vowels</p>
                 <p className="text-xs text-gray-400 mt-0.5">
                   {learnedVowels === 0
                     ? 'Master nekudot to read Hebrew'
                     : `${learnedVowels} of ${totalVowels} learned`}
                 </p>
               </div>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" strokeWidth="2" className="shrink-0">
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
+              <ChevronRight className="w-5 h-5 text-gray-300 shrink-0" strokeWidth={2} />
             </div>
           </Link>
         </motion.div>
@@ -354,18 +344,16 @@ export function Dashboard() {
         >
           <Link href="/siddur">
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100/80 p-4 hover:shadow-md transition-all flex items-center gap-4">
-              <div className="bg-[#C6973F]/8 w-11 h-11 rounded-xl flex items-center justify-center shrink-0">
-                <span className="text-[#C6973F] font-bold text-lg font-[var(--font-hebrew-serif)]">ש</span>
+              <div className="bg-gold/8 w-11 h-11 rounded-xl flex items-center justify-center shrink-0">
+                <span className="text-gold font-bold text-lg font-[var(--font-hebrew-serif)]">ש</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[15px] font-semibold text-[#2D3142]">Learn Prayers</p>
+                <p className="text-[15px] font-semibold text-foreground">Learn Prayers</p>
                 <p className="text-xs text-gray-400 mt-0.5">
                   Practice davening with audio and transliteration
                 </p>
               </div>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#CBD5E1" strokeWidth="2" className="shrink-0">
-                <polyline points="9 18 15 12 9 6" />
-              </svg>
+              <ChevronRight className="w-5 h-5 text-gray-300 shrink-0" strokeWidth={2} />
             </div>
           </Link>
         </motion.div>
@@ -386,18 +374,13 @@ export function Dashboard() {
           <div className="space-y-2">
             {quests.map((q, i) => (
               <div key={i} className="flex items-center gap-3 py-0.5">
-                <div className={`w-[22px] h-[22px] rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
-                  q.done
-                    ? 'bg-[#4A7C59] border-[#4A7C59]'
+                <div className={`w-[22px] h-[22px] rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${q.done
+                    ? 'bg-success border-success'
                     : 'border-gray-200'
-                }`}>
-                  {q.done && (
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                  )}
+                  }`}>
+                  {q.done && <Check className="w-3 h-3 text-white" strokeWidth={3} />}
                 </div>
-                <span className={`text-[13px] ${q.done ? 'text-gray-300 line-through' : 'text-[#2D3142] font-medium'}`}>
+                <span className={`text-[13px] ${q.done ? 'text-gray-300 line-through' : 'text-foreground font-medium'}`}>
                   {q.label}
                 </span>
               </div>
@@ -413,9 +396,9 @@ export function Dashboard() {
           className="grid grid-cols-3 gap-2.5"
         >
           {[
-            { value: masteredLetters, label: 'Letters', color: '#1B4965' },
-            { value: Math.round(todayMinutes), label: 'Min Today', color: '#4A7C59' },
-            { value: profile.streakDays, label: 'Day Streak', color: '#C6973F' },
+            { value: masteredLetters, label: 'Letters', color: 'var(--primary)' },
+            { value: Math.round(todayMinutes), label: 'Min Today', color: 'var(--success)' },
+            { value: profile.streakDays, label: 'Day Streak', color: 'var(--gold)' },
           ].map((stat) => (
             <div key={stat.label} className="bg-white rounded-2xl shadow-sm border border-gray-100/80 py-4 px-3 text-center">
               <p className="text-[22px] font-bold" style={{ color: stat.color }}>{stat.value}</p>
@@ -432,21 +415,18 @@ export function Dashboard() {
             transition={{ delay: 0.25 }}
             className="bg-white rounded-2xl shadow-sm border border-gray-100/80 p-4 flex items-center gap-4"
           >
-            <div className="w-10 h-10 bg-[#1B4965]/8 rounded-xl flex items-center justify-center shrink-0">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1B4965" strokeWidth="1.5">
-                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
-                <circle cx="12" cy="7" r="4" />
-              </svg>
+            <div className="w-10 h-10 bg-primary/8 rounded-xl flex items-center justify-center shrink-0">
+              <RefreshCw className="w-5 h-5 text-primary" strokeWidth={1.5} />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-[#2D3142]">Save your progress</p>
+              <p className="text-sm font-semibold text-foreground">Save your progress</p>
               <p className="text-xs text-gray-400 mt-0.5">
                 Sync across devices &amp; never lose your data
               </p>
             </div>
             <Link
               href="/signup"
-              className="px-4 py-2 rounded-xl bg-[#1B4965] text-white text-xs font-semibold hover:bg-[#163d55] transition-colors whitespace-nowrap shadow-sm"
+              className="px-4 py-2 rounded-xl bg-primary text-white text-xs font-semibold hover:bg-primary/90 transition-colors whitespace-nowrap shadow-sm"
             >
               Sign Up
             </Link>

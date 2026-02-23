@@ -17,7 +17,7 @@ export const SHABBAT_SHACHARIT: DaveningService = {
       title: 'Birkot HaShachar',
       titleHebrew: 'בִּרְכוֹת הַשַּׁחַר',
       description: 'The morning blessings — thanking Hashem for the basics of life',
-      color: '#D4A373',
+      color: 'var(--warning)',
       items: [
         {
           id: 'shabbat-birkot-modeh-ani',
@@ -85,7 +85,7 @@ export const SHABBAT_SHACHARIT: DaveningService = {
       title: "Pesukei D'Zimra",
       titleHebrew: 'פְּסוּקֵי דְזִמְרָא',
       description: 'Psalms and praises to prepare your heart for the main prayer — expanded for Shabbat',
-      color: '#5FA8D3',
+      color: 'var(--primary-light)',
       items: [
         {
           id: 'shabbat-pdzimra-hodu',
@@ -278,7 +278,7 @@ export const SHABBAT_SHACHARIT: DaveningService = {
       title: 'Shabbat Amidah',
       titleHebrew: 'עֲמִידַת שַׁבָּת',
       description: 'The central Shabbat prayer — 7 blessings said standing, facing Jerusalem',
-      color: '#1B4965',
+      color: 'var(--primary)',
       items: [
         {
           id: 'shabbat-amidah-silent-instruction',
@@ -347,7 +347,7 @@ export const SHABBAT_SHACHARIT: DaveningService = {
       title: 'Torah Reading',
       titleHebrew: 'קְרִיאַת הַתּוֹרָה',
       description: 'The weekly Torah portion is read from the scroll — the highlight of the Shabbat morning',
-      color: '#C6973F',
+      color: 'var(--gold)',
       items: [
         {
           id: 'shabbat-torah-service-opening',
@@ -410,7 +410,7 @@ export const SHABBAT_SHACHARIT: DaveningService = {
       title: 'Musaf',
       titleHebrew: 'מוּסָף',
       description: 'The additional Shabbat prayer corresponding to the additional Temple offering',
-      color: '#1B4965',
+      color: 'var(--primary)',
       items: [
         {
           id: 'shabbat-musaf-half-kaddish',
@@ -494,7 +494,7 @@ export const SHABBAT_SHACHARIT: DaveningService = {
       title: 'Closing',
       titleHebrew: 'סִיּוּם הַתְּפִלָּה',
       description: 'Closing prayers and hymns of the Shabbat morning service',
-      color: '#4A7C59',
+      color: 'var(--success)',
       items: [
         {
           id: 'shabbat-closing-ein-kelokeinu',

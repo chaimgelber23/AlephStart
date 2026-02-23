@@ -32,13 +32,12 @@ export function AmudMode({
   const updateServicePosition = useUserStore((s) => s.updateServicePosition);
   const audioSpeed = useUserStore((s) => s.profile.audioSpeed);
   const pronunciation = useUserStore((s) => s.profile.pronunciation);
-  const voiceGender = useUserStore((s) => s.profile.voiceGender);
 
   const audioOptions = useMemo(
-    () => ({ speed: audioSpeed, pronunciation, voiceGender }),
-    [audioSpeed, pronunciation, voiceGender]
+    () => ({ speed: audioSpeed, pronunciation }),
+    [audioSpeed, pronunciation]
   );
-  const { play, stop, isPlaying, isLoading } = useAudio(audioOptions);
+  const { play, stop, isPlaying, isLoading, isUnavailable } = useAudio(audioOptions);
 
   const currentSegment = service.segments[segmentIndex];
   const currentItem = currentSegment?.items[itemIndex];
@@ -124,12 +123,12 @@ export function AmudMode({
   };
 
   return (
-    <div className="min-h-screen bg-[#FEFDFB]">
+    <div className="min-h-screen bg-background">
       {/* Amud Mode Header */}
-      <div className="sticky top-0 z-20 bg-[#1B4965] text-white">
+      <div className="sticky top-0 z-20 bg-primary text-white">
         <div className="max-w-md mx-auto px-6 py-3">
           <div className="flex items-center justify-between">
-            <button onClick={onBack} className="text-[#5FA8D3] text-sm hover:text-white">
+            <button onClick={onBack} className="text-primary-light text-sm hover:text-white">
               ← Exit Amud
             </button>
             <div className="flex items-center gap-2">
@@ -138,7 +137,7 @@ export function AmudMode({
             </div>
             <button
               onClick={() => setShowTips(!showTips)}
-              className="text-xs text-[#5FA8D3] hover:text-white"
+              className="text-xs text-primary-light hover:text-white"
             >
               {showTips ? 'Hide Tips' : 'Tips'}
             </button>
@@ -161,7 +160,7 @@ export function AmudMode({
           {/* Overall progress */}
           <div className="mt-2 h-1 bg-white/10 rounded-full overflow-hidden">
             <div
-              className="h-full bg-[#5FA8D3] rounded-full transition-all duration-300"
+              className="h-full bg-primary-light rounded-full transition-all duration-300"
               style={{
                 width: `${((flatIndex + 1) / allItems.length) * 100}%`,
               }}
@@ -171,7 +170,7 @@ export function AmudMode({
       </div>
 
       {/* Toggle Bar */}
-      <div className="sticky top-[88px] z-10 bg-[#FEFDFB]/95 backdrop-blur-sm px-6 py-1 border-b border-gray-100">
+      <div className="sticky top-[88px] z-10 bg-background/95 backdrop-blur-sm px-6 py-1 border-b border-gray-100">
         <div className="max-w-md mx-auto">
           <DisplayToggleBar />
         </div>
@@ -209,7 +208,7 @@ export function AmudMode({
               {/* Item Header */}
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
-                  <h2 className="text-lg font-bold text-[#2D3142]">
+                  <h2 className="text-lg font-bold text-foreground">
                     {currentItem.label}
                   </h2>
                   {currentItem.labelHebrew && (
@@ -225,8 +224,8 @@ export function AmudMode({
 
               {/* Amud Instruction */}
               {displaySettings.showAmudCues && currentItem.amud.instruction && (
-                <div className="bg-[#1B4965]/5 rounded-xl p-3 mb-4">
-                  <p className="text-sm text-[#1B4965] font-medium">
+                <div className="bg-primary/5 rounded-xl p-3 mb-4">
+                  <p className="text-sm text-primary font-medium">
                     {currentItem.amud.instruction}
                   </p>
                 </div>
@@ -240,7 +239,7 @@ export function AmudMode({
                     {currentItem.amud.physicalActions.map((action) => (
                       <span
                         key={action}
-                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#D4A373]/15 text-[#8B6914] text-xs font-medium"
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-warning/15 text-[#8B6914] text-xs font-medium"
                       >
                         {action.replace(/_/g, ' ')}
                       </span>
@@ -267,7 +266,7 @@ export function AmudMode({
                             key={i}
                             onClick={() => { stop(); setSectionIndex(i); }}
                             className={`w-2 h-2 rounded-full transition-colors ${
-                              i === sectionIndex ? 'bg-[#1B4965]' : 'bg-gray-200'
+                              i === sectionIndex ? 'bg-primary' : 'bg-gray-200'
                             }`}
                           />
                         ))
@@ -275,7 +274,7 @@ export function AmudMode({
                         <div className="flex items-center gap-2">
                           <div className="w-20 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                             <div
-                              className="h-full bg-[#1B4965] rounded-full transition-all"
+                              className="h-full bg-primary rounded-full transition-all"
                               style={{
                                 width: `${((sectionIndex + 1) / currentPrayer.sections.length) * 100}%`,
                               }}
@@ -293,13 +292,13 @@ export function AmudMode({
                   {currentItem.amud.role !== 'congregation' && (
                     <div className={`rounded-2xl border-2 p-6 ${
                       currentItem.amud.role === 'shaliach_tzibbur'
-                        ? 'border-[#1B4965]/20 bg-[#1B4965]/[0.03]'
+                        ? 'border-primary/20 bg-primary/[0.03]'
                         : currentItem.amud.role === 'both'
                         ? 'border-[#7C3AED]/20 bg-[#7C3AED]/[0.03]'
                         : 'border-gray-100 bg-white'
                     }`}>
                       {displaySettings.showAmudCues && currentItem.amud.role === 'shaliach_tzibbur' && (
-                        <p className="text-[10px] uppercase tracking-widest text-[#1B4965] font-bold mb-3 text-center">
+                        <p className="text-[10px] uppercase tracking-widest text-primary font-bold mb-3 text-center">
                           You say
                         </p>
                       )}
@@ -319,7 +318,7 @@ export function AmudMode({
                       {/* Transliteration */}
                       {displaySettings.showTransliteration && (
                         <div className="mt-2 text-center">
-                          <p className="text-lg text-[#1B4965]/70 italic font-medium">
+                          <p className="text-lg text-primary/70 italic font-medium">
                             {currentSection.transliteration}
                           </p>
                         </div>
@@ -334,7 +333,7 @@ export function AmudMode({
 
                       {/* Section amud annotation (if different from item-level) */}
                       {displaySettings.showAmudCues && currentSection.amud?.instruction && (
-                        <p className="text-xs text-[#1B4965] mt-3 text-center">
+                        <p className="text-xs text-primary mt-3 text-center">
                           {currentSection.amud.instruction}
                         </p>
                       )}
@@ -345,8 +344,8 @@ export function AmudMode({
                         disabled={isLoading}
                         className={`mt-4 w-full py-2.5 rounded-xl text-sm font-medium transition-all ${
                           isPlaying
-                            ? 'bg-[#C17767] text-white'
-                            : 'bg-[#1B4965]/10 text-[#1B4965] hover:bg-[#1B4965]/20'
+                            ? 'bg-error text-white'
+                            : 'bg-primary/10 text-primary hover:bg-primary/20'
                         }`}
                       >
                         {isLoading ? 'Loading...' : isPlaying ? '⏹ Stop' : '▶ Listen'}
@@ -356,22 +355,22 @@ export function AmudMode({
 
                   {/* CONGREGATION RESPONSE */}
                   {displaySettings.showAmudCues && currentItem.amud.congregationResponse && (
-                    <div className="rounded-2xl border border-[#4A7C59]/20 bg-[#4A7C59]/[0.03] p-5">
-                      <p className="text-[10px] uppercase tracking-widest text-[#4A7C59] font-bold mb-2 text-center">
+                    <div className="rounded-2xl border border-success/20 bg-success/[0.03] p-5">
+                      <p className="text-[10px] uppercase tracking-widest text-success font-bold mb-2 text-center">
                         Congregation responds
                       </p>
                       <div dir="rtl" className="text-center leading-[2.5]">
-                        <p className="font-[var(--font-hebrew-serif)] text-xl text-[#4A7C59]">
+                        <p className="font-[var(--font-hebrew-serif)] text-xl text-success">
                           {currentItem.amud.congregationResponse}
                         </p>
                       </div>
                       {displaySettings.showTransliteration && currentItem.amud.congregationResponseTransliteration && (
-                        <p className="text-sm text-[#4A7C59]/60 italic text-center mt-1">
+                        <p className="text-sm text-success/60 italic text-center mt-1">
                           {currentItem.amud.congregationResponseTransliteration}
                         </p>
                       )}
                       {currentItem.amud.waitForCongregation && (
-                        <p className="text-xs text-[#4A7C59] mt-2 text-center font-medium">
+                        <p className="text-xs text-success mt-2 text-center font-medium">
                           ⏸ Wait for congregation to finish
                         </p>
                       )}
@@ -382,15 +381,15 @@ export function AmudMode({
                   {displaySettings.showAmudCues &&
                     currentSection.amud?.congregationResponse &&
                     currentSection.amud.congregationResponse !== currentItem.amud.congregationResponse && (
-                      <div className="rounded-xl border border-[#4A7C59]/15 bg-[#4A7C59]/[0.02] p-4">
-                        <p className="text-[10px] uppercase tracking-widest text-[#4A7C59] font-bold mb-1">
+                      <div className="rounded-xl border border-success/15 bg-success/[0.02] p-4">
+                        <p className="text-[10px] uppercase tracking-widest text-success font-bold mb-1">
                           They respond
                         </p>
-                        <p dir="rtl" className="font-[var(--font-hebrew-serif)] text-lg text-[#4A7C59]">
+                        <p dir="rtl" className="font-[var(--font-hebrew-serif)] text-lg text-success">
                           {currentSection.amud.congregationResponse}
                         </p>
                         {displaySettings.showTransliteration && currentSection.amud.congregationResponseTransliteration && (
-                          <p className="text-xs text-[#4A7C59]/50 italic mt-0.5">
+                          <p className="text-xs text-success/50 italic mt-0.5">
                             {currentSection.amud.congregationResponseTransliteration}
                           </p>
                         )}
@@ -421,7 +420,7 @@ export function AmudMode({
             className={`px-4 py-2.5 rounded-xl text-sm font-medium ${
               flatIndex === 0 && sectionIndex === 0
                 ? 'text-gray-300'
-                : 'text-[#1B4965] hover:bg-[#1B4965]/5'
+                : 'text-primary hover:bg-primary/5'
             }`}
           >
             ← Previous
@@ -437,7 +436,7 @@ export function AmudMode({
             className={`px-4 py-2.5 rounded-xl text-sm font-medium ${
               flatIndex === allItems.length - 1 && (!currentPrayer || sectionIndex >= currentPrayer.sections.length - 1)
                 ? 'text-gray-300'
-                : 'bg-[#1B4965] text-white hover:bg-[#163d55]'
+                : 'bg-primary text-white hover:bg-[#163d55]'
             }`}
           >
             Next →
@@ -450,7 +449,7 @@ export function AmudMode({
 
 function TipCard({ title, text }: { title: string; text: string }) {
   return (
-    <div className="bg-[#D4A373]/10 rounded-xl p-3">
+    <div className="bg-warning/10 rounded-xl p-3">
       <p className="text-xs font-semibold text-[#8B6914]">{title}</p>
       <p className="text-xs text-[#8B6914]/70 mt-0.5">{text}</p>
     </div>

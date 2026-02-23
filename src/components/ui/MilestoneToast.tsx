@@ -107,7 +107,7 @@ export function MilestoneToast({ milestone, onClose }: MilestoneToastProps) {
         particleCount: 100,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ['#1B4965', '#5FA8D3', '#C6973F', '#4A7C59'],
+        colors: ['var(--primary)', 'var(--primary-light)', 'var(--gold)', 'var(--success)'],
       });
 
       // Auto-close after 6 seconds
@@ -128,13 +128,13 @@ export function MilestoneToast({ milestone, onClose }: MilestoneToastProps) {
           className="fixed bottom-8 left-4 right-4 md:left-auto md:right-8 md:w-96 z-50"
         >
           <div
-            className="bg-white rounded-2xl shadow-2xl border border-[#C6973F]/30 p-6 cursor-pointer"
+            className="bg-white rounded-2xl shadow-2xl border border-gold/30 p-6 cursor-pointer"
             onClick={onClose}
           >
             <div className="flex items-start gap-4">
               <span className="text-4xl">{data.icon}</span>
               <div className="flex-1">
-                <h3 className="text-lg font-bold text-[#C6973F]">{data.title}</h3>
+                <h3 className="text-lg font-bold text-gold">{data.title}</h3>
                 <p className="text-sm text-gray-600 mt-1">{data.message}</p>
               </div>
             </div>

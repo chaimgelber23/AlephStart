@@ -1,11 +1,16 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Noto_Serif_Hebrew, Noto_Sans_Hebrew } from "next/font/google";
+import { Inter, Noto_Serif_Hebrew, Noto_Sans_Hebrew, Playfair_Display } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { AuthProvider } from "@/components/AuthProvider";
 import "./globals.css";
 
 const inter = Inter({
   variable: "--font-inter",
+  subsets: ["latin"],
+});
+
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
   subsets: ["latin"],
 });
 
@@ -32,7 +37,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
-  themeColor: "#1B4965",
+  themeColor: 'var(--primary)',
 };
 
 export default function RootLayout({
@@ -45,9 +50,10 @@ export default function RootLayout({
       <body
         className={`
           ${inter.variable}
+          ${playfair.variable}
           ${notoSerifHebrew.variable}
           ${notoSansHebrew.variable}
-          font-sans antialiased bg-[#FEFDFB] text-[#2D3142] min-h-screen
+          font-sans antialiased bg-[#FAF9F6] text-foreground min-h-screen
         `}
       >
         <AuthProvider>{children}</AuthProvider>

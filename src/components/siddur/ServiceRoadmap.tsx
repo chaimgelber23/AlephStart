@@ -54,18 +54,18 @@ export function ServiceRoadmap({
   };
 
   return (
-    <div className="min-h-screen bg-[#FEFDFB]">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-[#1B4965] text-white px-6 py-6 rounded-b-3xl">
+      <div className="bg-primary text-white px-6 py-6 rounded-b-3xl">
         <div className="max-w-md mx-auto">
-          <button onClick={onBack} className="text-[#5FA8D3] text-sm hover:text-white">
+          <button onClick={onBack} className="text-primary-light text-sm hover:text-white">
             ← Back
           </button>
 
           <div className="flex items-center justify-between mt-3">
             <div>
               <h1 className="text-xl font-bold">{service.name}</h1>
-              <p dir="rtl" className="font-[var(--font-hebrew-serif)] text-[#5FA8D3] text-sm mt-0.5">
+              <p dir="rtl" className="font-[var(--font-hebrew-serif)] text-primary-light text-sm mt-0.5">
                 {service.nameHebrew}
               </p>
             </div>
@@ -80,7 +80,7 @@ export function ServiceRoadmap({
             </div>
             <div className="h-2 bg-white/10 rounded-full overflow-hidden">
               <motion.div
-                className="h-full bg-[#5FA8D3] rounded-full"
+                className="h-full bg-primary-light rounded-full"
                 initial={{ width: 0 }}
                 animate={{ width: `${progressPercent}%` }}
                 transition={{ duration: 0.6, ease: 'easeOut' }}
@@ -181,7 +181,7 @@ function SegmentCard({
 
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between">
-                <h3 className="font-bold text-[#2D3142] text-sm">{segment.title}</h3>
+                <h3 className="font-bold text-foreground text-sm">{segment.title}</h3>
                 <div className="flex items-center gap-2">
                   {minutes > 0 && (
                     <span className="text-[10px] text-gray-400">~{minutes} min</span>
@@ -234,7 +234,7 @@ function SegmentCard({
                     onClick={() => onSelectItem(item, segmentIndex, itemIdx)}
                     className={`w-full text-left rounded-xl px-3 py-2.5 transition-all ${
                       isCurrent
-                        ? 'bg-[#1B4965]/10 border border-[#1B4965]/20'
+                        ? 'bg-primary/10 border border-primary/20'
                         : 'hover:bg-gray-50'
                     }`}
                   >
@@ -242,7 +242,7 @@ function SegmentCard({
                       {/* "You are here" dot */}
                       {isCurrent && (
                         <motion.div
-                          className="w-2 h-2 rounded-full bg-[#1B4965] shrink-0"
+                          className="w-2 h-2 rounded-full bg-primary shrink-0"
                           animate={{ scale: [1, 1.3, 1] }}
                           transition={{ repeat: Infinity, duration: 2 }}
                         />
@@ -261,7 +261,7 @@ function SegmentCard({
                           <span className={`text-sm ${
                             item.type === 'instruction'
                               ? 'text-gray-400 italic'
-                              : 'text-[#2D3142] font-medium'
+                              : 'text-foreground font-medium'
                           }`}>
                             {item.label}
                           </span>

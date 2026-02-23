@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { BottomNav } from '@/components/ui/BottomNav';
@@ -33,19 +33,33 @@ export default function SiddurPage() {
   // Store
   const pronunciation = useUserStore((s) => s.profile.pronunciation);
   const audioSpeed = useUserStore((s) => s.profile.audioSpeed);
-  const voiceGender = useUserStore((s) => s.profile.voiceGender);
   const updateProfile = useUserStore((s) => s.updateProfile);
   const hasUsedCoaching = useUserStore((s) => s.hasUsedCoaching);
   const isPrayerFullyCoached = useUserStore((s) => s.isPrayerFullyCoached);
   const displaySettings = useUserStore((s) => s.displaySettings);
   const updateServicePosition = useUserStore((s) => s.updateServicePosition);
 
-  // Audio
+  // Auto-advance state
+  const [autoPlayNext, setAutoPlayNext] = useState(false);
+
+  // Audio — auto-advance to next section when audio ends
+  const handleAudioEnded = useCallback(() => {
+    if (!selectedPrayer) return;
+    const total = selectedPrayer.sections.length;
+    setCurrentSectionIndex((prev) => {
+      if (prev < total - 1) {
+        setAutoPlayNext(true);
+        return prev + 1;
+      }
+      return prev;
+    });
+  }, [selectedPrayer]);
+
   const audioOptions = useMemo(
-    () => ({ speed: audioSpeed, pronunciation, voiceGender }),
-    [audioSpeed, pronunciation, voiceGender]
+    () => ({ speed: audioSpeed, pronunciation, onEnded: handleAudioEnded }),
+    [audioSpeed, pronunciation, handleAudioEnded]
   );
-  const { play, stop, isPlaying, isLoading } = useAudio(audioOptions);
+  const { play, stop, isPlaying, isLoading, isUnavailable, setSpeed } = useAudio(audioOptions);
 
   // Current section data
   const currentSection = selectedPrayer?.sections[currentSectionIndex];
@@ -56,7 +70,24 @@ export default function SiddurPage() {
     words,
     wordTimings: currentSection?.wordTimings,
     isPlaying,
+    speed: audioSpeed,
   });
+
+  // Auto-play the next section after auto-advance
+  useEffect(() => {
+    if (autoPlayNext && currentSection && selectedPrayer) {
+      setAutoPlayNext(false);
+      const text =
+        pronunciation === 'american'
+          ? currentSection.transliteration
+          : currentSection.hebrewText;
+      const audioMode = pronunciation === 'american' ? 'transliteration' : 'hebrew';
+      const timer = setTimeout(() => {
+        play(text, audioMode, audioSpeed, selectedPrayer.id, currentSection.id);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [autoPlayNext, currentSection, selectedPrayer, pronunciation, audioSpeed, play]);
 
   // Prayer map for AmudMode
   const prayerMap = useMemo(() => {
@@ -132,6 +163,23 @@ export default function SiddurPage() {
     }
   }, [isPlaying, stop, play, currentSection, selectedPrayer, pronunciation, audioSpeed]);
 
+  const handleReplay = useCallback(() => {
+    if (currentSection && selectedPrayer) {
+      stop();
+      const text =
+        pronunciation === 'american'
+          ? currentSection.transliteration
+          : currentSection.hebrewText;
+      const audioMode = pronunciation === 'american' ? 'transliteration' : 'hebrew';
+      play(text, audioMode, audioSpeed, selectedPrayer.id, currentSection.id);
+    }
+  }, [currentSection, selectedPrayer, pronunciation, audioSpeed, stop, play]);
+
+  const handleSpeedChange = useCallback((newSpeed: number) => {
+    updateProfile({ audioSpeed: newSpeed });
+    setSpeed(newSpeed);
+  }, [updateProfile, setSpeed]);
+
   // === VIEWS ===
 
   // List view (main siddur page)
@@ -171,7 +219,7 @@ export default function SiddurPage() {
     const showCompactProgress = totalSections > 12;
 
     return (
-      <div className="min-h-screen bg-[#FEFDFB]">
+      <div className="min-h-screen bg-background">
         {/* Top Bar */}
         <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-100 px-6 py-3 z-10">
           <div className="max-w-md mx-auto">
@@ -197,11 +245,11 @@ export default function SiddurPage() {
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-[#C6973F]/10 border border-[#C6973F]/20 rounded-2xl p-4 flex items-center gap-3"
+              className="bg-gold/10 border border-gold/20 rounded-2xl p-4 flex items-center gap-3"
             >
               <span className="text-xl">&#x1F393;</span>
               <div className="flex-1">
-                <p className="text-sm font-medium text-[#2D3142]">First time?</p>
+                <p className="text-sm font-medium text-foreground">First time?</p>
                 <p className="text-xs text-gray-500">
                   Tap &quot;Coach&quot; below to learn this step by step
                 </p>
@@ -222,12 +270,12 @@ export default function SiddurPage() {
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-[#1B4965]/5 rounded-2xl p-5"
+              className="bg-primary/5 rounded-2xl p-5"
             >
               <div className="flex items-start gap-3">
                 <span className="text-2xl mt-0.5">&#x1F4A1;</span>
                 <div>
-                  <p className="text-sm font-medium text-[#1B4965]">
+                  <p className="text-sm font-medium text-primary">
                     When: {selectedPrayer.whenSaid}
                   </p>
                   <p className="text-sm text-gray-600 mt-2">
@@ -250,7 +298,7 @@ export default function SiddurPage() {
               {currentSection.amud.physicalActions?.map((action) => (
                 <span
                   key={action}
-                  className="inline-flex items-center px-2 py-0.5 rounded-full bg-[#D4A373]/15 text-[#8B6914] text-[10px] font-medium"
+                  className="inline-flex items-center px-2 py-0.5 rounded-full bg-warning/15 text-[#8B6914] text-[10px] font-medium"
                 >
                   {action.replace(/_/g, ' ')}
                 </span>
@@ -266,8 +314,12 @@ export default function SiddurPage() {
               currentWordIndex={currentWordIndex}
               progress={progress}
               onTogglePlay={handleTogglePlay}
+              onReplay={handleReplay}
+              onSpeedChange={handleSpeedChange}
+              onWordTap={handleReplay}
               isPlaying={isPlaying}
               isLoading={isLoading}
+              isUnavailable={isUnavailable}
             />
           )}
 
@@ -277,6 +329,7 @@ export default function SiddurPage() {
               onClick={() => {
                 if (currentSectionIndex > 0) {
                   stop();
+                  setAutoPlayNext(false);
                   setCurrentSectionIndex(currentSectionIndex - 1);
                 }
               }}
@@ -284,7 +337,7 @@ export default function SiddurPage() {
               className={`px-4 py-2 rounded-lg text-sm font-medium ${
                 currentSectionIndex === 0
                   ? 'text-gray-300'
-                  : 'text-[#1B4965] hover:bg-[#1B4965]/5'
+                  : 'text-primary hover:bg-primary/5'
               }`}
             >
               ← Previous
@@ -295,7 +348,7 @@ export default function SiddurPage() {
               <div className="flex items-center gap-2">
                 <div className="w-24 h-1.5 bg-gray-200 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-[#1B4965] rounded-full transition-all duration-300"
+                    className="h-full bg-primary rounded-full transition-all duration-300"
                     style={{ width: `${((currentSectionIndex + 1) / totalSections) * 100}%` }}
                   />
                 </div>
@@ -310,7 +363,7 @@ export default function SiddurPage() {
                     key={i}
                     onClick={() => { stop(); setCurrentSectionIndex(i); }}
                     className={`w-2.5 h-2.5 rounded-full transition-colors ${
-                      i === currentSectionIndex ? 'bg-[#1B4965]' : 'bg-gray-200 hover:bg-gray-300'
+                      i === currentSectionIndex ? 'bg-primary' : 'bg-gray-200 hover:bg-gray-300'
                     }`}
                   />
                 ))}
@@ -321,6 +374,7 @@ export default function SiddurPage() {
               onClick={() => {
                 if (currentSectionIndex < totalSections - 1) {
                   stop();
+                  setAutoPlayNext(false);
                   setCurrentSectionIndex(currentSectionIndex + 1);
                 }
               }}
@@ -328,7 +382,7 @@ export default function SiddurPage() {
               className={`px-4 py-2 rounded-lg text-sm font-medium ${
                 currentSectionIndex === totalSections - 1
                   ? 'text-gray-300'
-                  : 'text-[#1B4965] hover:bg-[#1B4965]/5'
+                  : 'text-primary hover:bg-primary/5'
               }`}
             >
               Next →
@@ -342,7 +396,7 @@ export default function SiddurPage() {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.5 }}
           onClick={() => { stop(); setShowCoaching(true); }}
-          className="fixed bottom-24 right-6 bg-[#C6973F] text-white px-5 py-3 rounded-full shadow-lg hover:bg-[#b8892f] active:scale-95 transition-all flex items-center gap-2 z-20"
+          className="fixed bottom-24 right-6 bg-gold text-white px-5 py-3 rounded-full shadow-lg hover:bg-[#b8892f] active:scale-95 transition-all flex items-center gap-2 z-20"
         >
           <span className="text-base">&#x1F393;</span>
           <span className="text-sm font-medium">Coach</span>
@@ -378,14 +432,14 @@ function PrayerCard({ prayer, onSelect }: { prayer: Prayer; onSelect: (p: Prayer
   return (
     <button
       onClick={() => onSelect(prayer)}
-      className="w-full rounded-2xl border bg-white border-gray-100 hover:shadow-md hover:border-[#5FA8D3]/30 cursor-pointer p-4 text-left transition-all"
+      className="w-full rounded-2xl border bg-white border-gray-100 hover:shadow-md hover:border-primary-light/30 cursor-pointer p-4 text-left transition-all"
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${
             isPrayerCoached
-              ? 'bg-[#4A7C59]/10 text-[#4A7C59]'
-              : 'bg-[#1B4965]/10 text-[#1B4965]'
+              ? 'bg-success/10 text-success'
+              : 'bg-primary/10 text-primary'
           }`}>
             {isPrayerCoached ? (
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
@@ -396,7 +450,7 @@ function PrayerCard({ prayer, onSelect }: { prayer: Prayer; onSelect: (p: Prayer
             )}
           </div>
           <div>
-            <h3 className="font-semibold text-[#2D3142] text-sm">{prayer.nameEnglish}</h3>
+            <h3 className="font-semibold text-foreground text-sm">{prayer.nameEnglish}</h3>
             <p dir="rtl" className="font-[var(--font-hebrew-serif)] text-base text-gray-500">
               {prayer.nameHebrew}
             </p>
@@ -408,7 +462,7 @@ function PrayerCard({ prayer, onSelect }: { prayer: Prayer; onSelect: (p: Prayer
       </div>
       {prayer.sections.length > 4 && (
         <div className="mt-2 flex items-center gap-2 ml-11">
-          <span className="text-xs bg-[#1B4965]/5 text-[#1B4965] px-2 py-0.5 rounded-full font-medium">
+          <span className="text-xs bg-primary/5 text-primary px-2 py-0.5 rounded-full font-medium">
             {prayer.sections.length} sections
           </span>
           {prayer.estimatedReadSeconds >= 60 && (
@@ -453,15 +507,15 @@ function SiddurList({
   }, [tefillahPrayers, searchQuery]);
 
   return (
-    <div className="min-h-screen bg-[#FEFDFB]">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-[#1B4965] text-white px-6 py-8 rounded-b-3xl">
+      <div className="bg-primary text-white px-6 py-8 rounded-b-3xl">
         <div className="max-w-md mx-auto">
-          <Link href="/" className="text-[#5FA8D3] text-sm hover:text-white">
+          <Link href="/" className="text-primary-light text-sm hover:text-white">
             ← Home
           </Link>
           <h1 className="text-2xl font-bold mt-2">Your Siddur</h1>
-          <p className="text-[#5FA8D3] text-sm mt-1">
+          <p className="text-primary-light text-sm mt-1">
             Learn to daven, lead from the amud, and follow along in shul
           </p>
         </div>
@@ -480,7 +534,7 @@ function SiddurList({
               onClick={() => setActiveTab(tab.id)}
               className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
                 activeTab === tab.id
-                  ? 'bg-white text-[#1B4965] shadow-sm'
+                  ? 'bg-white text-primary shadow-sm'
                   : 'text-gray-500 hover:text-gray-700'
               }`}
             >
@@ -555,7 +609,7 @@ function SiddurList({
                 placeholder="Search prayers..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 text-sm focus:border-[#1B4965] focus:ring-2 focus:ring-[#1B4965]/20 outline-none bg-white"
+                className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none bg-white"
               />
             </div>
 

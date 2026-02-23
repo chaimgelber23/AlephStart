@@ -50,22 +50,22 @@ function LoginContent() {
       >
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
           <div className="text-center space-y-3 mb-8">
-            <div className="font-[var(--font-hebrew-serif)] text-6xl text-[#1B4965] leading-none">
+            <div className="font-[var(--font-hebrew-serif)] text-6xl text-primary leading-none">
               א
             </div>
-            <h1 className="text-2xl font-bold text-[#2D3142]">Welcome Back</h1>
+            <h1 className="text-2xl font-bold text-foreground">Welcome Back</h1>
             <p className="text-sm text-gray-500">Sign in to continue learning</p>
           </div>
 
           {error && (
-            <div className="bg-[#C17767]/10 text-[#C17767] text-sm rounded-xl px-4 py-3 mb-6">
+            <div className="bg-error/10 text-error text-sm rounded-xl px-4 py-3 mb-6">
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-[#2D3142] mb-1.5">
+              <label className="block text-sm font-medium text-foreground mb-1.5">
                 Email
               </label>
               <input
@@ -73,19 +73,19 @@ function LoginContent() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#1B4965] focus:ring-2 focus:ring-[#1B4965]/20 outline-none text-base"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none text-base"
                 placeholder="your@email.com"
               />
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-sm font-medium text-[#2D3142]">
+                <label className="block text-sm font-medium text-foreground">
                   Password
                 </label>
                 <Link
                   href="/reset-password"
-                  className="text-xs text-[#1B4965] hover:underline"
+                  className="text-xs text-primary hover:underline"
                 >
                   Forgot password?
                 </Link>
@@ -95,7 +95,7 @@ function LoginContent() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#1B4965] focus:ring-2 focus:ring-[#1B4965]/20 outline-none text-base"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none text-base"
                 placeholder="••••••••"
               />
             </div>
@@ -103,7 +103,7 @@ function LoginContent() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-[#1B4965] text-white py-3.5 rounded-xl text-base font-medium hover:bg-[#163d55] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-primary text-white py-3.5 rounded-xl text-base font-medium hover:bg-[#163d55] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Signing in...' : 'Sign In'}
             </button>
@@ -111,7 +111,7 @@ function LoginContent() {
 
           <p className="text-center text-sm text-gray-500 mt-6">
             Don&apos;t have an account?{' '}
-            <Link href="/signup" className="text-[#1B4965] font-medium hover:underline">
+            <Link href="/signup" className="text-primary font-medium hover:underline">
               Sign Up
             </Link>
           </p>

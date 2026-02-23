@@ -8,7 +8,7 @@ function LoadingScreen() {
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="text-center space-y-4">
-        <div className="font-[var(--font-hebrew-serif)] text-6xl text-[#1B4965] animate-pulse">
+        <div className="font-[var(--font-hebrew-serif)] text-6xl text-primary animate-pulse">
           א
         </div>
         <p className="text-gray-500">Confirming your account...</p>

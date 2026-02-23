@@ -182,27 +182,27 @@ export default function VowelLearnPage() {
     const resumeVowels = getLessonVowels(vowelLearnSession.currentLesson);
     const resumeLabel = VOWEL_LESSONS[vowelLearnSession.currentLesson]?.label ?? '';
     return (
-      <div className="min-h-screen bg-[#FEFDFB] flex items-center justify-center px-6">
+      <div className="min-h-screen bg-background flex items-center justify-center px-6">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           className="bg-white rounded-2xl border border-gray-100 shadow-md p-8 max-w-sm w-full text-center space-y-4"
         >
           <p className="text-4xl">&#x05B7;</p>
-          <h2 className="text-xl font-bold text-[#2D3142]">Welcome back!</h2>
+          <h2 className="text-xl font-bold text-foreground">Welcome back!</h2>
           <p className="text-sm text-gray-500">
             You were on Lesson {vowelLearnSession.currentLesson + 1} — {resumeLabel} ({resumeVowels.map((v) => v.name).join(', ')})
           </p>
           <div className="space-y-2 pt-2">
             <button
               onClick={resumeSession}
-              className="w-full bg-[#1B4965] text-white py-3.5 rounded-xl font-medium hover:bg-[#163d55] transition-colors"
+              className="w-full bg-primary text-white py-3.5 rounded-xl font-medium hover:bg-[#163d55] transition-colors"
             >
               Continue Where I Left Off
             </button>
             <button
               onClick={startFresh}
-              className="w-full border-2 border-gray-200 text-gray-600 py-3 rounded-xl font-medium hover:border-[#1B4965] transition-colors"
+              className="w-full border-2 border-gray-200 text-gray-600 py-3 rounded-xl font-medium hover:border-primary transition-colors"
             >
               Start from Beginning
             </button>
@@ -213,7 +213,7 @@ export default function VowelLearnPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FEFDFB]">
+    <div className="min-h-screen bg-background">
       {/* Top Bar */}
       <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-100 px-6 py-4 z-10">
         <div className="max-w-md mx-auto flex items-center justify-between">
@@ -223,7 +223,7 @@ export default function VowelLearnPage() {
           <span className="text-sm font-medium text-gray-600">
             Lesson {currentLesson + 1} of {totalLessons} — {VOWEL_LESSONS[currentLesson]?.label}
           </span>
-          <span className="text-sm text-[#1B4965]">
+          <span className="text-sm text-primary">
             {phase === 'teach' && `${teachIndex + 1}/${lessonVowels.length}`}
             {phase === 'drill' && `Drill ${drillIndex + 1}/${drillsPerLesson}`}
             {phase === 'complete' && 'Done!'}
@@ -257,7 +257,7 @@ export default function VowelLearnPage() {
                 <p className="text-sm font-medium uppercase tracking-wider" style={{ color: currentTeachVowel.color }}>
                   New Vowel
                 </p>
-                <h2 className="text-xl font-bold text-[#2D3142] mt-1">
+                <h2 className="text-xl font-bold text-foreground mt-1">
                   Meet {currentTeachVowel.name}
                 </h2>
               </div>
@@ -266,7 +266,7 @@ export default function VowelLearnPage() {
 
               <button
                 onClick={handleTeachNext}
-                className="w-full bg-[#1B4965] text-white py-4 rounded-xl text-lg font-medium hover:bg-[#163d55] transition-colors"
+                className="w-full bg-primary text-white py-4 rounded-xl text-lg font-medium hover:bg-[#163d55] transition-colors"
               >
                 {teachIndex < lessonVowels.length - 1 ? 'Next Vowel →' : "Let's Practice! →"}
               </button>
@@ -283,7 +283,7 @@ export default function VowelLearnPage() {
               className="space-y-8"
             >
               <div className="text-center">
-                <p className="text-sm text-[#1B4965] font-medium uppercase tracking-wider">
+                <p className="text-sm text-primary font-medium uppercase tracking-wider">
                   What sound does this vowel make?
                 </p>
               </div>
@@ -319,13 +319,13 @@ export default function VowelLearnPage() {
                   const isSelected = selectedAnswer === vowel.id;
                   const isCorrect = vowel.id === drillCorrectVowel.id;
 
-                  let bgClass = 'bg-white border-gray-200 hover:border-[#5FA8D3]';
+                  let bgClass = 'bg-white border-gray-200 hover:border-primary-light';
                   if (showResult && isSelected && isCorrect) {
-                    bgClass = 'bg-[#4A7C59]/10 border-[#4A7C59]';
+                    bgClass = 'bg-success/10 border-success';
                   } else if (showResult && isSelected && !isCorrect) {
-                    bgClass = 'bg-[#C17767]/10 border-[#C17767]';
+                    bgClass = 'bg-error/10 border-error';
                   } else if (showResult && isCorrect) {
-                    bgClass = 'bg-[#4A7C59]/5 border-[#4A7C59]/50';
+                    bgClass = 'bg-success/5 border-success/50';
                   }
 
                   return (
@@ -339,7 +339,7 @@ export default function VowelLearnPage() {
                         ${!showResult ? 'active:scale-95' : ''}
                       `}
                     >
-                      <p className="text-lg font-semibold text-[#2D3142]">{vowel.name}</p>
+                      <p className="text-lg font-semibold text-foreground">{vowel.name}</p>
                       <p className="text-sm text-gray-500">{vowel.sound}</p>
                     </button>
                   );
@@ -353,8 +353,8 @@ export default function VowelLearnPage() {
                   animate={{ opacity: 1, y: 0 }}
                   className={`text-center py-3 rounded-xl ${
                     selectedAnswer === drillCorrectVowel.id
-                      ? 'bg-[#4A7C59]/10 text-[#4A7C59]'
-                      : 'bg-[#C17767]/10 text-[#C17767]'
+                      ? 'bg-success/10 text-success'
+                      : 'bg-error/10 text-error'
                   }`}
                 >
                   {selectedAnswer === drillCorrectVowel.id
@@ -374,7 +374,7 @@ export default function VowelLearnPage() {
               className="text-center space-y-6 py-8"
             >
               <div className="text-6xl">&#x2728;</div>
-              <h2 className="text-2xl font-bold text-[#2D3142]">Lesson Complete!</h2>
+              <h2 className="text-2xl font-bold text-foreground">Lesson Complete!</h2>
               <p className="text-gray-600">
                 You learned: {lessonVowels.map((v) => v.name).join(', ')}
               </p>
@@ -382,13 +382,13 @@ export default function VowelLearnPage() {
               <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-3">
                 <div className="flex justify-between">
                   <span className="text-gray-500">Score</span>
-                  <span className="font-bold text-[#1B4965]">
+                  <span className="font-bold text-primary">
                     {drillScore}/{drillTotal} ({Math.round((drillScore / Math.max(drillTotal, 1)) * 100)}%)
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">Vowels learned</span>
-                  <span className="font-bold" style={{ color: lessonVowels[0]?.color ?? '#1B4965' }}>
+                  <span className="font-bold" style={{ color: lessonVowels[0]?.color ?? 'var(--primary)' }}>
                     {lessonVowels.map((v) => v.name).join(', ')}
                   </span>
                 </div>
@@ -398,13 +398,13 @@ export default function VowelLearnPage() {
                 {currentLesson < totalLessons - 1 && (
                   <button
                     onClick={handleNextLesson}
-                    className="w-full bg-[#1B4965] text-white py-4 rounded-xl text-lg font-medium hover:bg-[#163d55] transition-colors"
+                    className="w-full bg-primary text-white py-4 rounded-xl text-lg font-medium hover:bg-[#163d55] transition-colors"
                   >
                     Next Lesson →
                   </button>
                 )}
                 <Link href="/">
-                  <button className="w-full border-2 border-gray-200 text-gray-600 py-4 rounded-xl text-lg font-medium hover:border-[#1B4965] hover:text-[#1B4965] transition-colors">
+                  <button className="w-full border-2 border-gray-200 text-gray-600 py-4 rounded-xl text-lg font-medium hover:border-primary hover:text-primary transition-colors">
                     Back to Home
                   </button>
                 </Link>

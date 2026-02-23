@@ -59,22 +59,22 @@ export function FeedbackPhase({ prayer, onComplete }: FeedbackPhaseProps) {
         >
           &#x1F389;
         </motion.div>
-        <h2 className="text-xl font-bold text-[#2D3142]">
+        <h2 className="text-xl font-bold text-foreground">
           You just learned {prayer.nameEnglish}!
         </h2>
         <p
           dir="rtl"
-          className="font-[var(--font-hebrew-serif)] text-2xl text-[#1B4965] mt-1"
+          className="font-[var(--font-hebrew-serif)] text-2xl text-primary mt-1"
         >
           {prayer.nameHebrew}
         </p>
       </div>
 
-      <div className="h-px bg-[#C6973F]/20" />
+      <div className="h-px bg-gold/20" />
 
       {/* Question 1: Pace */}
       <div>
-        <p className="text-sm font-medium text-[#2D3142] mb-2">
+        <p className="text-sm font-medium text-foreground mb-2">
           How was the pace?
         </p>
         <div className="flex gap-2">
@@ -88,7 +88,7 @@ export function FeedbackPhase({ prayer, onComplete }: FeedbackPhaseProps) {
               onClick={() => setPace(opt.value)}
               className={`flex-1 py-2.5 rounded-xl text-sm font-medium border-2 transition-all ${
                 pace === opt.value
-                  ? 'border-[#1B4965] text-[#1B4965] bg-[#1B4965]/5'
+                  ? 'border-primary text-primary bg-primary/5'
                   : 'border-gray-200 text-gray-500 hover:border-gray-300'
               }`}
             >
@@ -100,7 +100,7 @@ export function FeedbackPhase({ prayer, onComplete }: FeedbackPhaseProps) {
 
       {/* Question 2: Listen count */}
       <div>
-        <p className="text-sm font-medium text-[#2D3142] mb-2">
+        <p className="text-sm font-medium text-foreground mb-2">
           Number of listens?
         </p>
         <div className="flex gap-2">
@@ -114,7 +114,7 @@ export function FeedbackPhase({ prayer, onComplete }: FeedbackPhaseProps) {
               onClick={() => setListens(opt.value)}
               className={`flex-1 py-2.5 rounded-xl text-sm font-medium border-2 transition-all ${
                 listens === opt.value
-                  ? 'border-[#1B4965] text-[#1B4965] bg-[#1B4965]/5'
+                  ? 'border-primary text-primary bg-primary/5'
                   : 'border-gray-200 text-gray-500 hover:border-gray-300'
               }`}
             >
@@ -126,7 +126,7 @@ export function FeedbackPhase({ prayer, onComplete }: FeedbackPhaseProps) {
 
       {/* Question 3: What helped */}
       <div>
-        <p className="text-sm font-medium text-[#2D3142] mb-2">
+        <p className="text-sm font-medium text-foreground mb-2">
           What helped most?
         </p>
         <div className="flex flex-wrap gap-2">
@@ -141,7 +141,7 @@ export function FeedbackPhase({ prayer, onComplete }: FeedbackPhaseProps) {
               onClick={() => toggleHelpful(opt.value)}
               className={`px-4 py-2 rounded-full text-sm font-medium border-2 transition-all ${
                 helpful.includes(opt.value)
-                  ? 'border-[#C6973F] text-[#C6973F] bg-[#C6973F]/5'
+                  ? 'border-gold text-gold bg-gold/5'
                   : 'border-gray-200 text-gray-500 hover:border-gray-300'
               }`}
             >
@@ -157,7 +157,7 @@ export function FeedbackPhase({ prayer, onComplete }: FeedbackPhaseProps) {
         disabled={!canSubmit}
         className={`w-full py-4 rounded-xl text-base font-medium transition-all ${
           canSubmit
-            ? 'bg-[#C6973F] text-white hover:bg-[#b8892f] active:scale-[0.98]'
+            ? 'bg-gold text-white hover:bg-[#b8892f] active:scale-[0.98]'
             : 'bg-gray-200 text-gray-400 cursor-not-allowed'
         }`}
       >

@@ -22,7 +22,7 @@ export function ReadingDisplay({ reading, onComplete }: ReadingDisplayProps) {
     <div className="space-y-6">
       {/* Title and description */}
       <div className="text-center">
-        <h3 className="text-lg font-semibold text-[#2D3142]">{reading.title}</h3>
+        <h3 className="text-lg font-semibold text-foreground">{reading.title}</h3>
         <p className="text-sm text-gray-500 mt-1">{reading.description}</p>
       </div>
 
@@ -33,7 +33,7 @@ export function ReadingDisplay({ reading, onComplete }: ReadingDisplayProps) {
             <div
               key={i}
               className={`w-2 h-2 rounded-full transition-colors ${
-                i === currentLine ? 'bg-[#1B4965]' : i < currentLine ? 'bg-[#4A7C59]' : 'bg-gray-200'
+                i === currentLine ? 'bg-primary' : i < currentLine ? 'bg-success' : 'bg-gray-200'
               }`}
             />
           ))}
@@ -45,7 +45,7 @@ export function ReadingDisplay({ reading, onComplete }: ReadingDisplayProps) {
         key={currentLine}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="bg-white rounded-2xl border-2 border-[#1B4965]/20 p-8 space-y-4"
+        className="bg-white rounded-2xl border-2 border-primary/20 p-8 space-y-4"
       >
         {/* Hebrew text */}
         <div className="text-center">
@@ -91,7 +91,7 @@ export function ReadingDisplay({ reading, onComplete }: ReadingDisplayProps) {
           onClick={() => setShowTransliteration(!showTransliteration)}
           className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
             showTransliteration
-              ? 'bg-[#1B4965] text-white border-[#1B4965]'
+              ? 'bg-primary text-white border-primary'
               : 'bg-white text-gray-500 border-gray-200'
           }`}
         >
@@ -101,7 +101,7 @@ export function ReadingDisplay({ reading, onComplete }: ReadingDisplayProps) {
           onClick={() => setShowTranslation(!showTranslation)}
           className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
             showTranslation
-              ? 'bg-[#1B4965] text-white border-[#1B4965]'
+              ? 'bg-primary text-white border-primary'
               : 'bg-white text-gray-500 border-gray-200'
           }`}
         >
@@ -127,7 +127,7 @@ export function ReadingDisplay({ reading, onComplete }: ReadingDisplayProps) {
               setCurrentLine((i) => i + 1);
             }
           }}
-          className="flex-1 py-3 rounded-xl bg-[#1B4965] text-white font-medium hover:bg-[#163d55] active:scale-[0.98] transition-all"
+          className="flex-1 py-3 rounded-xl bg-primary text-white font-medium hover:bg-[#163d55] active:scale-[0.98] transition-all"
         >
           {isLastLine ? 'I Read It!' : 'Next Line'}
         </button>

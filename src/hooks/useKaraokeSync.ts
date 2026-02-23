@@ -8,6 +8,7 @@ interface UseKaraokeSyncOptions {
   wordTimings?: WordTiming[];
   isPlaying: boolean;
   duration?: number;
+  speed?: number;
   onWordChange?: (index: number) => void;
 }
 
@@ -22,21 +23,30 @@ export function useKaraokeSync({
   wordTimings,
   isPlaying,
   duration,
+  speed,
   onWordChange,
 }: UseKaraokeSyncOptions): UseKaraokeSyncReturn {
   const [currentWordIndex, setCurrentWordIndex] = useState<number>(-1);
   const [progress, setProgress] = useState<number>(0);
 
-  const startTimeRef = useRef<number | null>(null);
   const animationFrameRef = useRef<number | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const prevWordIndexRef = useRef<number>(-1);
   const onWordChangeRef = useRef(onWordChange);
 
-  // Keep the callback ref up to date without triggering effects
+  // Refs for speed-aware cumulative tracking (precise mode)
+  const audioPositionRef = useRef<number>(0);
+  const lastTickTimeRef = useRef<number>(0);
+  const speedRef = useRef(speed || 1);
+
+  // Keep refs up to date
   useEffect(() => {
     onWordChangeRef.current = onWordChange;
   }, [onWordChange]);
+
+  useEffect(() => {
+    speedRef.current = speed || 1;
+  }, [speed]);
 
   // Fire onWordChange whenever currentWordIndex changes
   useEffect(() => {
@@ -47,19 +57,16 @@ export function useKaraokeSync({
   }, [currentWordIndex]);
 
   const reset = useCallback(() => {
-    // Cancel any running animation frame
     if (animationFrameRef.current !== null) {
       cancelAnimationFrame(animationFrameRef.current);
       animationFrameRef.current = null;
     }
-
-    // Clear any running interval
     if (intervalRef.current !== null) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-
-    startTimeRef.current = null;
+    audioPositionRef.current = 0;
+    lastTickTimeRef.current = 0;
     setCurrentWordIndex(-1);
     setProgress(0);
   }, []);
@@ -70,27 +77,32 @@ export function useKaraokeSync({
     if (words.length === 0) return;
 
     if (!isPlaying) {
-      // Stop: cancel animation frame, reset index
       if (animationFrameRef.current !== null) {
         cancelAnimationFrame(animationFrameRef.current);
         animationFrameRef.current = null;
       }
-      startTimeRef.current = null;
+      audioPositionRef.current = 0;
+      lastTickTimeRef.current = 0;
       setCurrentWordIndex(-1);
       setProgress(0);
       return;
     }
 
-    // Start playing: record the start time
-    startTimeRef.current = performance.now();
+    // Start playing: reset cumulative tracking
+    audioPositionRef.current = 0;
+    lastTickTimeRef.current = performance.now();
     setCurrentWordIndex(0);
 
     const totalDuration = wordTimings[wordTimings.length - 1].endMs;
 
     const tick = () => {
-      if (startTimeRef.current === null) return;
+      const now = performance.now();
+      const wallDelta = now - lastTickTimeRef.current;
+      lastTickTimeRef.current = now;
 
-      const elapsed = performance.now() - startTimeRef.current;
+      // Accumulate audio position scaled by current speed
+      audioPositionRef.current += wallDelta * speedRef.current;
+      const elapsed = audioPositionRef.current;
 
       // If we've exceeded the total duration, finish
       if (elapsed >= totalDuration) {
@@ -107,7 +119,6 @@ export function useKaraokeSync({
           foundIndex = i;
           break;
         }
-        // If we're past this word but before the next, stay on this word
         if (
           elapsed >= wordTimings[i].endMs &&
           (i + 1 >= wordTimings.length || elapsed < wordTimings[i + 1].startMs)
@@ -122,8 +133,6 @@ export function useKaraokeSync({
       }
 
       setProgress(Math.min(elapsed / totalDuration, 1));
-
-      // Continue the loop
       animationFrameRef.current = requestAnimationFrame(tick);
     };
 
@@ -139,12 +148,10 @@ export function useKaraokeSync({
 
   // --- Even-split fallback (no wordTimings) ---
   useEffect(() => {
-    // Only run this effect when wordTimings is NOT provided
     if (wordTimings && wordTimings.length > 0) return;
     if (words.length === 0) return;
 
     if (!isPlaying) {
-      // Stop: clear interval, reset index
       if (intervalRef.current !== null) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
@@ -154,10 +161,12 @@ export function useKaraokeSync({
       return;
     }
 
-    // Start playing
+    // Estimate duration, scaled by speed
+    const currentSpeed = speedRef.current;
     const estimatedDuration = words.length * 400;
-    const totalDuration = duration || estimatedDuration;
-    const msPerWord = totalDuration / words.length;
+    const baseDuration = duration || estimatedDuration;
+    const adjustedDuration = baseDuration / currentSpeed;
+    const msPerWord = adjustedDuration / words.length;
 
     let wordIdx = 0;
     setCurrentWordIndex(0);
@@ -167,7 +176,6 @@ export function useKaraokeSync({
       wordIdx += 1;
 
       if (wordIdx >= words.length) {
-        // Reached the end
         setCurrentWordIndex(words.length - 1);
         setProgress(1);
         if (intervalRef.current !== null) {
@@ -187,7 +195,7 @@ export function useKaraokeSync({
         intervalRef.current = null;
       }
     };
-  }, [isPlaying, wordTimings, words.length, duration]);
+  }, [isPlaying, wordTimings, words.length, duration, speed]);
 
   // Clean up everything on unmount
   useEffect(() => {

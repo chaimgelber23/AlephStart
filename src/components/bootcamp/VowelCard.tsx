@@ -60,7 +60,7 @@ export function VowelCard({ vowel, exampleLetter = 'ב', isActive = false, pronu
 
       {/* Vowel name and sound */}
       <div className="text-center">
-        <p className="text-lg font-semibold text-[#2D3142]">{vowel.name}</p>
+        <p className="text-lg font-semibold text-foreground">{vowel.name}</p>
         <p className="text-sm text-gray-500">
           Sound: <span className="font-medium" style={{ color: vowel.color }}>{vowel.sound}</span>
         </p>
@@ -123,7 +123,7 @@ export function VowelCard({ vowel, exampleLetter = 'ב', isActive = false, pronu
       </div>
 
       {/* Description */}
-      <div className="bg-[#FEFDFB] rounded-xl p-3 w-full">
+      <div className="bg-background rounded-xl p-3 w-full">
         <p className="text-sm text-gray-600 text-center">{vowel.description}</p>
       </div>
     </motion.div>

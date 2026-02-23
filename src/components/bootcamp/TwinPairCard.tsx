@@ -15,9 +15,9 @@ export function TwinPairCard({ letterWithDagesh, letterWithout, hint }: TwinPair
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-2xl shadow-sm border-2 border-[#1B4965] p-6"
+      className="bg-white rounded-2xl shadow-sm border-2 border-primary p-6"
     >
-      <p className="text-xs font-semibold text-[#C6973F] uppercase tracking-wider text-center mb-4">
+      <p className="text-xs font-semibold text-gold uppercase tracking-wider text-center mb-4">
         Twin Letters
       </p>
 
@@ -30,8 +30,8 @@ export function TwinPairCard({ letterWithDagesh, letterWithout, hint }: TwinPair
           >
             {letterWithDagesh.hebrew}
           </span>
-          <p className="text-base font-semibold text-[#2D3142]">{letterWithDagesh.name}</p>
-          <p className="text-sm text-[#1B4965] font-medium">{letterWithDagesh.sound}</p>
+          <p className="text-base font-semibold text-foreground">{letterWithDagesh.name}</p>
+          <p className="text-sm text-primary font-medium">{letterWithDagesh.sound}</p>
           <AudioButton audioUrl={letterWithDagesh.audioUrl} label={`Hear ${letterWithDagesh.name}`} size="sm" />
         </div>
 
@@ -50,8 +50,8 @@ export function TwinPairCard({ letterWithDagesh, letterWithout, hint }: TwinPair
           >
             {letterWithout.hebrew}
           </span>
-          <p className="text-base font-semibold text-[#2D3142]">{letterWithout.name}</p>
-          <p className="text-sm text-[#1B4965] font-medium">{letterWithout.sound}</p>
+          <p className="text-base font-semibold text-foreground">{letterWithout.name}</p>
+          <p className="text-sm text-primary font-medium">{letterWithout.sound}</p>
           <AudioButton audioUrl={letterWithout.audioUrl} label={`Hear ${letterWithout.name}`} size="sm" />
         </div>
       </div>

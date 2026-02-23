@@ -30,14 +30,14 @@ export default function BootcampDayCompletePage() {
         particleCount: 100,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ['#1B4965', '#C6973F', '#4A7C59', '#5FA8D3'],
+        colors: ['var(--primary)', 'var(--gold)', 'var(--success)', 'var(--primary-light)'],
       });
     }
   }, [completed, completeDay, completeBootcamp, dayNumber]);
 
   if (!dayData) {
     return (
-      <div className="min-h-screen bg-[#FEFDFB] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <p className="text-gray-500">Day not found</p>
       </div>
     );
@@ -51,7 +51,7 @@ export default function BootcampDayCompletePage() {
   const isLastDay = dayNumber === 5;
 
   return (
-    <div className="min-h-screen bg-[#FEFDFB]">
+    <div className="min-h-screen bg-background">
       <div className="max-w-md mx-auto px-6 py-12">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -59,7 +59,7 @@ export default function BootcampDayCompletePage() {
           className="text-center space-y-6"
         >
           <div className="text-6xl">{isLastDay ? '🎓' : '🎉'}</div>
-          <h1 className="text-2xl font-bold text-[#2D3142]">
+          <h1 className="text-2xl font-bold text-foreground">
             Day {dayNumber} Complete!
           </h1>
           <p className="text-gray-600">
@@ -70,13 +70,13 @@ export default function BootcampDayCompletePage() {
           <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-4 text-left">
             <div className="flex justify-between items-center">
               <span className="text-gray-500 text-sm">Word drill score</span>
-              <span className="font-bold text-[#1B4965]">
+              <span className="font-bold text-primary">
                 {drillScore}/{drillTotal} ({Math.round((drillScore / Math.max(drillTotal, 1)) * 100)}%)
               </span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-500 text-sm">Letters learned so far</span>
-              <span className="font-bold text-[#4A7C59]">{lettersThroughDay.length}</span>
+              <span className="font-bold text-success">{lettersThroughDay.length}</span>
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-500 text-sm">Vowels learned so far</span>
@@ -84,13 +84,13 @@ export default function BootcampDayCompletePage() {
             </div>
             <div className="flex justify-between items-center">
               <span className="text-gray-500 text-sm">Practice words</span>
-              <span className="font-bold text-[#C6973F]">{dayData.practiceWords.length}</span>
+              <span className="font-bold text-gold">{dayData.practiceWords.length}</span>
             </div>
           </div>
 
           {/* Encouragement */}
-          <div className="bg-[#1B4965]/5 rounded-xl p-4">
-            <p className="text-sm text-[#1B4965] italic">
+          <div className="bg-primary/5 rounded-xl p-4">
+            <p className="text-sm text-primary italic">
               {dayNumber === 1 && 'You just started reading Hebrew. The journey of a thousand words begins with a single letter.'}
               {dayNumber === 2 && 'You can read the bracha formula — words that Jews have been saying for thousands of years.'}
               {dayNumber === 3 && 'You read the complete bracha opening. Every bracha you hear in shul starts with what you just read.'}
@@ -104,20 +104,20 @@ export default function BootcampDayCompletePage() {
             {isLastDay ? (
               <button
                 onClick={() => router.push('/bootcamp/complete')}
-                className="w-full bg-[#C6973F] text-white py-4 rounded-xl text-lg font-medium hover:bg-[#b8892f] active:scale-[0.98] transition-all"
+                className="w-full bg-gold text-white py-4 rounded-xl text-lg font-medium hover:bg-[#b8892f] active:scale-[0.98] transition-all"
               >
                 See Your Graduation
               </button>
             ) : (
               <button
                 onClick={() => router.push(`/bootcamp/day/${dayNumber + 1}`)}
-                className="w-full bg-[#1B4965] text-white py-4 rounded-xl text-lg font-medium hover:bg-[#163d55] active:scale-[0.98] transition-all"
+                className="w-full bg-primary text-white py-4 rounded-xl text-lg font-medium hover:bg-[#163d55] active:scale-[0.98] transition-all"
               >
                 Continue to Day {dayNumber + 1}
               </button>
             )}
             <Link href="/bootcamp">
-              <button className="w-full border-2 border-gray-200 text-gray-600 py-3 rounded-xl font-medium hover:border-[#1B4965] hover:text-[#1B4965] transition-colors">
+              <button className="w-full border-2 border-gray-200 text-gray-600 py-3 rounded-xl font-medium hover:border-primary hover:text-primary transition-colors">
                 Back to Bootcamp
               </button>
             </Link>

@@ -34,7 +34,7 @@ export function HebrewText({
         className={cn(
           "font-['Noto_Serif_Hebrew',serif] text-[#1A1A2E] leading-[2]",
           sizeClasses[size],
-          onClick && 'cursor-pointer hover:text-[#1B4965] transition-colors'
+          onClick && 'cursor-pointer hover:text-primary transition-colors'
         )}
       >
         {children}

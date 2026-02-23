@@ -6,19 +6,13 @@ import type { PrayerSection } from '@/types';
 interface TryYourselfPhaseProps {
   section: PrayerSection;
   showTranslation: boolean;
-  isPlaying: boolean;
-  isLoading: boolean;
-  onPlayCheck: () => void;
-  onComplete: () => void;
+  onAdvance: () => void;
 }
 
 export function TryYourselfPhase({
   section,
   showTranslation,
-  isPlaying,
-  isLoading,
-  onPlayCheck,
-  onComplete,
+  onAdvance,
 }: TryYourselfPhaseProps) {
   return (
     <motion.div
@@ -30,7 +24,8 @@ export function TryYourselfPhase({
       {/* Instruction */}
       <div className="text-center">
         <p className="text-sm text-gray-500">
-          Now say it on your own. Take your time.
+          Try reading the Hebrew on your own. The transliteration is there if
+          you need it. When you&apos;ve said it, tap Done.
         </p>
       </div>
 
@@ -43,10 +38,10 @@ export function TryYourselfPhase({
           </p>
         </div>
 
-        {/* Transliteration — always visible */}
+        {/* Transliteration */}
         <div className="text-center">
-          <p className="text-[10px] uppercase tracking-widest text-[#1B4965]/40 font-semibold mb-0.5">How to say it</p>
-          <p className="text-lg font-medium text-[#1B4965] italic">
+          <p className="text-[10px] uppercase tracking-widest text-primary/40 font-semibold mb-0.5">How to say it</p>
+          <p className="text-lg font-medium text-primary italic">
             {section.transliteration}
           </p>
         </div>
@@ -54,7 +49,7 @@ export function TryYourselfPhase({
         {/* Translation — faded if preference says so */}
         {showTranslation && (
           <div className="text-center">
-            <p className="text-[10px] uppercase tracking-widest text-[#1B4965]/40 font-semibold mb-0.5">What it means</p>
+            <p className="text-[10px] uppercase tracking-widest text-primary/40 font-semibold mb-0.5">What it means</p>
             <p className="text-sm text-gray-300">
               {section.translation}
             </p>
@@ -62,26 +57,13 @@ export function TryYourselfPhase({
         )}
       </div>
 
-      {/* Action buttons */}
-      <div className="flex gap-3">
-        <button
-          onClick={onPlayCheck}
-          disabled={isPlaying || isLoading}
-          className={`flex-1 py-3.5 rounded-xl text-sm font-medium border-2 transition-all ${
-            isPlaying
-              ? 'border-[#1B4965] text-[#1B4965] bg-[#1B4965]/5'
-              : 'border-gray-200 text-gray-500 hover:border-[#1B4965] hover:text-[#1B4965]'
-          }`}
-        >
-          {isLoading ? 'Loading...' : isPlaying ? 'Playing...' : 'Play to check'}
-        </button>
-        <button
-          onClick={onComplete}
-          className="flex-1 py-3.5 rounded-xl text-sm font-medium bg-[#4A7C59] text-white hover:bg-[#3d6a4a] active:scale-[0.98] transition-all"
-        >
-          I said it!
-        </button>
-      </div>
+      {/* Done button */}
+      <button
+        onClick={onAdvance}
+        className="w-full py-3.5 rounded-xl text-sm font-medium bg-success text-white hover:bg-[#3d6a4a] active:scale-[0.98] transition-all"
+      >
+        Done
+      </button>
     </motion.div>
   );
 }

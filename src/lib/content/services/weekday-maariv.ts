@@ -109,7 +109,7 @@ export const WEEKDAY_MAARIV: DaveningService = {
       title: 'Amidah',
       titleHebrew: 'עֲמִידָה',
       description: 'The central prayer — 19 blessings said standing, facing Jerusalem. At Maariv the Amidah is recited silently only — there is no repetition.',
-      color: '#1B4965',
+      color: 'var(--primary)',
       items: [
         {
           id: 'maariv-half-kaddish',
@@ -165,7 +165,7 @@ export const WEEKDAY_MAARIV: DaveningService = {
       title: 'Closing',
       titleHebrew: 'סִיּוּם הַתְּפִלָּה',
       description: 'Closing prayers to conclude the evening service',
-      color: '#4A7C59',
+      color: 'var(--success)',
       items: [
         {
           id: 'maariv-full-kaddish',

@@ -17,7 +17,7 @@ export const SHABBAT_MINCHA: DaveningService = {
       title: 'Ashrei and Torah Reading',
       titleHebrew: 'אַשְׁרֵי וּקְרִיאַת הַתּוֹרָה',
       description: 'Ashrei followed by the Shabbat afternoon Torah reading',
-      color: '#C6973F',
+      color: 'var(--gold)',
       items: [
         {
           id: 'mincha-ashrei',
@@ -82,7 +82,7 @@ export const SHABBAT_MINCHA: DaveningService = {
       title: 'Shabbat Amidah',
       titleHebrew: 'עֲמִידָה לְשַׁבָּת',
       description: 'The Shabbat afternoon Amidah — 7 blessings with the theme of rest and tranquility',
-      color: '#1B4965',
+      color: 'var(--primary)',
       items: [
         {
           id: 'mincha-half-kaddish',
@@ -169,7 +169,7 @@ export const SHABBAT_MINCHA: DaveningService = {
       title: 'Closing',
       titleHebrew: 'סִיּוּם הַתְּפִלָּה',
       description: 'Closing prayers to conclude the Shabbat afternoon service',
-      color: '#4A7C59',
+      color: 'var(--success)',
       items: [
         {
           id: 'mincha-full-kaddish',

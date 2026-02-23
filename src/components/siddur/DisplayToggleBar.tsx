@@ -3,11 +3,11 @@
 import { useUserStore } from '@/stores/userStore';
 import type { DisplaySettings } from '@/types';
 
-const TOGGLES: { key: keyof DisplaySettings; label: string; icon: string }[] = [
-  { key: 'showTransliteration', label: 'Transliteration', icon: 'Aa' },
-  { key: 'showTranslation', label: 'Translation', icon: 'En' },
-  { key: 'showInstructions', label: 'Instructions', icon: '?' },
-  { key: 'showAmudCues', label: 'Amud', icon: '🎤' },
+const TOGGLES: { key: keyof DisplaySettings; label: string }[] = [
+  { key: 'showTransliteration', label: 'Translit.' },
+  { key: 'showTranslation', label: 'English' },
+  { key: 'showInstructions', label: 'Tips' },
+  { key: 'showAmudCues', label: 'Amud' },
 ];
 
 export function DisplayToggleBar() {
@@ -15,21 +15,33 @@ export function DisplayToggleBar() {
   const updateDisplaySettings = useUserStore((s) => s.updateDisplaySettings);
 
   return (
-    <div className="flex gap-2 overflow-x-auto no-scrollbar py-2">
-      {TOGGLES.map(({ key, label, icon }) => {
+    <div className="grid grid-cols-2 gap-x-4 gap-y-1 py-2">
+      {TOGGLES.map(({ key, label }) => {
         const isOn = displaySettings[key];
         return (
           <button
             key={key}
             onClick={() => updateDisplaySettings({ [key]: !isOn })}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all ${
-              isOn
-                ? 'bg-[#1B4965] text-white'
-                : 'bg-gray-100 text-gray-400 border border-gray-200'
-            }`}
+            className="flex items-center justify-between min-h-[36px] px-1"
           >
-            <span className="text-[10px]">{icon}</span>
-            {label}
+            <span
+              className={`text-xs font-medium transition-colors ${
+                isOn ? 'text-foreground' : 'text-gray-400'
+              }`}
+            >
+              {label}
+            </span>
+            <div
+              className={`relative w-9 h-5 rounded-full transition-colors shrink-0 ${
+                isOn ? 'bg-primary' : 'bg-gray-300'
+              }`}
+            >
+              <span
+                className={`absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-white shadow transition-transform ${
+                  isOn ? 'translate-x-4' : 'translate-x-0'
+                }`}
+              />
+            </div>
           </button>
         );
       })}

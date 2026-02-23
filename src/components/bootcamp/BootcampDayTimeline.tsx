@@ -31,8 +31,8 @@ export function BootcampDayTimeline({ progress, onSelectDay }: BootcampDayTimeli
               disabled={isLocked}
               className={`
                 w-full flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left
-                ${isComplete ? 'bg-[#4A7C59]/5 border-[#4A7C59]/30' : ''}
-                ${isAvailable ? 'bg-white border-[#1B4965] shadow-sm hover:shadow-md cursor-pointer active:scale-[0.99]' : ''}
+                ${isComplete ? 'bg-success/5 border-success/30' : ''}
+                ${isAvailable ? 'bg-white border-primary shadow-sm hover:shadow-md cursor-pointer active:scale-[0.99]' : ''}
                 ${isLocked ? 'bg-gray-50 border-gray-100 opacity-60 cursor-not-allowed' : ''}
               `}
             >
@@ -41,8 +41,8 @@ export function BootcampDayTimeline({ progress, onSelectDay }: BootcampDayTimeli
                 className={`
                   w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0
                   text-lg font-bold
-                  ${isComplete ? 'bg-[#4A7C59] text-white' : ''}
-                  ${isAvailable ? 'bg-[#1B4965] text-white' : ''}
+                  ${isComplete ? 'bg-success text-white' : ''}
+                  ${isAvailable ? 'bg-primary text-white' : ''}
                   ${isLocked ? 'bg-gray-200 text-gray-400' : ''}
                 `}
               >
@@ -58,11 +58,11 @@ export function BootcampDayTimeline({ progress, onSelectDay }: BootcampDayTimeli
               {/* Content */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <p className={`font-semibold ${isLocked ? 'text-gray-400' : 'text-[#2D3142]'}`}>
+                  <p className={`font-semibold ${isLocked ? 'text-gray-400' : 'text-foreground'}`}>
                     Day {day.day}: {day.title}
                   </p>
                   {isAvailable && !isComplete && (
-                    <span className="text-xs bg-[#1B4965] text-white px-2 py-0.5 rounded-full">
+                    <span className="text-xs bg-primary text-white px-2 py-0.5 rounded-full">
                       {status === 'in_progress' ? 'Continue' : 'Start'}
                     </span>
                   )}

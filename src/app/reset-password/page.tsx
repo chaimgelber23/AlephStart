@@ -36,10 +36,10 @@ export default function ResetPasswordPage() {
       >
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
           <div className="text-center space-y-3 mb-8">
-            <div className="font-[var(--font-hebrew-serif)] text-6xl text-[#1B4965] leading-none">
+            <div className="font-[var(--font-hebrew-serif)] text-6xl text-primary leading-none">
               א
             </div>
-            <h1 className="text-2xl font-bold text-[#2D3142]">Reset Password</h1>
+            <h1 className="text-2xl font-bold text-foreground">Reset Password</h1>
             <p className="text-sm text-gray-500">
               Enter your email and we&apos;ll send a reset link
             </p>
@@ -47,7 +47,7 @@ export default function ResetPasswordPage() {
 
           {sent ? (
             <div className="text-center space-y-4">
-              <div className="bg-[#4A7C59]/10 text-[#4A7C59] rounded-xl px-4 py-4">
+              <div className="bg-success/10 text-success rounded-xl px-4 py-4">
                 <p className="font-medium">Check your email</p>
                 <p className="text-sm mt-1">
                   If an account exists with <strong>{email}</strong>, we&apos;ve sent a
@@ -56,7 +56,7 @@ export default function ResetPasswordPage() {
               </div>
               <Link
                 href="/login"
-                className="inline-block text-[#1B4965] font-medium hover:underline"
+                className="inline-block text-primary font-medium hover:underline"
               >
                 Back to Sign In
               </Link>
@@ -64,14 +64,14 @@ export default function ResetPasswordPage() {
           ) : (
             <>
               {error && (
-                <div className="bg-[#C17767]/10 text-[#C17767] text-sm rounded-xl px-4 py-3 mb-6">
+                <div className="bg-error/10 text-error text-sm rounded-xl px-4 py-3 mb-6">
                   {error}
                 </div>
               )}
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-[#2D3142] mb-1.5">
+                  <label className="block text-sm font-medium text-foreground mb-1.5">
                     Email
                   </label>
                   <input
@@ -79,7 +79,7 @@ export default function ResetPasswordPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-[#1B4965] focus:ring-2 focus:ring-[#1B4965]/20 outline-none text-base"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none text-base"
                     placeholder="your@email.com"
                   />
                 </div>
@@ -87,7 +87,7 @@ export default function ResetPasswordPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-[#1B4965] text-white py-3.5 rounded-xl text-base font-medium hover:bg-[#163d55] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-primary text-white py-3.5 rounded-xl text-base font-medium hover:bg-[#163d55] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? 'Sending...' : 'Send Reset Link'}
                 </button>
@@ -96,7 +96,7 @@ export default function ResetPasswordPage() {
               <p className="text-center text-sm text-gray-500 mt-6">
                 <Link
                   href="/login"
-                  className="text-[#1B4965] font-medium hover:underline"
+                  className="text-primary font-medium hover:underline"
                 >
                   Back to Sign In
                 </Link>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useCallback } from 'react';
-import type { Pronunciation, VoiceGender } from '@/types';
+import type { Pronunciation } from '@/types';
 
 type AudioMode = 'hebrew' | 'transliteration';
 
@@ -23,7 +23,6 @@ interface UseAudioOptions {
   speed?: number;
   onEnded?: () => void;
   pronunciation?: Pronunciation;
-  voiceGender?: VoiceGender;
 }
 
 /**
@@ -62,6 +61,7 @@ async function tryStaticFile(
 export function useAudio(options?: UseAudioOptions) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isUnavailable, setIsUnavailable] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const currentUrlRef = useRef<string | null>(null);
@@ -100,6 +100,12 @@ export function useAudio(options?: UseAudioOptions) {
     setIsPlaying(true);
   }, []);
 
+  const setSpeed = useCallback((newSpeed: number) => {
+    if (audioRef.current) {
+      audioRef.current.playbackRate = newSpeed;
+    }
+  }, []);
+
   const play = useCallback(async (
     text: string,
     mode: AudioMode = 'hebrew',
@@ -110,12 +116,13 @@ export function useAudio(options?: UseAudioOptions) {
     stop();
     setError(null);
     setIsLoading(true);
+    setIsUnavailable(false);
 
     const speed = speedOverride ?? options?.speed ?? 1.0;
     const pronunciation = options?.pronunciation ?? 'modern';
 
     try {
-      // 1. Try pre-generated static file (uses pronunciation for file lookup)
+      // Try pre-generated static file (uses pronunciation for file lookup)
       if (prayerId && sectionId) {
         const staticUrl = await tryStaticFile(prayerId, sectionId, pronunciation);
         if (staticUrl) {
@@ -125,27 +132,15 @@ export function useAudio(options?: UseAudioOptions) {
         }
       }
 
-      // 2. Fall back to TTS API
-      const response = await fetch('/api/tts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text, mode, speed, voiceGender: options?.voiceGender || 'male' }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json().catch(() => ({ error: 'Audio unavailable' }));
-        throw new Error(data.error || 'Failed to generate audio');
-      }
-
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      await playAudioUrl(url, speed, true);
+      // No static file available
+      setIsUnavailable(true);
+      setError('Audio not yet available for this section');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Audio unavailable');
     } finally {
       setIsLoading(false);
     }
-  }, [stop, options?.speed, options?.pronunciation, options?.voiceGender, playAudioUrl]);
+  }, [stop, options?.speed, options?.pronunciation, playAudioUrl]);
 
-  return { play, stop, isPlaying, isLoading, error };
+  return { play, stop, isPlaying, isLoading, isUnavailable, error, setSpeed };
 }

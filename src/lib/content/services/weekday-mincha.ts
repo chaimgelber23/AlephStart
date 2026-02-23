@@ -17,7 +17,7 @@ export const WEEKDAY_MINCHA: DaveningService = {
       title: 'Ashrei',
       titleHebrew: 'אַשְׁרֵי',
       description: 'The opening psalm of the afternoon service',
-      color: '#5FA8D3',
+      color: 'var(--primary-light)',
       items: [
         {
           id: 'mincha-ashrei',
@@ -44,7 +44,7 @@ export const WEEKDAY_MINCHA: DaveningService = {
       title: 'Amidah',
       titleHebrew: 'עֲמִידָה',
       description: 'The central prayer — 19 blessings said standing, facing Jerusalem',
-      color: '#1B4965',
+      color: 'var(--primary)',
       items: [
         {
           id: 'mincha-half-kaddish',
@@ -130,7 +130,7 @@ export const WEEKDAY_MINCHA: DaveningService = {
       title: 'Post-Amidah',
       titleHebrew: 'סִיּוּם הַתְּפִלָּה',
       description: 'Closing prayers after the Amidah',
-      color: '#4A7C59',
+      color: 'var(--success)',
       items: [
         {
           id: 'mincha-tachanun',

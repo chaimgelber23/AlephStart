@@ -6,42 +6,47 @@
  *   STYLE=american  npx tsx --tsconfig tsconfig.json scripts/generate-audio.ts
  *
  * Environment:
- *   - ELEVENLABS_API_KEY  (required)
- *   - STYLE               pronunciation style: modern (default) | american | <future>
+ *   - GOOGLE_APPLICATION_CREDENTIALS or GOOGLE_TTS_API_KEY (required for modern/Hebrew)
+ *   - ELEVENLABS_API_KEY  (required for american/transliteration)
+ *   - STYLE               pronunciation style: modern (default) | american
  *
  * File convention:
- *   modern   → {sectionId}.mp3           (Modern Israeli Hebrew)
- *   american → {sectionId}-american.mp3   (American Shul / Yeshivish)
- *   <new>    → {sectionId}-{style}.mp3    (add to STYLE_CONFIG below)
- *
- * To add a new pronunciation style:
- *   1. Add an entry to STYLE_CONFIG below
- *   2. Add the style name to the Pronunciation type in src/types/index.ts
- *   3. Add the suffix to PRONUNCIATION_SUFFIX in src/hooks/useAudio.ts
- *   4. Run:  STYLE=<name> npx tsx --tsconfig tsconfig.json scripts/generate-audio.ts
+ *   modern   → {sectionId}.mp3           (Modern Israeli Hebrew — Google Cloud TTS)
+ *   american → {sectionId}-american.mp3   (American Shul / Yeshivish — ElevenLabs)
  */
 
 import * as fs from 'fs';
 import * as path from 'path';
+import textToSpeech from '@google-cloud/text-to-speech';
 
-const API_KEY = process.env.ELEVENLABS_API_KEY;
-if (!API_KEY) {
-  console.error('Missing ELEVENLABS_API_KEY in .env.local');
-  process.exit(1);
+// Load .env.local
+function loadEnvFile(filePath: string) {
+  if (!fs.existsSync(filePath)) return;
+  const content = fs.readFileSync(filePath, 'utf8');
+  for (const line of content.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eqIdx = trimmed.indexOf('=');
+    if (eqIdx === -1) continue;
+    const key = trimmed.slice(0, eqIdx).trim();
+    let value = trimmed.slice(eqIdx + 1).trim();
+    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+      value = value.slice(1, -1);
+    }
+    if (!process.env[key]) process.env[key] = value;
+  }
 }
+loadEnvFile(path.resolve(__dirname, '../.env.local'));
+loadEnvFile(path.resolve(__dirname, '../.env'));
+
+const STYLE_NAME = process.env.STYLE || 'modern';
 
 // ── Style configuration ───────────────────────────────────────────────
-// Each style defines: which text field to send, which voice to use,
-// and what file suffix to use. Add new styles here.
 
 interface StyleConfig {
-  /** File suffix: '' for default, '-american', '-sephardi', etc. */
   suffix: string;
-  /** Which section field to read: 'hebrewText' or 'transliteration' */
   textField: 'hebrewText' | 'transliteration';
-  /** ElevenLabs voice ID */
-  voiceId: string;
-  /** Human-readable label for console output */
+  engine: 'google' | 'elevenlabs';
   label: string;
 }
 
@@ -49,55 +54,90 @@ const STYLE_CONFIG: Record<string, StyleConfig> = {
   modern: {
     suffix: '',
     textField: 'hebrewText',
-    voiceId: process.env.ELEVENLABS_HEBREW_VOICE_ID || 'XB0fDUnXU5powFXDhCwa',
-    label: 'Modern Israeli Hebrew',
+    engine: 'google',
+    label: 'Modern Israeli Hebrew (Google Cloud TTS)',
   },
   american: {
     suffix: '-american',
     textField: 'transliteration',
-    voiceId: process.env.ELEVENLABS_ENGLISH_VOICE_ID || 'EXAVITQu4vr4xnSDxMaL',
-    label: 'American Shul (Yeshivish)',
+    engine: 'elevenlabs',
+    label: 'American Shul / Yeshivish (ElevenLabs)',
   },
-  // To add more styles, e.g.:
-  // sephardi: {
-  //   suffix: '-sephardi',
-  //   textField: 'hebrewText',
-  //   voiceId: 'SOME_VOICE_ID',
-  //   label: 'Sephardi',
-  // },
 };
 
-const STYLE_NAME = process.env.STYLE || 'modern';
 const styleConfig = STYLE_CONFIG[STYLE_NAME];
 if (!styleConfig) {
   console.error(`Unknown STYLE="${STYLE_NAME}". Available: ${Object.keys(STYLE_CONFIG).join(', ')}`);
   process.exit(1);
 }
 
-// ── Helpers ───────────────────────────────────────────────────────────
+// ── Google Cloud TTS ─────────────────────────────────────────────────
 
-async function loadPrayers() {
-  const prayersModule = await import('../src/lib/content/prayers');
-  return prayersModule.PRAYERS;
+let _googleClient: textToSpeech.TextToSpeechClient | null = null;
+
+function getGoogleClient(): textToSpeech.TextToSpeechClient {
+  if (!_googleClient) {
+    const apiKey = process.env.GOOGLE_TTS_API_KEY;
+    if (apiKey) {
+      _googleClient = new textToSpeech.TextToSpeechClient({ apiKey });
+    } else {
+      _googleClient = new textToSpeech.TextToSpeechClient();
+    }
+  }
+  return _googleClient;
 }
 
-async function generateAudio(text: string, voiceId: string): Promise<Buffer> {
+async function generateGoogleAudio(text: string): Promise<Buffer> {
+  const client = getGoogleClient();
+  const [response] = await client.synthesizeSpeech({
+    input: { text },
+    voice: {
+      languageCode: 'he-IL',
+      name: 'he-IL-Wavenet-B', // male
+    },
+    audioConfig: {
+      audioEncoding: 'MP3' as const,
+      speakingRate: 0.9,
+      effectsProfileId: ['headphone-class-device'],
+    },
+  });
+
+  if (!response.audioContent) {
+    throw new Error('Google Cloud TTS returned empty audio');
+  }
+  if (typeof response.audioContent === 'string') {
+    return Buffer.from(response.audioContent, 'base64');
+  }
+  return Buffer.from(response.audioContent);
+}
+
+// ── ElevenLabs TTS ───────────────────────────────────────────────────
+
+const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
+
+async function generateElevenLabsAudio(text: string): Promise<Buffer> {
+  if (!ELEVENLABS_API_KEY) {
+    throw new Error('Missing ELEVENLABS_API_KEY');
+  }
+  const voiceId = process.env.ELEVENLABS_ENGLISH_VOICE_ID || 'EXAVITQu4vr4xnSDxMaL';
   const response = await fetch(
     `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
     {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'xi-api-key': API_KEY!,
+        'xi-api-key': ELEVENLABS_API_KEY,
       },
       body: JSON.stringify({
         text,
-        model_id: 'eleven_multilingual_v2',
+        model_id: 'eleven_v3',
         voice_settings: {
-          stability: 0.75,
-          similarity_boost: 0.75,
-          speed: 0.9,
+          stability: 0.5,
+          similarity_boost: 0.82,
+          speed: 0.85,
         },
+        apply_text_normalization: 'on',
+        language_code: 'en',
       }),
     }
   );
@@ -107,13 +147,41 @@ async function generateAudio(text: string, voiceId: string): Promise<Buffer> {
     throw new Error(`ElevenLabs API error ${response.status}: ${errorText}`);
   }
 
-  const arrayBuffer = await response.arrayBuffer();
-  return Buffer.from(arrayBuffer);
+  return Buffer.from(await response.arrayBuffer());
+}
+
+// ── Unified generate ─────────────────────────────────────────────────
+
+async function generateAudio(text: string): Promise<Buffer> {
+  if (styleConfig.engine === 'google') {
+    return generateGoogleAudio(text);
+  }
+  return generateElevenLabsAudio(text);
+}
+
+// ── Helpers ───────────────────────────────────────────────────────────
+
+async function loadPrayers() {
+  const prayersModule = await import('../src/lib/content/prayers');
+  return prayersModule.PRAYERS;
 }
 
 // ── Main ──────────────────────────────────────────────────────────────
 
 async function main() {
+  // Validate required credentials
+  if (styleConfig.engine === 'google') {
+    if (!process.env.GOOGLE_APPLICATION_CREDENTIALS && !process.env.GOOGLE_TTS_API_KEY) {
+      console.error('Missing Google Cloud credentials. Set GOOGLE_APPLICATION_CREDENTIALS or GOOGLE_TTS_API_KEY');
+      process.exit(1);
+    }
+  } else {
+    if (!ELEVENLABS_API_KEY) {
+      console.error('Missing ELEVENLABS_API_KEY in .env.local');
+      process.exit(1);
+    }
+  }
+
   const prayers = await loadPrayers();
   const audioDir = path.resolve(__dirname, '../public/audio/prayers');
 
@@ -147,12 +215,12 @@ async function main() {
 
       try {
         console.log(`  🔊 ${prayer.nameEnglish} > ${section.id}`);
-        const audio = await generateAudio(text, styleConfig.voiceId);
+        const audio = await generateAudio(text);
         fs.writeFileSync(filePath, audio);
         generated++;
 
-        // Rate limit: ElevenLabs allows ~2-3 requests/sec on free tier
-        await new Promise((r) => setTimeout(r, 500));
+        // Rate limit
+        await new Promise((r) => setTimeout(r, styleConfig.engine === 'google' ? 200 : 500));
       } catch (err) {
         console.error(`  ✗ Error: ${err instanceof Error ? err.message : err}`);
         errors++;

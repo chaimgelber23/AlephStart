@@ -17,7 +17,7 @@ export const SHABBAT_KABBALAT_SHABBAT: DaveningService = {
       title: 'Kabbalat Shabbat',
       titleHebrew: 'קַבָּלַת שַׁבָּת',
       description: 'Welcoming the Shabbat with psalms and song',
-      color: '#C6973F',
+      color: 'var(--gold)',
       items: [
         {
           id: 'kshabbat-psalms',
@@ -176,7 +176,7 @@ export const SHABBAT_KABBALAT_SHABBAT: DaveningService = {
       title: 'Shabbat Amidah',
       titleHebrew: 'עֲמִידָה לְשַׁבָּת',
       description: 'The Shabbat standing prayer — 7 blessings',
-      color: '#1B4965',
+      color: 'var(--primary)',
       items: [
         {
           id: 'shabbat-amidah-half-kaddish',
@@ -244,7 +244,7 @@ export const SHABBAT_KABBALAT_SHABBAT: DaveningService = {
       title: 'Closing',
       titleHebrew: 'סִיּוּם',
       description: 'Closing prayers and Kiddush',
-      color: '#4A7C59',
+      color: 'var(--success)',
       items: [
         {
           id: 'closing-vayechulu',

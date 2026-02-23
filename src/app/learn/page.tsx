@@ -174,14 +174,14 @@ export default function LearnPage() {
   if (showResumePrompt && learnSession) {
     const resumeLetters = getLessonLetters(learnSession.currentLesson);
     return (
-      <div className="min-h-screen bg-[#FEFDFB] flex items-center justify-center px-6">
+      <div className="min-h-screen bg-background flex items-center justify-center px-6">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           className="bg-white rounded-2xl border border-gray-100 shadow-md p-8 max-w-sm w-full text-center space-y-4"
         >
           <p className="text-4xl">📖</p>
-          <h2 className="text-xl font-bold text-[#2D3142]">Welcome back!</h2>
+          <h2 className="text-xl font-bold text-foreground">Welcome back!</h2>
           <p className="text-sm text-gray-500">
             You were on Lesson {learnSession.currentLesson + 1} — learning{' '}
             {resumeLetters.map((l) => l.name).join(', ')}
@@ -189,13 +189,13 @@ export default function LearnPage() {
           <div className="space-y-2 pt-2">
             <button
               onClick={resumeSession}
-              className="w-full bg-[#1B4965] text-white py-3.5 rounded-xl font-medium hover:bg-[#163d55] transition-colors"
+              className="w-full bg-primary text-white py-3.5 rounded-xl font-medium hover:bg-[#163d55] transition-colors"
             >
               Continue Where I Left Off
             </button>
             <button
               onClick={startFresh}
-              className="w-full border-2 border-gray-200 text-gray-600 py-3 rounded-xl font-medium hover:border-[#1B4965] transition-colors"
+              className="w-full border-2 border-gray-200 text-gray-600 py-3 rounded-xl font-medium hover:border-primary transition-colors"
             >
               Start from Beginning
             </button>
@@ -206,7 +206,7 @@ export default function LearnPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FEFDFB]">
+    <div className="min-h-screen bg-background">
       {/* Top Bar */}
       <div className="sticky top-0 bg-white/95 backdrop-blur-sm border-b border-gray-100 px-6 py-4 z-10">
         <div className="max-w-md mx-auto flex items-center justify-between">
@@ -216,7 +216,7 @@ export default function LearnPage() {
           <span className="text-sm font-medium text-gray-600">
             Lesson {currentLesson + 1} of {totalLessons}
           </span>
-          <span className="text-sm text-[#1B4965]">
+          <span className="text-sm text-primary">
             {phase === 'teach' && `Teaching ${teachIndex + 1}/${lessonLetters.length}`}
             {phase === 'drill' && `Drill ${drillIndex + 1}/9`}
             {phase === 'complete' && 'Complete!'}
@@ -247,10 +247,10 @@ export default function LearnPage() {
               className="space-y-6"
             >
               <div className="text-center">
-                <p className="text-sm text-[#1B4965] font-medium uppercase tracking-wider">
+                <p className="text-sm text-primary font-medium uppercase tracking-wider">
                   New Letter
                 </p>
-                <h2 className="text-xl font-bold text-[#2D3142] mt-1">
+                <h2 className="text-xl font-bold text-foreground mt-1">
                   Meet {currentTeachLetter.name}
                 </h2>
               </div>
@@ -259,7 +259,7 @@ export default function LearnPage() {
 
               <button
                 onClick={handleTeachNext}
-                className="w-full bg-[#1B4965] text-white py-4 rounded-xl text-lg font-medium hover:bg-[#163d55] transition-colors"
+                className="w-full bg-primary text-white py-4 rounded-xl text-lg font-medium hover:bg-[#163d55] transition-colors"
               >
                 {teachIndex < lessonLetters.length - 1 ? 'Next Letter →' : "Let's Practice! →"}
               </button>
@@ -276,7 +276,7 @@ export default function LearnPage() {
               className="space-y-8"
             >
               <div className="text-center">
-                <p className="text-sm text-[#1B4965] font-medium uppercase tracking-wider">
+                <p className="text-sm text-primary font-medium uppercase tracking-wider">
                   Which letter is this?
                 </p>
               </div>
@@ -309,13 +309,13 @@ export default function LearnPage() {
                   const isSelected = selectedAnswer === letter.id;
                   const isCorrect = letter.id === drillCorrectLetter.id;
 
-                  let bgClass = 'bg-white border-gray-200 hover:border-[#5FA8D3]';
+                  let bgClass = 'bg-white border-gray-200 hover:border-primary-light';
                   if (showResult && isSelected && isCorrect) {
-                    bgClass = 'bg-[#4A7C59]/10 border-[#4A7C59]';
+                    bgClass = 'bg-success/10 border-success';
                   } else if (showResult && isSelected && !isCorrect) {
-                    bgClass = 'bg-[#C17767]/10 border-[#C17767]';
+                    bgClass = 'bg-error/10 border-error';
                   } else if (showResult && isCorrect) {
-                    bgClass = 'bg-[#4A7C59]/5 border-[#4A7C59]/50';
+                    bgClass = 'bg-success/5 border-success/50';
                   }
 
                   return (
@@ -329,7 +329,7 @@ export default function LearnPage() {
                         ${!showResult ? 'active:scale-95' : ''}
                       `}
                     >
-                      <p className="text-lg font-semibold text-[#2D3142]">{letter.name}</p>
+                      <p className="text-lg font-semibold text-foreground">{letter.name}</p>
                       <p className="text-sm text-gray-500">{letter.sound}</p>
                     </button>
                   );
@@ -343,8 +343,8 @@ export default function LearnPage() {
                   animate={{ opacity: 1, y: 0 }}
                   className={`text-center py-3 rounded-xl ${
                     selectedAnswer === drillCorrectLetter.id
-                      ? 'bg-[#4A7C59]/10 text-[#4A7C59]'
-                      : 'bg-[#C17767]/10 text-[#C17767]'
+                      ? 'bg-success/10 text-success'
+                      : 'bg-error/10 text-error'
                   }`}
                 >
                   {selectedAnswer === drillCorrectLetter.id
@@ -364,7 +364,7 @@ export default function LearnPage() {
               className="text-center space-y-6 py-8"
             >
               <div className="text-6xl">🎉</div>
-              <h2 className="text-2xl font-bold text-[#2D3142]">Lesson Complete!</h2>
+              <h2 className="text-2xl font-bold text-foreground">Lesson Complete!</h2>
               <p className="text-gray-600">
                 You learned {lessonLetters.map((l) => l.name).join(', ')}
               </p>
@@ -372,13 +372,13 @@ export default function LearnPage() {
               <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-3">
                 <div className="flex justify-between">
                   <span className="text-gray-500">Score</span>
-                  <span className="font-bold text-[#1B4965]">
+                  <span className="font-bold text-primary">
                     {drillScore}/{drillTotal} ({Math.round((drillScore / Math.max(drillTotal, 1)) * 100)}%)
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">Letters learned</span>
-                  <span className="font-bold text-[#4A7C59]">
+                  <span className="font-bold text-success">
                     {lessonLetters.map((l) => l.hebrew).join(' ')}
                   </span>
                 </div>
@@ -388,13 +388,13 @@ export default function LearnPage() {
                 {currentLesson < totalLessons - 1 && (
                   <button
                     onClick={handleNextLesson}
-                    className="w-full bg-[#1B4965] text-white py-4 rounded-xl text-lg font-medium hover:bg-[#163d55] transition-colors"
+                    className="w-full bg-primary text-white py-4 rounded-xl text-lg font-medium hover:bg-[#163d55] transition-colors"
                   >
                     Next Lesson →
                   </button>
                 )}
                 <Link href="/">
-                  <button className="w-full border-2 border-gray-200 text-gray-600 py-4 rounded-xl text-lg font-medium hover:border-[#1B4965] hover:text-[#1B4965] transition-colors">
+                  <button className="w-full border-2 border-gray-200 text-gray-600 py-4 rounded-xl text-lg font-medium hover:border-primary hover:text-primary transition-colors">
                     Back to Home
                   </button>
                 </Link>

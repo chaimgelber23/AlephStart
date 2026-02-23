@@ -31,14 +31,14 @@ export function SectionCompletePhase({
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: 'spring', stiffness: 300, damping: 20, delay: 0.1 }}
-          className="w-16 h-16 bg-[#4A7C59]/10 rounded-full flex items-center justify-center mx-auto"
+          className="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mx-auto"
         >
           <svg
             width="32"
             height="32"
             viewBox="0 0 24 24"
             fill="none"
-            stroke="#4A7C59"
+            stroke='var(--success)'
             strokeWidth="3"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -47,7 +47,7 @@ export function SectionCompletePhase({
           </svg>
         </motion.div>
 
-        <h3 className="text-lg font-bold text-[#2D3142] mt-4">
+        <h3 className="text-lg font-bold text-foreground mt-4">
           Nice!
         </h3>
         <p className="text-sm text-gray-500 mt-1">
@@ -56,18 +56,18 @@ export function SectionCompletePhase({
       </div>
 
       {/* What they learned */}
-      <div className="bg-[#4A7C59]/5 rounded-2xl p-5 text-center">
+      <div className="bg-success/5 rounded-2xl p-5 text-center">
         <p
           dir="rtl"
-          className="font-[var(--font-hebrew-serif)] text-2xl text-[#2D3142] leading-relaxed"
+          className="font-[var(--font-hebrew-serif)] text-2xl text-foreground leading-relaxed"
         >
           {section.hebrewText}
         </p>
-        <p className="text-[10px] uppercase tracking-widest text-[#4A7C59]/40 font-semibold mt-3 mb-0.5">How to say it</p>
+        <p className="text-[10px] uppercase tracking-widest text-success/40 font-semibold mt-3 mb-0.5">How to say it</p>
         <p className="text-sm text-gray-500 italic">
           {section.transliteration}
         </p>
-        <p className="text-[10px] uppercase tracking-widest text-[#4A7C59]/40 font-semibold mt-2 mb-0.5">What it means</p>
+        <p className="text-[10px] uppercase tracking-widest text-success/40 font-semibold mt-2 mb-0.5">What it means</p>
         <p className="text-sm text-gray-400">
           {section.translation}
         </p>
@@ -77,7 +77,7 @@ export function SectionCompletePhase({
       {isLastSection ? (
         <button
           onClick={onNext}
-          className="w-full py-4 rounded-xl text-base font-medium bg-[#C6973F] text-white hover:bg-[#b8892f] active:scale-[0.98] transition-all"
+          className="w-full py-4 rounded-xl text-base font-medium bg-gold text-white hover:bg-[#b8892f] active:scale-[0.98] transition-all"
         >
           See how you did!
         </button>
@@ -85,7 +85,7 @@ export function SectionCompletePhase({
         <div className="space-y-2">
           <button
             onClick={onNext}
-            className="w-full py-4 rounded-xl text-base font-medium bg-[#1B4965] text-white hover:bg-[#163d55] active:scale-[0.98] transition-all"
+            className="w-full py-4 rounded-xl text-base font-medium bg-primary text-white hover:bg-[#163d55] active:scale-[0.98] transition-all"
           >
             Ready for the next part?
           </button>

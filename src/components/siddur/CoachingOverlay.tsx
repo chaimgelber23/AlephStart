@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useUserStore } from '@/stores/userStore';
-import { useAudio } from '@/hooks/useAudio';
 import { CoachingStepNav, PHASE_ORDER } from './CoachingStepNav';
 import { ContextPhase } from './phases/ContextPhase';
 import { ListenPhase } from './phases/ListenPhase';
@@ -26,8 +25,6 @@ export function CoachingOverlay({
   onClose,
 }: CoachingOverlayProps) {
   const prefs = useUserStore((s) => s.coachingPreferences);
-  const pronunciation = useUserStore((s) => s.profile.pronunciation);
-  const voiceGender = useUserStore((s) => s.profile.voiceGender);
   const updateSectionProgress = useUserStore((s) => s.updateSectionProgress);
   const markSectionCoached = useUserStore((s) => s.markSectionCoached);
   const isSectionCoached = useUserStore((s) => s.isSectionCoached);
@@ -46,124 +43,14 @@ export function CoachingOverlay({
   const [phase, setPhase] = useState<CoachingPhase>(
     currentSectionIndex === 0 && !prefs.skipContextCard ? 'context' : 'listen'
   );
-  const [repCount, setRepCount] = useState(0);
   const [completedPhases, setCompletedPhases] = useState<Set<CoachingPhase>>(new Set());
-  const [highlightedWordIndex, setHighlightedWordIndex] = useState(-1);
 
   const currentSection = prayer.sections[currentSectionIndex];
   const totalSections = prayer.sections.length;
   const isLastSection = currentSectionIndex === totalSections - 1;
 
-  // Audio with onEnded callback for auto-replay
-  const handleAudioEnded = useCallback(() => {
-    setRepCount((prev) => prev + 1);
-  }, []);
-
-  const audioOptions = useMemo(
-    () => ({
-      speed: prefs.initialSpeed,
-      onEnded: handleAudioEnded,
-      pronunciation,
-      voiceGender,
-    }),
-    [prefs.initialSpeed, handleAudioEnded, pronunciation, voiceGender]
-  );
-
-  const { play, stop, isPlaying, isLoading } = useAudio(audioOptions);
-
-  // Get target rep count for current phase
-  const getTargetCount = useCallback(() => {
-    switch (phase) {
-      case 'listen':
-        return prefs.listenCount;
-      case 'follow_along':
-        return prefs.followAlongCount;
-      case 'say_together':
-        return prefs.sayTogetherCount;
-      default:
-        return 0;
-    }
-  }, [phase, prefs]);
-
-  // Get speed for current phase
-  const getPhaseSpeed = useCallback(() => {
-    switch (phase) {
-      case 'listen':
-        return prefs.initialSpeed;
-      case 'follow_along':
-        return Math.min(prefs.initialSpeed + 0.1, 1.5);
-      case 'say_together':
-        return 1.0;
-      default:
-        return 1.0;
-    }
-  }, [phase, prefs.initialSpeed]);
-
-  // Play audio for current section
-  const playCurrentSection = useCallback(() => {
-    if (!currentSection) return;
-    const text =
-      pronunciation === 'american'
-        ? currentSection.transliteration
-        : currentSection.hebrewText;
-    const mode = pronunciation === 'american' ? 'transliteration' : 'hebrew';
-    play(text, mode, getPhaseSpeed(), prayer.id, currentSection.id);
-  }, [currentSection, pronunciation, play, getPhaseSpeed, prayer.id]);
-
-  // Auto-play when entering listen/follow/say phases
-  useEffect(() => {
-    if (
-      phase === 'listen' ||
-      phase === 'follow_along' ||
-      phase === 'say_together'
-    ) {
-      setRepCount(0);
-      const timer = setTimeout(() => playCurrentSection(), 300);
-      return () => clearTimeout(timer);
-    }
-    return () => stop();
-  }, [phase, currentSectionIndex]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Auto-replay when rep finishes but more reps needed
-  useEffect(() => {
-    const target = getTargetCount();
-    if (target === 0 || repCount === 0) return;
-
-    if (repCount < target) {
-      const timer = setTimeout(() => playCurrentSection(), 600);
-      return () => clearTimeout(timer);
-    }
-
-    // All reps done — advance to next phase
-    if (repCount >= target) {
-      advancePhase();
-    }
-  }, [repCount]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Word highlighting for follow-along phase
-  useEffect(() => {
-    if (phase !== 'follow_along' || !isPlaying || !currentSection) {
-      setHighlightedWordIndex(-1);
-      return;
-    }
-
-    const words = currentSection.hebrewText.split(' ');
-    const totalWords = words.length;
-    // Simple even-split timing (fallback when no wordTimings)
-    const msPerWord = 2000 / totalWords; // ~2 seconds per phrase
-    let wordIdx = 0;
-
-    const interval = setInterval(() => {
-      setHighlightedWordIndex(wordIdx);
-      wordIdx = (wordIdx + 1) % totalWords;
-    }, msPerWord);
-
-    return () => clearInterval(interval);
-  }, [phase, isPlaying, currentSection]);
-
   // Advance to the next coaching phase
   const advancePhase = useCallback(() => {
-    stop();
     setCompletedPhases((prev) => new Set([...prev, phase]));
 
     const phaseTransitions: Record<CoachingPhase, CoachingPhase> = {
@@ -179,11 +66,9 @@ export function CoachingOverlay({
     const nextPhase = phaseTransitions[phase];
 
     if (phase === 'section_complete' && !isLastSection) {
-      // Move to next section
       markSectionCoached(prayer.id, currentSection.id);
       setCurrentSectionIndex((prev) => prev + 1);
       setCompletedPhases(new Set());
-      setRepCount(0);
     }
 
     if (phase === 'section_complete' && isLastSection) {
@@ -191,17 +76,14 @@ export function CoachingOverlay({
     }
 
     setPhase(nextPhase);
-    setRepCount(0);
-  }, [phase, isLastSection, stop, markSectionCoached, prayer.id, currentSection]);
+  }, [phase, isLastSection, markSectionCoached, prayer.id, currentSection]);
 
   // Jump to a specific phase (for step nav)
   const jumpToPhase = useCallback(
     (targetPhase: CoachingPhase) => {
-      stop();
-      setRepCount(0);
       setPhase(targetPhase);
     },
-    [stop]
+    []
   );
 
   // Handle feedback submission
@@ -216,16 +98,15 @@ export function CoachingOverlay({
 
   // Save progress on close
   const handleClose = useCallback(() => {
-    stop();
     if (currentSection) {
       updateSectionProgress(`${prayer.id}:${currentSection.id}`, {
         currentStep: phase,
-        listenCount: repCount,
+        listenCount: 0,
         lastPracticed: new Date().toISOString().split('T')[0],
       });
     }
     onClose();
-  }, [stop, prayer.id, currentSection, phase, repCount, updateSectionProgress, onClose]);
+  }, [prayer.id, currentSection, phase, updateSectionProgress, onClose]);
 
   // Section dots for navigating between sections
   const renderSectionDots = () => {
@@ -236,17 +117,15 @@ export function CoachingOverlay({
           <button
             key={s.id}
             onClick={() => {
-              stop();
               setCurrentSectionIndex(i);
               setPhase('listen');
-              setRepCount(0);
               setCompletedPhases(new Set());
             }}
             className={`w-2 h-2 rounded-full transition-all ${
               i === currentSectionIndex
-                ? 'bg-[#1B4965] w-4'
+                ? 'bg-primary w-4'
                 : isSectionCoached(prayer.id, s.id)
-                ? 'bg-[#4A7C59]'
+                ? 'bg-success'
                 : 'bg-gray-200'
             }`}
           />
@@ -275,7 +154,7 @@ export function CoachingOverlay({
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-        className="fixed inset-x-0 bottom-0 z-50 bg-[#FEFDFB] rounded-t-3xl shadow-2xl"
+        className="fixed inset-x-0 bottom-0 z-50 bg-background rounded-t-3xl shadow-2xl"
         style={{ maxHeight: '88vh' }}
       >
         <div className="flex flex-col h-full max-h-[88vh]">
@@ -287,7 +166,7 @@ export function CoachingOverlay({
           {/* Header with close button */}
           <div className="flex items-center justify-between px-5 py-2">
             <div className="flex-1">
-              <p className="text-sm font-semibold text-[#2D3142]">
+              <p className="text-sm font-semibold text-foreground">
                 {prayer.nameEnglish}
               </p>
             </div>
@@ -334,11 +213,7 @@ export function CoachingOverlay({
                 <ListenPhase
                   key={`listen-${currentSectionIndex}`}
                   section={currentSection}
-                  targetCount={prefs.listenCount}
-                  currentRep={repCount}
-                  isPlaying={isPlaying}
-                  isLoading={isLoading}
-                  onSkip={advancePhase}
+                  onAdvance={advancePhase}
                 />
               )}
 
@@ -346,11 +221,7 @@ export function CoachingOverlay({
                 <FollowAlongPhase
                   key={`follow-${currentSectionIndex}`}
                   section={currentSection}
-                  targetCount={prefs.followAlongCount}
-                  currentRep={repCount}
-                  isPlaying={isPlaying}
-                  highlightedWordIndex={highlightedWordIndex}
-                  onSkip={advancePhase}
+                  onAdvance={advancePhase}
                 />
               )}
 
@@ -358,11 +229,7 @@ export function CoachingOverlay({
                 <SayTogetherPhase
                   key={`say-${currentSectionIndex}`}
                   section={currentSection}
-                  targetCount={prefs.sayTogetherCount}
-                  currentRep={repCount}
-                  isPlaying={isPlaying}
-                  isLoading={isLoading}
-                  onSkip={advancePhase}
+                  onAdvance={advancePhase}
                 />
               )}
 
@@ -371,20 +238,7 @@ export function CoachingOverlay({
                   key={`try-${currentSectionIndex}`}
                   section={currentSection}
                   showTranslation={prefs.showTranslationDuringPractice}
-                  isPlaying={isPlaying}
-                  isLoading={isLoading}
-                  onPlayCheck={() => {
-                    const text =
-                      pronunciation === 'american'
-                        ? currentSection.transliteration
-                        : currentSection.hebrewText;
-                    const mode =
-                      pronunciation === 'american'
-                        ? 'transliteration'
-                        : 'hebrew';
-                    play(text, mode, 1.0, prayer.id, currentSection.id);
-                  }}
-                  onComplete={advancePhase}
+                  onAdvance={advancePhase}
                 />
               )}
 

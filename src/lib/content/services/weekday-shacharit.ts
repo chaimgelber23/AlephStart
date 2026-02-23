@@ -17,7 +17,7 @@ export const WEEKDAY_SHACHARIT: DaveningService = {
       title: 'Birkot HaShachar',
       titleHebrew: 'בִּרְכוֹת הַשַּׁחַר',
       description: 'The morning blessings — thanking Hashem for the basics of life',
-      color: '#D4A373',
+      color: 'var(--warning)',
       items: [
         {
           id: 'birkot-modeh-ani',
@@ -108,7 +108,7 @@ export const WEEKDAY_SHACHARIT: DaveningService = {
       title: "Pesukei D'Zimra",
       titleHebrew: 'פְּסוּקֵי דְזִמְרָא',
       description: 'Psalms and praises to prepare your heart for the main prayer',
-      color: '#5FA8D3',
+      color: 'var(--primary-light)',
       items: [
         {
           id: 'pdzimra-hodu',
@@ -301,7 +301,7 @@ export const WEEKDAY_SHACHARIT: DaveningService = {
       title: 'Amidah',
       titleHebrew: 'עֲמִידָה',
       description: 'The central prayer — 19 blessings said standing, facing Jerusalem',
-      color: '#1B4965',
+      color: 'var(--primary)',
       items: [
         {
           id: 'amidah-silent-instruction',
@@ -384,7 +384,7 @@ export const WEEKDAY_SHACHARIT: DaveningService = {
       title: 'Post-Amidah',
       titleHebrew: 'סִיּוּם הַתְּפִלָּה',
       description: 'Closing prayers after the Amidah',
-      color: '#4A7C59',
+      color: 'var(--success)',
       items: [
         {
           id: 'post-tachanun',

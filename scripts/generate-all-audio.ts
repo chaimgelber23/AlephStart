@@ -1,12 +1,9 @@
 /**
  * Generate ALL TTS audio for AlephStart — letters, vowels, bootcamp, and prayers.
  *
- * QUALITY SETTINGS:
- *   - Model: eleven_v3 (ElevenLabs' most natural, expressive model — 70+ languages)
- *   - Language codes: 'he' for Hebrew, 'en' for English
- *   - Text normalization: ON for consistent pronunciation
- *   - Per-content voice tuning (prayers are warm/flowing, letters are clear/educational)
- *   - Speaker boost: ON for clarity
+ * AUDIO ENGINES:
+ *   - Hebrew content → Google Cloud TTS (WaveNet he-IL voices — proper pronunciation)
+ *   - English content → ElevenLabs (natural English voices for transliteration)
  *
  * Usage:
  *   # Generate female audio for everything:
@@ -27,7 +24,9 @@
  *   GENDER=female FORCE=true npx tsx --tsconfig tsconfig.json scripts/generate-all-audio.ts
  *
  * Environment:
- *   ELEVENLABS_API_KEY  (required)
+ *   ELEVENLABS_API_KEY            (required for English/transliteration audio)
+ *   GOOGLE_APPLICATION_CREDENTIALS (required for Hebrew audio — path to service account JSON)
+ *     OR GOOGLE_TTS_API_KEY       (simpler API key auth for Google Cloud TTS)
  *   GENDER              male | female (required)
  *   STYLE               modern | american | both (default: both)
  *   CATEGORY            letters | vowels | bootcamp | prayers | all (default: all)
@@ -42,6 +41,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import textToSpeech from '@google-cloud/text-to-speech';
 
 // Load .env.local manually (no dotenv dependency needed)
 function loadEnvFile(filePath: string) {
@@ -63,9 +63,14 @@ function loadEnvFile(filePath: string) {
 loadEnvFile(path.resolve(__dirname, '../.env.local'));
 loadEnvFile(path.resolve(__dirname, '../.env'));
 
-const API_KEY = process.env.ELEVENLABS_API_KEY;
-if (!API_KEY) {
-  console.error('Missing ELEVENLABS_API_KEY. Set it in .env.local');
+const ELEVENLABS_API_KEY = process.env.ELEVENLABS_API_KEY;
+const HAS_GOOGLE_CREDS = !!(process.env.GOOGLE_APPLICATION_CREDENTIALS || process.env.GOOGLE_TTS_API_KEY);
+
+if (!ELEVENLABS_API_KEY) {
+  console.warn('WARNING: Missing ELEVENLABS_API_KEY — English/transliteration audio will be skipped.');
+}
+if (!HAS_GOOGLE_CREDS) {
+  console.error('Missing Google Cloud credentials. Set GOOGLE_APPLICATION_CREDENTIALS or GOOGLE_TTS_API_KEY in .env.local');
   process.exit(1);
 }
 
@@ -79,24 +84,147 @@ const STYLE = process.env.STYLE || 'both';
 const CATEGORY = process.env.CATEGORY || 'all';
 const FORCE = process.env.FORCE === 'true';
 
-// ── Voice IDs ─────────────────────────────────────────────────────────
+// ── Google Cloud TTS ─────────────────────────────────────────────────
 
-const VOICE_IDS = {
+const GOOGLE_HEBREW_VOICES = {
+  male: 'he-IL-Wavenet-B',
+  female: 'he-IL-Wavenet-A',
+} as const;
+
+let _googleClient: textToSpeech.TextToSpeechClient | null = null;
+
+function getGoogleClient(): textToSpeech.TextToSpeechClient {
+  if (!_googleClient) {
+    const apiKey = process.env.GOOGLE_TTS_API_KEY;
+    if (apiKey) {
+      _googleClient = new textToSpeech.TextToSpeechClient({ apiKey });
+    } else {
+      _googleClient = new textToSpeech.TextToSpeechClient();
+    }
+  }
+  return _googleClient;
+}
+
+interface GoogleTTSOptions {
+  speed?: number;
+  pitch?: number;
+}
+
+async function generateHebrewAudio(text: string, opts: GoogleTTSOptions = {}): Promise<Buffer> {
+  const client = getGoogleClient();
+  const voiceName = GOOGLE_HEBREW_VOICES[GENDER];
+
+  const [response] = await client.synthesizeSpeech({
+    input: { text },
+    voice: {
+      languageCode: 'he-IL',
+      name: voiceName,
+    },
+    audioConfig: {
+      audioEncoding: 'MP3' as const,
+      speakingRate: opts.speed || 1.0,
+      pitch: opts.pitch || 0,
+      effectsProfileId: ['headphone-class-device'],
+    },
+  });
+
+  if (!response.audioContent) {
+    throw new Error('Google Cloud TTS returned empty audio');
+  }
+
+  if (typeof response.audioContent === 'string') {
+    return Buffer.from(response.audioContent, 'base64');
+  }
+  return Buffer.from(response.audioContent);
+}
+
+// ── ElevenLabs TTS (English only) ────────────────────────────────────
+
+const ELEVENLABS_VOICE_IDS = {
   male: {
-    hebrew: process.env.ELEVENLABS_HEBREW_MALE_VOICE_ID || 'JBFqnCBsd6RMkjVDRZzb',   // George — warm, captivating storyteller (great for prayer)
-    english: process.env.ELEVENLABS_ENGLISH_MALE_VOICE_ID || 'W1EJxHy9vl73xgPIKgpn',  // Rabbi Shafier — actual rabbi, strong & inviting
+    english: process.env.ELEVENLABS_ENGLISH_MALE_VOICE_ID || 'W1EJxHy9vl73xgPIKgpn',  // Rabbi Shafier
   },
   female: {
-    hebrew: process.env.ELEVENLABS_HEBREW_FEMALE_VOICE_ID || 'pFZP5JQG7iQjIQuC4Bku',   // Lily — velvety, warm (beautiful for prayer)
-    english: process.env.ELEVENLABS_ENGLISH_FEMALE_VOICE_ID || 'hpp4J3VqNfWAUOO0d1Us', // Bella — professional, bright, warm educator
+    english: process.env.ELEVENLABS_ENGLISH_FEMALE_VOICE_ID || 'hpp4J3VqNfWAUOO0d1Us', // Bella
   },
 } as const;
 
-// ── Model & Quality ──────────────────────────────────────────────────
-// eleven_v3 = ElevenLabs' newest, most natural model (70+ languages incl. Hebrew)
-// Falls back to eleven_multilingual_v2 if v3 fails
 const PRIMARY_MODEL = 'eleven_v3';
 const FALLBACK_MODEL = 'eleven_multilingual_v2';
+let usingFallbackModel = false;
+
+interface ElevenLabsOptions {
+  stability?: number;
+  similarity_boost?: number;
+  style?: number;
+  use_speaker_boost?: boolean;
+  speed?: number;
+}
+
+function snapStabilityForV3(value: number): number {
+  if (value <= 0.25) return 0.0;
+  if (value <= 0.75) return 0.5;
+  return 1.0;
+}
+
+async function generateEnglishAudio(text: string, opts: ElevenLabsOptions = {}): Promise<Buffer> {
+  if (!ELEVENLABS_API_KEY) {
+    throw new Error('ElevenLabs API key not configured');
+  }
+
+  const voiceId = ELEVENLABS_VOICE_IDS[GENDER].english;
+  const modelId = usingFallbackModel ? FALLBACK_MODEL : PRIMARY_MODEL;
+  const isV3 = !usingFallbackModel;
+
+  const rawStability = opts.stability ?? 0.65;
+  const stability = isV3 ? snapStabilityForV3(rawStability) : rawStability;
+
+  const voiceSettings: Record<string, unknown> = {
+    stability,
+    similarity_boost: opts.similarity_boost ?? 0.80,
+    speed: opts.speed ?? 0.85,
+  };
+
+  if (!isV3) {
+    voiceSettings.style = opts.style ?? 0.15;
+    voiceSettings.use_speaker_boost = opts.use_speaker_boost ?? true;
+  }
+
+  const body: Record<string, unknown> = {
+    text,
+    model_id: modelId,
+    voice_settings: voiceSettings,
+    apply_text_normalization: 'on',
+    language_code: 'en',
+  };
+
+  const response = await fetch(
+    `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'xi-api-key': ELEVENLABS_API_KEY,
+      },
+      body: JSON.stringify(body),
+    }
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    if (!usingFallbackModel && (errorText.includes('model') || response.status === 422)) {
+      console.log(`  ⚠ eleven_v3 not available, falling back to eleven_multilingual_v2`);
+      usingFallbackModel = true;
+      return generateEnglishAudio(text, opts);
+    }
+    if (errorText.includes('quota_exceeded')) {
+      quotaExhausted = true;
+    }
+    throw new Error(`ElevenLabs API error ${response.status}: ${errorText}`);
+  }
+
+  return Buffer.from(await response.arrayBuffer());
+}
 
 // ── File suffix helpers ───────────────────────────────────────────────
 
@@ -112,94 +240,7 @@ function buildFileName(id: string, style: 'modern' | 'american', extra = ''): st
   return `${id}${extra}${styleSuffix(style)}${genderSuffix()}.mp3`;
 }
 
-// ── ElevenLabs TTS ────────────────────────────────────────────────────
-
-interface TTSOptions {
-  stability?: number;
-  similarity_boost?: number;
-  style?: number;
-  use_speaker_boost?: boolean;
-  speed?: number;
-  language_code?: string;
-}
-
-let quotaExhausted = false;
-let usingFallbackModel = false;
-
-// eleven_v3 only accepts stability: 0.0 (Creative), 0.5 (Natural), 1.0 (Robust)
-function snapStabilityForV3(value: number): number {
-  if (value <= 0.25) return 0.0;
-  if (value <= 0.75) return 0.5;
-  return 1.0;
-}
-
-async function generateAudio(
-  text: string,
-  voiceId: string,
-  opts: TTSOptions = {}
-): Promise<Buffer> {
-  const modelId = usingFallbackModel ? FALLBACK_MODEL : PRIMARY_MODEL;
-  const isV3 = modelId === PRIMARY_MODEL && !usingFallbackModel;
-
-  const rawStability = opts.stability ?? 0.65;
-  const stability = isV3 ? snapStabilityForV3(rawStability) : rawStability;
-
-  const voiceSettings: Record<string, unknown> = {
-    stability,
-    similarity_boost: opts.similarity_boost ?? 0.80,
-    speed: opts.speed ?? 0.85,
-  };
-
-  // style and use_speaker_boost — include for v2, skip for v3 to avoid errors
-  if (!isV3) {
-    voiceSettings.style = opts.style ?? 0.15;
-    voiceSettings.use_speaker_boost = opts.use_speaker_boost ?? true;
-  }
-
-  const body: Record<string, unknown> = {
-    text,
-    model_id: modelId,
-    voice_settings: voiceSettings,
-    apply_text_normalization: 'on',
-  };
-
-  // Set language code for better pronunciation
-  if (opts.language_code) {
-    body.language_code = opts.language_code;
-  }
-
-  const response = await fetch(
-    `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'xi-api-key': API_KEY!,
-      },
-      body: JSON.stringify(body),
-    }
-  );
-
-  if (!response.ok) {
-    const errorText = await response.text();
-
-    // If model not available, try fallback
-    if (!usingFallbackModel && (errorText.includes('model') || response.status === 422)) {
-      console.log(`  ⚠ eleven_v3 not available, falling back to eleven_multilingual_v2`);
-      usingFallbackModel = true;
-      return generateAudio(text, voiceId, opts);
-    }
-
-    // Detect quota exhaustion → stop wasting time
-    if (errorText.includes('quota_exceeded')) {
-      quotaExhausted = true;
-    }
-
-    throw new Error(`ElevenLabs API error ${response.status}: ${errorText}`);
-  }
-
-  return Buffer.from(await response.arrayBuffer());
-}
+// ── Shared helpers ───────────────────────────────────────────────────
 
 function writeAudio(filePath: string, audio: Buffer) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
@@ -210,19 +251,48 @@ async function delay(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-// Track totals
 let totalGenerated = 0;
 let totalSkipped = 0;
 let totalErrors = 0;
+let quotaExhausted = false;
+
+// ── Quality presets ──────────────────────────────────────────────────
+
+// Google Cloud TTS speed presets for Hebrew content
+const GOOGLE_PRESETS = {
+  letterName:  { speed: 0.85, pitch: 0 },
+  letterSound: { speed: 0.75, pitch: 0 },
+  vowel:       { speed: 0.85, pitch: 0 },
+  syllable:    { speed: 0.80, pitch: 0 },
+  word:        { speed: 0.90, pitch: 0 },
+  reading:     { speed: 0.90, pitch: 0 },
+  vocab:       { speed: 0.90, pitch: 0 },
+  prayer:      { speed: 0.90, pitch: 0 },
+} as const;
+
+// ElevenLabs presets for English content
+const ELEVEN_PRESETS = {
+  letterName: { stability: 1.0, similarity_boost: 0.82, speed: 0.78 },
+  letterSound: { stability: 1.0, similarity_boost: 0.85, speed: 0.65 },
+  letterSilent: { stability: 1.0, similarity_boost: 0.80, speed: 0.72 },
+  vowel: { stability: 1.0, similarity_boost: 0.82, speed: 0.78 },
+  syllable: { stability: 1.0, similarity_boost: 0.82, speed: 0.70 },
+  word: { stability: 0.5, similarity_boost: 0.82, speed: 0.78 },
+  reading: { stability: 0.5, similarity_boost: 0.82, speed: 0.82 },
+  vocab: { stability: 0.5, similarity_boost: 0.82, speed: 0.78 },
+  prayer: { stability: 0.5, similarity_boost: 0.82, speed: 0.85 },
+} as const;
+
+// ── Unified generate-and-save ────────────────────────────────────────
 
 async function generateAndSave(
   filePath: string,
   text: string,
-  voiceId: string,
+  lang: 'he' | 'en',
   label: string,
-  opts: TTSOptions = {}
+  presetKey: keyof typeof GOOGLE_PRESETS
 ) {
-  if (quotaExhausted) {
+  if (quotaExhausted && lang === 'en') {
     totalErrors++;
     return;
   }
@@ -232,18 +302,26 @@ async function generateAndSave(
     return;
   }
 
-  // Retry once on transient failures
   for (let attempt = 0; attempt < 2; attempt++) {
     try {
       console.log(`  🔊 ${label}`);
-      const audio = await generateAudio(text, voiceId, opts);
+
+      let audio: Buffer;
+      if (lang === 'he') {
+        audio = await generateHebrewAudio(text, GOOGLE_PRESETS[presetKey]);
+      } else {
+        audio = await generateEnglishAudio(text, ELEVEN_PRESETS[presetKey]);
+      }
+
       writeAudio(filePath, audio);
       totalGenerated++;
-      await delay(500); // Rate limit
+
+      // Rate limit — Google allows higher QPS but be polite
+      await delay(lang === 'he' ? 200 : 500);
       return;
     } catch (err) {
       if (quotaExhausted) {
-        console.error(`  ✗ Quota exhausted — stopping generation.`);
+        console.error(`  ✗ Quota exhausted — stopping English generation.`);
         totalErrors++;
         return;
       }
@@ -297,141 +375,56 @@ const LETTER_SOUNDS: Record<string, string> = {
   fei_sofit: 'fff', tzadi_sofit: 'tsss',
 };
 
-// ── Quality presets per content type ──────────────────────────────────
-// Tuned for the most natural, realistic output per use case.
-
-// Stability for eleven_v3: 0.0 = Creative, 0.5 = Natural, 1.0 = Robust
-// For v2 fallback, the raw values still work (continuous 0-1)
-const PRESETS = {
-  // Letter names: clear, educational, slightly slow → Robust
-  letterName: (lang: string): TTSOptions => ({
-    stability: 1.0,
-    similarity_boost: 0.82,
-    style: 0.10,
-    use_speaker_boost: true,
-    speed: 0.78,
-    language_code: lang,
-  }),
-
-  // Letter pure sounds: very stable, slow, precise → Robust
-  letterSound: (lang: string): TTSOptions => ({
-    stability: 1.0,
-    similarity_boost: 0.85,
-    style: 0.05,
-    use_speaker_boost: true,
-    speed: 0.65,
-    language_code: lang,
-  }),
-
-  // Silent letter descriptions → Robust
-  letterSilent: (lang: string): TTSOptions => ({
-    stability: 1.0,
-    similarity_boost: 0.80,
-    style: 0.10,
-    use_speaker_boost: true,
-    speed: 0.72,
-    language_code: lang,
-  }),
-
-  // Vowel names + sounds: clear and educational → Robust
-  vowel: (lang: string): TTSOptions => ({
-    stability: 1.0,
-    similarity_boost: 0.82,
-    style: 0.10,
-    use_speaker_boost: true,
-    speed: 0.78,
-    language_code: lang,
-  }),
-
-  // Bootcamp syllables: very clear, isolated pronunciation → Robust
-  syllable: (lang: string): TTSOptions => ({
-    stability: 1.0,
-    similarity_boost: 0.82,
-    style: 0.05,
-    use_speaker_boost: true,
-    speed: 0.70,
-    language_code: lang,
-  }),
-
-  // Bootcamp words: clear but natural → Natural
-  word: (lang: string): TTSOptions => ({
-    stability: 0.5,
-    similarity_boost: 0.82,
-    style: 0.12,
-    use_speaker_boost: true,
-    speed: 0.78,
-    language_code: lang,
-  }),
-
-  // Bootcamp readings: flowing, natural cadence → Natural
-  reading: (lang: string): TTSOptions => ({
-    stability: 0.5,
-    similarity_boost: 0.82,
-    style: 0.20,
-    use_speaker_boost: true,
-    speed: 0.82,
-    language_code: lang,
-  }),
-
-  // Vocabulary: clear pronunciation → Natural
-  vocab: (lang: string): TTSOptions => ({
-    stability: 0.5,
-    similarity_boost: 0.82,
-    style: 0.10,
-    use_speaker_boost: true,
-    speed: 0.78,
-    language_code: lang,
-  }),
-
-  // Prayer sections: warm, reverent, natural flowing Hebrew → Natural
-  prayer: (lang: string): TTSOptions => ({
-    stability: 0.5,
-    similarity_boost: 0.82,
-    style: 0.25,
-    use_speaker_boost: true,
-    speed: 0.85,
-    language_code: lang,
-  }),
-} as const;
-
 // ── Category generators ───────────────────────────────────────────────
 
 async function generateLetters(styles: ('modern' | 'american')[]) {
   const letters = await loadLetters();
   const audioDir = path.resolve(__dirname, '../public/audio/letters');
-  const voices = VOICE_IDS[GENDER];
 
   console.log(`\n📝 Letters (${letters.length} letters, ${GENDER} voice)\n`);
 
   for (const style of styles) {
-    if (quotaExhausted) break;
     console.log(`  Style: ${style}`);
-    const voiceId = voices.english;
 
     for (const letter of letters) {
-      if (quotaExhausted) break;
+      if (style === 'modern') {
+        // Hebrew letter name — use Google Cloud TTS
+        const nameFile = buildFileName(letter.id, style);
+        const namePath = path.join(audioDir, nameFile);
+        // Send the Hebrew character + name for best pronunciation
+        await generateAndSave(namePath, letter.hebrew, 'he', `${letter.name} (${letter.hebrew}) — Hebrew name`, 'letterName');
 
-      // 1. Letter name + sound file
-      const nameFile = buildFileName(letter.id, style);
-      const namePath = path.join(audioDir, nameFile);
-      const soundText = letter.sound === '(silent)' ? 'Silent.' : `${letter.sound}.`;
-      const nameText = `${letter.name}. ${soundText}`;
+        // Pure sound file — Hebrew pronunciation
+        const soundFile = buildFileName(letter.id, style, '-sound');
+        const soundPath = path.join(audioDir, soundFile);
+        const sound = LETTER_SOUNDS[letter.id];
 
-      await generateAndSave(namePath, nameText, voiceId, `${letter.name} (${letter.hebrew}) — name`,
-        PRESETS.letterName('en'));
-
-      // 2. Pure sound file
-      const soundFile = buildFileName(letter.id, style, '-sound');
-      const soundPath = path.join(audioDir, soundFile);
-      const sound = LETTER_SOUNDS[letter.id];
-
-      if (!sound || sound === '...') {
-        const silentText = `${letter.name} is silent. It carries the vowel sound.`;
-        await generateAndSave(soundPath, silentText, voiceId, `${letter.name} — silent`,
-          PRESETS.letterSilent('en'));
+        if (!sound || sound === '...') {
+          // Silent letters — explain in English
+          const silentText = `${letter.name} is silent. It carries the vowel sound.`;
+          await generateAndSave(soundPath, silentText, 'en', `${letter.name} — silent`, 'letterSilent');
+        } else {
+          // Generate the sound in Hebrew context
+          await generateAndSave(soundPath, sound, 'he', `${letter.name} — "${sound}"`, 'letterSound');
+        }
       } else {
-        await generateAndSave(soundPath, sound, voiceId, `${letter.name} — "${sound}"`,
-          PRESETS.letterSound('en'));
+        // American style — English pronunciation of letter names
+        const nameFile = buildFileName(letter.id, style);
+        const namePath = path.join(audioDir, nameFile);
+        const soundText = letter.sound === '(silent)' ? 'Silent.' : `${letter.sound}.`;
+        const nameText = `${letter.name}. ${soundText}`;
+        await generateAndSave(namePath, nameText, 'en', `${letter.name} — English name`, 'letterName');
+
+        const soundFile = buildFileName(letter.id, style, '-sound');
+        const soundPath = path.join(audioDir, soundFile);
+        const sound = LETTER_SOUNDS[letter.id];
+
+        if (!sound || sound === '...') {
+          const silentText = `${letter.name} is silent. It carries the vowel sound.`;
+          await generateAndSave(soundPath, silentText, 'en', `${letter.name} — silent`, 'letterSilent');
+        } else {
+          await generateAndSave(soundPath, sound, 'en', `${letter.name} — "${sound}"`, 'letterSound');
+        }
       }
     }
   }
@@ -440,113 +433,96 @@ async function generateLetters(styles: ('modern' | 'american')[]) {
 async function generateVowels(styles: ('modern' | 'american')[]) {
   const vowels = await loadVowels();
   const audioDir = path.resolve(__dirname, '../public/audio/vowels');
-  const voices = VOICE_IDS[GENDER];
 
   console.log(`\n🔵 Vowels (${vowels.length} vowels, ${GENDER} voice)\n`);
 
   for (const style of styles) {
-    if (quotaExhausted) break;
     console.log(`  Style: ${style}`);
-    const voiceId = voices.english;
 
     for (const vowel of vowels) {
-      if (quotaExhausted) break;
       const fileName = buildFileName(vowel.id, style);
       const filePath = path.join(audioDir, fileName);
-      const text = `${vowel.name}. ${vowel.sound}.`;
 
-      await generateAndSave(filePath, text, voiceId, `${vowel.name} (${vowel.hebrew}) — "${vowel.sound}"`,
-        PRESETS.vowel('en'));
+      if (style === 'modern') {
+        // Hebrew vowel sound — use Google Cloud TTS
+        await generateAndSave(filePath, vowel.hebrew, 'he', `${vowel.name} (${vowel.hebrew}) — Hebrew`, 'vowel');
+      } else {
+        // English pronunciation
+        const text = `${vowel.name}. ${vowel.sound}.`;
+        await generateAndSave(filePath, text, 'en', `${vowel.name} — English`, 'vowel');
+      }
     }
   }
 }
 
 async function generateBootcamp(styles: ('modern' | 'american')[]) {
   const days = await loadBootcampDays();
-  const voices = VOICE_IDS[GENDER];
 
   console.log(`\n🏕️ Bootcamp (${days.length} days, ${GENDER} voice)\n`);
 
   for (const style of styles) {
-    if (quotaExhausted) break;
     console.log(`  Style: ${style}`);
-    const lang = style === 'american' ? 'en' : 'he';
+    const isHebrew = style === 'modern';
 
     for (const day of days) {
-      if (quotaExhausted) break;
       console.log(`\n  Day ${day.day}: ${day.title}`);
 
       // Syllables
       const syllableDir = path.resolve(__dirname, '../public/audio/bootcamp/syllables');
       for (const syl of day.syllables) {
-        if (quotaExhausted) break;
         const baseId = path.basename(syl.audioUrl, '.mp3');
         const fileName = buildFileName(baseId, style);
         const filePath = path.join(syllableDir, fileName);
+        const text = isHebrew ? syl.hebrew : syl.transliteration;
 
-        const text = style === 'american' ? syl.transliteration : syl.hebrew;
-        const voiceId = style === 'american' ? voices.english : voices.hebrew;
-
-        await generateAndSave(filePath, text, voiceId, `Syllable: ${syl.transliteration} (${syl.hebrew})`,
-          PRESETS.syllable(lang));
+        await generateAndSave(filePath, text, isHebrew ? 'he' : 'en',
+          `Syllable: ${syl.transliteration} (${syl.hebrew})`, 'syllable');
       }
 
       // Practice words
       const wordsDir = path.resolve(__dirname, '../public/audio/bootcamp/words');
       for (const word of day.practiceWords) {
-        if (quotaExhausted) break;
         const baseId = path.basename(word.audioUrl, '.mp3');
         const fileName = buildFileName(baseId, style);
         const filePath = path.join(wordsDir, fileName);
+        const text = isHebrew ? word.hebrew : word.transliteration;
 
-        const text = style === 'american' ? word.transliteration : word.hebrew;
-        const voiceId = style === 'american' ? voices.english : voices.hebrew;
-
-        await generateAndSave(filePath, text, voiceId, `Word: ${word.transliteration} (${word.hebrew})`,
-          PRESETS.word(lang));
+        await generateAndSave(filePath, text, isHebrew ? 'he' : 'en',
+          `Word: ${word.transliteration} (${word.hebrew})`, 'word');
       }
 
       // Culminating reading
       if (day.culminatingReading?.lines) {
         const readingsDir = path.resolve(__dirname, '../public/audio/bootcamp/readings');
         for (const line of day.culminatingReading.lines) {
-          if (quotaExhausted) break;
           const baseId = path.basename(line.audioUrl, '.mp3');
           const fileName = buildFileName(baseId, style);
           const filePath = path.join(readingsDir, fileName);
+          const text = isHebrew ? line.hebrew : line.transliteration;
 
-          const text = style === 'american' ? line.transliteration : line.hebrew;
-          const voiceId = style === 'american' ? voices.english : voices.hebrew;
-
-          await generateAndSave(filePath, text, voiceId, `Reading: ${line.transliteration}`,
-            PRESETS.reading(lang));
+          await generateAndSave(filePath, text, isHebrew ? 'he' : 'en',
+            `Reading: ${line.transliteration}`, 'reading');
         }
       }
     }
   }
 
   // Bootcamp vocabulary words
-  if (!quotaExhausted) {
-    const vocab = await loadBootcampVocab();
-    console.log(`\n  📚 Bootcamp Vocabulary (${vocab.length} words)\n`);
+  const vocab = await loadBootcampVocab();
+  console.log(`\n  📚 Bootcamp Vocabulary (${vocab.length} words)\n`);
 
-    for (const style of styles) {
-      if (quotaExhausted) break;
-      const lang = style === 'american' ? 'en' : 'he';
-      const wordsDir = path.resolve(__dirname, '../public/audio/bootcamp/words');
+  for (const style of styles) {
+    const isHebrew = style === 'modern';
+    const wordsDir = path.resolve(__dirname, '../public/audio/bootcamp/words');
 
-      for (const word of vocab) {
-        if (quotaExhausted) break;
-        const baseId = path.basename(word.audioUrl, '.mp3');
-        const fileName = buildFileName(baseId, style);
-        const filePath = path.join(wordsDir, fileName);
+    for (const word of vocab) {
+      const baseId = path.basename(word.audioUrl, '.mp3');
+      const fileName = buildFileName(baseId, style);
+      const filePath = path.join(wordsDir, fileName);
+      const text = isHebrew ? word.hebrew : word.transliteration;
 
-        const text = style === 'american' ? word.transliteration : word.hebrew;
-        const voiceId = style === 'american' ? voices.english : voices.hebrew;
-
-        await generateAndSave(filePath, text, voiceId, `Vocab: ${word.transliteration} (${word.hebrew})`,
-          PRESETS.vocab(lang));
-      }
+      await generateAndSave(filePath, text, isHebrew ? 'he' : 'en',
+        `Vocab: ${word.transliteration} (${word.hebrew})`, 'vocab');
     }
   }
 }
@@ -554,36 +530,28 @@ async function generateBootcamp(styles: ('modern' | 'american')[]) {
 async function generatePrayers(styles: ('modern' | 'american')[]) {
   const prayers = await loadPrayers();
   const audioDir = path.resolve(__dirname, '../public/audio/prayers');
-  const voices = VOICE_IDS[GENDER];
 
   console.log(`\n🕍 Prayers (${prayers.length} prayers, ${GENDER} voice)\n`);
 
   for (const style of styles) {
-    if (quotaExhausted) break;
     console.log(`  Style: ${style}`);
-    const lang = style === 'american' ? 'en' : 'he';
+    const isHebrew = style === 'modern';
 
     for (const prayer of prayers) {
-      if (quotaExhausted) break;
       const prayerDir = path.join(audioDir, prayer.id);
 
       for (const section of prayer.sections) {
-        if (quotaExhausted) break;
         const fileName = buildFileName(section.id, style);
         const filePath = path.join(prayerDir, fileName);
-
-        const text = style === 'american'
-          ? section.transliteration
-          : section.hebrewText;
-        const voiceId = style === 'american' ? voices.english : voices.hebrew;
+        const text = isHebrew ? section.hebrewText : section.transliteration;
 
         if (!text) {
           totalSkipped++;
           continue;
         }
 
-        await generateAndSave(filePath, text, voiceId, `${prayer.nameEnglish} > ${section.id}`,
-          PRESETS.prayer(lang));
+        await generateAndSave(filePath, text, isHebrew ? 'he' : 'en',
+          `${prayer.nameEnglish} > ${section.id}`, 'prayer');
       }
     }
   }
@@ -598,11 +566,10 @@ async function main() {
     STYLE === 'american' ? ['american'] :
     ['modern', 'american'];
 
-  const modelLabel = usingFallbackModel ? FALLBACK_MODEL : PRIMARY_MODEL;
-
   console.log(`\n${'='.repeat(60)}`);
   console.log(`  AlephStart Audio Generator`);
-  console.log(`  Model:    ${PRIMARY_MODEL} (fallback: ${FALLBACK_MODEL})`);
+  console.log(`  Hebrew:   Google Cloud TTS (WaveNet ${GOOGLE_HEBREW_VOICES[GENDER]})`);
+  console.log(`  English:  ElevenLabs (${PRIMARY_MODEL})`);
   console.log(`  Gender:   ${GENDER}`);
   console.log(`  Styles:   ${styles.join(', ')}`);
   console.log(`  Category: ${CATEGORY}`);
@@ -624,12 +591,11 @@ async function main() {
 
   console.log(`\n${'='.repeat(60)}`);
   console.log(`  DONE!`);
-  console.log(`  Model used: ${usingFallbackModel ? FALLBACK_MODEL : PRIMARY_MODEL}`);
   console.log(`  Generated:  ${totalGenerated}`);
   console.log(`  Skipped:    ${totalSkipped} (already exist)`);
   console.log(`  Errors:     ${totalErrors}`);
   if (quotaExhausted) {
-    console.log(`  ⚠ QUOTA EXHAUSTED — re-run after credits refresh`);
+    console.log(`  ⚠ ElevenLabs QUOTA EXHAUSTED — English audio may be incomplete`);
   }
   console.log(`${'='.repeat(60)}\n`);
 }

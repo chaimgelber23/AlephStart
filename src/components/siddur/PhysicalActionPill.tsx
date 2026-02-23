@@ -17,7 +17,7 @@ const ACTION_CONFIG: Record<PhysicalAction, { label: string; icon: string }> = {
 export function PhysicalActionPill({ action }: { action: PhysicalAction }) {
   const config = ACTION_CONFIG[action];
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#D4A373]/15 text-[#8B6914] text-[10px] font-medium">
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-warning/15 text-[#8B6914] text-[10px] font-medium">
       <span>{config.icon}</span>
       {config.label}
     </span>

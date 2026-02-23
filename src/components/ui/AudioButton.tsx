@@ -27,9 +27,9 @@ const sizeStyles = {
 };
 
 const variantStyles = {
-  primary: 'bg-[#1B4965] text-white hover:bg-[#163d55]',
-  ghost: 'bg-transparent text-[#1B4965] hover:bg-[#1B4965]/10',
-  outline: 'border-2 border-[#1B4965] text-[#1B4965] hover:bg-[#1B4965]/5',
+  primary: 'bg-primary text-white hover:bg-[#163d55]',
+  ghost: 'bg-transparent text-primary hover:bg-primary/10',
+  outline: 'border-2 border-primary text-primary hover:bg-primary/5',
 };
 
 export function AudioButton({
@@ -87,7 +87,7 @@ export function AudioButton({
         ${variantStyles[variant]}
         rounded-full flex items-center justify-center
         transition-all duration-200
-        ${isPlaying ? 'scale-110 ring-4 ring-[#5FA8D3]/30' : ''}
+        ${isPlaying ? 'scale-110 ring-4 ring-primary-light/30' : ''}
         active:scale-95
         ${className}
       `}

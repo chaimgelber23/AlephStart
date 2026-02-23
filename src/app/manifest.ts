@@ -8,8 +8,8 @@ export default function manifest(): MetadataRoute.Manifest {
       'Learn to read Hebrew and daven with confidence. From the Aleph-Bet to the Siddur.',
     start_url: '/',
     display: 'standalone',
-    background_color: '#FEFDFB',
-    theme_color: '#1B4965',
+    background_color: 'var(--background)',
+    theme_color: 'var(--primary)',
     icons: [
       {
         src: '/icon-192.png',

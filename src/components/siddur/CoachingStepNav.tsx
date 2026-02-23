@@ -4,10 +4,10 @@ import type { CoachingPhase } from '@/types';
 
 const STEPS: { phase: CoachingPhase; label: string; shortLabel: string }[] = [
   { phase: 'context', label: 'Context', shortLabel: 'Info' },
-  { phase: 'listen', label: 'Listen', shortLabel: 'Listen' },
-  { phase: 'follow_along', label: 'Follow', shortLabel: 'Follow' },
-  { phase: 'say_together', label: 'Say', shortLabel: 'Say' },
-  { phase: 'try_yourself', label: 'Try', shortLabel: 'Try' },
+  { phase: 'listen', label: 'Read', shortLabel: 'Read' },
+  { phase: 'follow_along', label: 'Practice', shortLabel: 'Practice' },
+  { phase: 'say_together', label: 'Say Aloud', shortLabel: 'Say' },
+  { phase: 'try_yourself', label: 'Solo', shortLabel: 'Solo' },
   { phase: 'section_complete', label: 'Done', shortLabel: 'Done' },
 ];
 
@@ -35,12 +35,11 @@ export function CoachingStepNav({
 
   return (
     <div className="flex items-center gap-1.5 px-2 py-2 overflow-x-auto">
-      {visibleSteps.map((step, i) => {
+      {visibleSteps.map((step) => {
         const isCurrent = step.phase === currentPhase;
         const isCompleted = completedPhases.has(step.phase);
         const currentIdx = PHASE_ORDER.indexOf(currentPhase);
         const stepIdx = PHASE_ORDER.indexOf(step.phase);
-        const isFuture = stepIdx > currentIdx && !isCompleted;
 
         return (
           <button
@@ -51,9 +50,9 @@ export function CoachingStepNav({
               whitespace-nowrap transition-all
               ${
                 isCurrent
-                  ? 'bg-[#1B4965] text-white'
+                  ? 'bg-primary text-white'
                   : isCompleted
-                  ? 'bg-[#4A7C59]/10 text-[#4A7C59]'
+                  ? 'bg-success/10 text-success'
                   : 'bg-gray-100 text-gray-400 hover:bg-gray-200 hover:text-gray-500'
               }
             `}

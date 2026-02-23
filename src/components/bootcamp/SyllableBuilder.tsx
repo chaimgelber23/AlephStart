@@ -43,7 +43,7 @@ export function SyllableBuilder({ syllables, onComplete }: SyllableBuilderProps)
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
           onClick={onComplete}
-          className="w-full mt-4 bg-[#1B4965] text-white py-3 rounded-xl font-medium hover:bg-[#163d55] active:scale-[0.98] transition-all"
+          className="w-full mt-4 bg-primary text-white py-3 rounded-xl font-medium hover:bg-[#163d55] active:scale-[0.98] transition-all"
         >
           Continue
         </motion.button>

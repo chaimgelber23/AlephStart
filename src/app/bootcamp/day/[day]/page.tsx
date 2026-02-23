@@ -63,7 +63,7 @@ export default function BootcampDayPage() {
 
   if (!dayData) {
     return (
-      <div className="min-h-screen bg-[#FEFDFB] flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <p className="text-gray-500">Day not found</p>
       </div>
     );
@@ -252,7 +252,7 @@ export default function BootcampDayPage() {
   const [phaseStep, phaseTotal] = getPhaseStep();
 
   return (
-    <div className="min-h-screen bg-[#FEFDFB]">
+    <div className="min-h-screen bg-background">
       <BootcampProgressHeader
         dayNumber={dayNumber}
         phaseName={getPhaseName()}
@@ -273,8 +273,8 @@ export default function BootcampDayPage() {
               className="space-y-6"
             >
               <div className="text-center">
-                <p className="text-xs text-[#C6973F] font-semibold uppercase tracking-wider">Quick Review</p>
-                <h2 className="text-lg font-bold text-[#2D3142] mt-1">
+                <p className="text-xs text-gold font-semibold uppercase tracking-wider">Quick Review</p>
+                <h2 className="text-lg font-bold text-foreground mt-1">
                   Which letter is this?
                 </h2>
               </div>
@@ -300,8 +300,8 @@ export default function BootcampDayPage() {
                     const isCorrect = letter.id === correct.id;
                     let bgClass = 'bg-white border-gray-200';
                     if (reviewAnswer) {
-                      if (isCorrect) bgClass = 'bg-[#4A7C59]/10 border-[#4A7C59]';
-                      else if (isSelected) bgClass = 'bg-[#C17767]/10 border-[#C17767]';
+                      if (isCorrect) bgClass = 'bg-success/10 border-success';
+                      else if (isSelected) bgClass = 'bg-error/10 border-error';
                       else bgClass = 'bg-white border-gray-100 opacity-50';
                     }
                     return (
@@ -311,7 +311,7 @@ export default function BootcampDayPage() {
                         disabled={!!reviewAnswer}
                         className={`${bgClass} border-2 rounded-xl p-3 text-center transition-all`}
                       >
-                        <p className="font-medium text-[#2D3142]">{letter.name}</p>
+                        <p className="font-medium text-foreground">{letter.name}</p>
                         <p className="text-xs text-gray-500">{letter.sound}</p>
                       </button>
                     );
@@ -344,8 +344,8 @@ export default function BootcampDayPage() {
                     className="space-y-6"
                   >
                     <div className="text-center">
-                      <p className="text-xs text-[#1B4965] font-semibold uppercase tracking-wider">Meet the Twins</p>
-                      <h2 className="text-lg font-bold text-[#2D3142] mt-1">
+                      <p className="text-xs text-primary font-semibold uppercase tracking-wider">Meet the Twins</p>
+                      <h2 className="text-lg font-bold text-foreground mt-1">
                         {withDagesh.name} & {without.name}
                       </h2>
                     </div>
@@ -358,8 +358,8 @@ export default function BootcampDayPage() {
 
                     {/* Cultural mnemonic for the pair */}
                     {culturalMnemonic && (
-                      <div className="bg-[#1B4965]/5 rounded-xl p-4">
-                        <p className="text-sm text-[#1B4965] text-center italic">
+                      <div className="bg-primary/5 rounded-xl p-4">
+                        <p className="text-sm text-primary text-center italic">
                           ✡ {culturalMnemonic}
                         </p>
                       </div>
@@ -367,7 +367,7 @@ export default function BootcampDayPage() {
 
                     <button
                       onClick={handleNextLetter}
-                      className="w-full bg-[#1B4965] text-white py-4 rounded-xl text-lg font-medium hover:bg-[#163d55] active:scale-[0.98] transition-all"
+                      className="w-full bg-primary text-white py-4 rounded-xl text-lg font-medium hover:bg-[#163d55] active:scale-[0.98] transition-all"
                     >
                       Continue
                     </button>
@@ -385,10 +385,10 @@ export default function BootcampDayPage() {
                 className="space-y-6"
               >
                 <div className="text-center">
-                  <p className="text-xs text-[#1B4965] font-semibold uppercase tracking-wider">
+                  <p className="text-xs text-primary font-semibold uppercase tracking-wider">
                     New Letter
                   </p>
-                  <h2 className="text-lg font-bold text-[#2D3142] mt-1">
+                  <h2 className="text-lg font-bold text-foreground mt-1">
                     Meet {currentLetter.name}
                   </h2>
                 </div>
@@ -397,8 +397,8 @@ export default function BootcampDayPage() {
 
                 {/* Cultural mnemonic */}
                 {culturalMnemonic && (
-                  <div className="bg-[#1B4965]/5 rounded-xl p-4">
-                    <p className="text-sm text-[#1B4965] text-center italic">
+                  <div className="bg-primary/5 rounded-xl p-4">
+                    <p className="text-sm text-primary text-center italic">
                       ✡ {culturalMnemonic}
                     </p>
                   </div>
@@ -406,7 +406,7 @@ export default function BootcampDayPage() {
 
                 <button
                   onClick={handleNextLetter}
-                  className="w-full bg-[#1B4965] text-white py-4 rounded-xl text-lg font-medium hover:bg-[#163d55] active:scale-[0.98] transition-all"
+                  className="w-full bg-primary text-white py-4 rounded-xl text-lg font-medium hover:bg-[#163d55] active:scale-[0.98] transition-all"
                 >
                   {(teachLetterIdx + 1 < currentLetterGroup.letterIds.length) ||
                    (teachLetterGroupIdx + 1 < dayData.letterGroups.length)
@@ -431,8 +431,8 @@ export default function BootcampDayPage() {
                   className="space-y-6"
                 >
                   <div className="text-center">
-                    <p className="text-xs text-[#1B4965] font-semibold uppercase tracking-wider">Build Syllables</p>
-                    <h2 className="text-lg font-bold text-[#2D3142] mt-1">
+                    <p className="text-xs text-primary font-semibold uppercase tracking-wider">Build Syllables</p>
+                    <h2 className="text-lg font-bold text-foreground mt-1">
                       Combine Letters + Vowels
                     </h2>
                   </div>
@@ -456,15 +456,15 @@ export default function BootcampDayPage() {
                   <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: currentVowel.color }}>
                     New Vowel
                   </p>
-                  <h2 className="text-lg font-bold text-[#2D3142] mt-1">
+                  <h2 className="text-lg font-bold text-foreground mt-1">
                     Meet {currentVowel.name}
                   </h2>
                 </div>
 
                 {/* Group teaching note */}
                 {showGroupNote && currentVowelGroup && (
-                  <div className="bg-[#1B4965]/5 rounded-xl p-4 mb-2">
-                    <p className="text-sm text-[#1B4965] text-center">
+                  <div className="bg-primary/5 rounded-xl p-4 mb-2">
+                    <p className="text-sm text-primary text-center">
                       {currentVowelGroup.teachingNote}
                     </p>
                   </div>
@@ -474,7 +474,7 @@ export default function BootcampDayPage() {
 
                 <button
                   onClick={handleNextVowel}
-                  className="w-full bg-[#1B4965] text-white py-4 rounded-xl text-lg font-medium hover:bg-[#163d55] active:scale-[0.98] transition-all"
+                  className="w-full bg-primary text-white py-4 rounded-xl text-lg font-medium hover:bg-[#163d55] active:scale-[0.98] transition-all"
                 >
                   {(teachVowelIdx + 1 < (currentVowelGroup?.vowelIds.length || 0)) ||
                    (teachVowelGroupIdx + 1 < dayData.vowelGroups.length)
@@ -494,8 +494,8 @@ export default function BootcampDayPage() {
               className="space-y-6"
             >
               <div className="text-center">
-                <p className="text-xs text-[#1B4965] font-semibold uppercase tracking-wider">Word Practice</p>
-                <h2 className="text-lg font-bold text-[#2D3142] mt-1">
+                <p className="text-xs text-primary font-semibold uppercase tracking-wider">Word Practice</p>
+                <h2 className="text-lg font-bold text-foreground mt-1">
                   Read the Hebrew Word
                 </h2>
               </div>
@@ -513,7 +513,7 @@ export default function BootcampDayPage() {
               className="space-y-6"
             >
               <div className="text-center">
-                <p className="text-xs text-[#C6973F] font-semibold uppercase tracking-wider">Culminating Reading</p>
+                <p className="text-xs text-gold font-semibold uppercase tracking-wider">Culminating Reading</p>
               </div>
 
               <ReadingDisplay reading={dayData.culminatingReading} onComplete={handleReadingComplete} />

@@ -7,7 +7,7 @@ import { motion } from 'framer-motion';
 import { RequireAuth } from '@/components/RequireAuth';
 import { useAuthStore } from '@/stores/authStore';
 import { useUserStore } from '@/stores/userStore';
-import type { Nusach, Pronunciation, TransliterationMode, VoiceGender, DisplaySettings } from '@/types';
+import type { Nusach, Pronunciation, TransliterationMode, DisplaySettings } from '@/types';
 
 export default function SettingsPage() {
   return (
@@ -115,15 +115,15 @@ function SettingsContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FEFDFB] pb-12">
+    <div className="min-h-screen bg-background pb-12">
       {/* Header */}
-      <div className="bg-[#1B4965] text-white px-6 py-8 rounded-b-3xl">
+      <div className="bg-primary text-white px-6 py-8 rounded-b-3xl">
         <div className="max-w-md mx-auto">
-          <Link href="/" className="text-[#5FA8D3] text-sm hover:text-white transition-colors">
+          <Link href="/" className="text-primary-light text-sm hover:text-white transition-colors">
             ← Home
           </Link>
           <h1 className="text-2xl font-bold mt-2">Settings</h1>
-          <p className="text-[#5FA8D3] text-sm mt-1">{user?.email}</p>
+          <p className="text-primary-light text-sm mt-1">{user?.email}</p>
         </div>
       </div>
 
@@ -132,7 +132,7 @@ function SettingsContent() {
         <SettingsSection title="Account">
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-[#2D3142] mb-1.5">
+              <label className="block text-sm font-medium text-foreground mb-1.5">
                 Display Name
               </label>
               <div className="flex gap-2">
@@ -140,12 +140,12 @@ function SettingsContent() {
                   type="text"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
-                  className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#1B4965] focus:ring-2 focus:ring-[#1B4965]/20 outline-none text-sm"
+                  className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none text-sm"
                   placeholder="Your name"
                 />
                 <button
                   onClick={handleSaveName}
-                  className="px-4 py-2.5 rounded-xl bg-[#1B4965] text-white text-sm font-medium hover:bg-[#163d55] transition-colors"
+                  className="px-4 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-[#163d55] transition-colors"
                 >
                   Save
                 </button>
@@ -153,7 +153,7 @@ function SettingsContent() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-[#2D3142] mb-1.5">
+              <label className="block text-sm font-medium text-foreground mb-1.5">
                 Change Email
               </label>
               <div className="flex gap-2">
@@ -161,13 +161,13 @@ function SettingsContent() {
                   type="email"
                   value={newEmail}
                   onChange={(e) => setNewEmail(e.target.value)}
-                  className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#1B4965] focus:ring-2 focus:ring-[#1B4965]/20 outline-none text-sm"
+                  className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none text-sm"
                   placeholder="new@email.com"
                 />
                 <button
                   onClick={handleChangeEmail}
                   disabled={!newEmail}
-                  className="px-4 py-2.5 rounded-xl bg-[#1B4965] text-white text-sm font-medium hover:bg-[#163d55] transition-colors disabled:opacity-50"
+                  className="px-4 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-[#163d55] transition-colors disabled:opacity-50"
                 >
                   Update
                 </button>
@@ -175,7 +175,7 @@ function SettingsContent() {
             </div>
 
             {accountMsg && (
-              <p className="text-sm text-[#4A7C59]">{accountMsg}</p>
+              <p className="text-sm text-success">{accountMsg}</p>
             )}
           </div>
         </SettingsSection>
@@ -184,38 +184,38 @@ function SettingsContent() {
         <SettingsSection title="Security" id="password-section">
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-[#2D3142] mb-1.5">
+              <label className="block text-sm font-medium text-foreground mb-1.5">
                 New Password
               </label>
               <input
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#1B4965] focus:ring-2 focus:ring-[#1B4965]/20 outline-none text-sm"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none text-sm"
                 placeholder="At least 8 characters"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-[#2D3142] mb-1.5">
+              <label className="block text-sm font-medium text-foreground mb-1.5">
                 Confirm New Password
               </label>
               <input
                 type="password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-[#1B4965] focus:ring-2 focus:ring-[#1B4965]/20 outline-none text-sm"
+                className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none text-sm"
                 placeholder="••••••••"
               />
             </div>
             <button
               onClick={handleChangePassword}
               disabled={!newPassword}
-              className="px-6 py-2.5 rounded-xl bg-[#1B4965] text-white text-sm font-medium hover:bg-[#163d55] transition-colors disabled:opacity-50"
+              className="px-6 py-2.5 rounded-xl bg-primary text-white text-sm font-medium hover:bg-[#163d55] transition-colors disabled:opacity-50"
             >
               Update Password
             </button>
-            {passwordError && <p className="text-sm text-[#C17767]">{passwordError}</p>}
-            {passwordMsg && <p className="text-sm text-[#4A7C59]">{passwordMsg}</p>}
+            {passwordError && <p className="text-sm text-error">{passwordError}</p>}
+            {passwordMsg && <p className="text-sm text-success">{passwordMsg}</p>}
           </div>
         </SettingsSection>
 
@@ -224,7 +224,7 @@ function SettingsContent() {
           <div className="space-y-5">
             {/* Nusach */}
             <div>
-              <label className="block text-sm font-medium text-[#2D3142] mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Nusach (Pronunciation)
               </label>
               <div className="grid grid-cols-3 gap-2">
@@ -234,7 +234,7 @@ function SettingsContent() {
                     onClick={() => updateProfile({ nusach: n })}
                     className={`px-3 py-2 rounded-xl text-sm font-medium border-2 transition-colors ${
                       profile.nusach === n
-                        ? 'border-[#1B4965] bg-[#1B4965]/5 text-[#1B4965]'
+                        ? 'border-primary bg-primary/5 text-primary'
                         : 'border-gray-200 text-gray-600 hover:border-gray-300'
                     }`}
                   >
@@ -246,7 +246,7 @@ function SettingsContent() {
 
             {/* Pronunciation */}
             <div>
-              <label className="block text-sm font-medium text-[#2D3142] mb-1">
+              <label className="block text-sm font-medium text-foreground mb-1">
                 Audio Pronunciation
               </label>
               <p className="text-xs text-gray-400 mb-2">
@@ -262,7 +262,7 @@ function SettingsContent() {
                     onClick={() => updateProfile({ pronunciation: opt.value })}
                     className={`px-3 py-2.5 rounded-xl text-sm font-medium border-2 transition-colors text-left ${
                       profile.pronunciation === opt.value
-                        ? 'border-[#1B4965] bg-[#1B4965]/5 text-[#1B4965]'
+                        ? 'border-primary bg-primary/5 text-primary'
                         : 'border-gray-200 text-gray-600 hover:border-gray-300'
                     }`}
                   >
@@ -273,37 +273,9 @@ function SettingsContent() {
               </div>
             </div>
 
-            {/* Voice Gender */}
-            <div>
-              <label className="block text-sm font-medium text-[#2D3142] mb-1">
-                Voice
-              </label>
-              <p className="text-xs text-gray-400 mb-2">
-                Choose a male or female voice for audio playback
-              </p>
-              <div className="grid grid-cols-2 gap-2">
-                {([
-                  { value: 'male' as const, label: 'Male Voice' },
-                  { value: 'female' as const, label: 'Female Voice' },
-                ] as { value: VoiceGender; label: string }[]).map((opt) => (
-                  <button
-                    key={opt.value}
-                    onClick={() => updateProfile({ voiceGender: opt.value })}
-                    className={`px-3 py-2.5 rounded-xl text-sm font-medium border-2 transition-colors ${
-                      profile.voiceGender === opt.value
-                        ? 'border-[#1B4965] bg-[#1B4965]/5 text-[#1B4965]'
-                        : 'border-gray-200 text-gray-600 hover:border-gray-300'
-                    }`}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
             {/* Daily Goal */}
             <div>
-              <label className="block text-sm font-medium text-[#2D3142] mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Daily Goal
               </label>
               <div className="grid grid-cols-4 gap-2">
@@ -313,7 +285,7 @@ function SettingsContent() {
                     onClick={() => updateProfile({ dailyGoalMinutes: mins })}
                     className={`px-3 py-2 rounded-xl text-sm font-medium border-2 transition-colors ${
                       profile.dailyGoalMinutes === mins
-                        ? 'border-[#1B4965] bg-[#1B4965]/5 text-[#1B4965]'
+                        ? 'border-primary bg-primary/5 text-primary'
                         : 'border-gray-200 text-gray-600 hover:border-gray-300'
                     }`}
                   >
@@ -325,7 +297,7 @@ function SettingsContent() {
 
             {/* Transliteration */}
             <div>
-              <label className="block text-sm font-medium text-[#2D3142] mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Transliteration
               </label>
               <div className="grid grid-cols-2 gap-2">
@@ -340,7 +312,7 @@ function SettingsContent() {
                     onClick={() => updateProfile({ transliterationMode: opt.value })}
                     className={`px-3 py-2 rounded-xl text-sm font-medium border-2 transition-colors ${
                       profile.transliterationMode === opt.value
-                        ? 'border-[#1B4965] bg-[#1B4965]/5 text-[#1B4965]'
+                        ? 'border-primary bg-primary/5 text-primary'
                         : 'border-gray-200 text-gray-600 hover:border-gray-300'
                     }`}
                   >
@@ -352,7 +324,7 @@ function SettingsContent() {
 
             {/* Audio Speed */}
             <div>
-              <label className="block text-sm font-medium text-[#2D3142] mb-2">
+              <label className="block text-sm font-medium text-foreground mb-2">
                 Audio Speed: {profile.audioSpeed}x
               </label>
               <input
@@ -362,7 +334,7 @@ function SettingsContent() {
                 step={0.25}
                 value={profile.audioSpeed}
                 onChange={(e) => updateProfile({ audioSpeed: parseFloat(e.target.value) })}
-                className="w-full accent-[#1B4965]"
+                className="w-full accent-primary"
               />
               <div className="flex justify-between text-xs text-gray-400 mt-1">
                 <span>0.5x</span>
@@ -387,13 +359,13 @@ function SettingsContent() {
             ]).map(({ key, label, desc }) => (
               <div key={key} className="flex items-center justify-between py-2">
                 <div className="flex-1 mr-4">
-                  <p className="text-sm font-medium text-[#2D3142]">{label}</p>
+                  <p className="text-sm font-medium text-foreground">{label}</p>
                   <p className="text-xs text-gray-400">{desc}</p>
                 </div>
                 <button
                   onClick={() => updateDisplaySettings({ [key]: !displaySettings[key] })}
                   className={`relative w-11 h-6 rounded-full transition-colors shrink-0 ${
-                    displaySettings[key] ? 'bg-[#1B4965]' : 'bg-gray-300'
+                    displaySettings[key] ? 'bg-primary' : 'bg-gray-300'
                   }`}
                 >
                   <span
@@ -410,7 +382,7 @@ function SettingsContent() {
         {/* Sign Out */}
         <button
           onClick={handleSignOut}
-          className="w-full py-3 rounded-xl border-2 border-gray-200 text-gray-600 font-medium hover:border-[#1B4965] hover:text-[#1B4965] transition-colors"
+          className="w-full py-3 rounded-xl border-2 border-gray-200 text-gray-600 font-medium hover:border-primary hover:text-primary transition-colors"
         >
           Sign Out
         </button>
@@ -423,27 +395,27 @@ function SettingsContent() {
           {!showDeleteConfirm ? (
             <button
               onClick={() => setShowDeleteConfirm(true)}
-              className="px-6 py-2.5 rounded-xl border-2 border-[#C17767] text-[#C17767] text-sm font-medium hover:bg-[#C17767]/5 transition-colors"
+              className="px-6 py-2.5 rounded-xl border-2 border-error text-error text-sm font-medium hover:bg-error/5 transition-colors"
             >
               Delete Account
             </button>
           ) : (
-            <div className="space-y-3 bg-[#C17767]/5 rounded-xl p-4">
-              <p className="text-sm font-medium text-[#C17767]">
+            <div className="space-y-3 bg-error/5 rounded-xl p-4">
+              <p className="text-sm font-medium text-error">
                 Type <strong>DELETE</strong> to confirm:
               </p>
               <input
                 type="text"
                 value={deleteInput}
                 onChange={(e) => setDeleteInput(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-[#C17767]/30 focus:border-[#C17767] outline-none text-sm"
+                className="w-full px-4 py-2.5 rounded-xl border border-error/30 focus:border-error outline-none text-sm"
                 placeholder="DELETE"
               />
               <div className="flex gap-2">
                 <button
                   onClick={handleDeleteAccount}
                   disabled={deleteInput !== 'DELETE' || deleting}
-                  className="px-6 py-2.5 rounded-xl bg-[#C17767] text-white text-sm font-medium disabled:opacity-50 transition-colors"
+                  className="px-6 py-2.5 rounded-xl bg-error text-white text-sm font-medium disabled:opacity-50 transition-colors"
                 >
                   {deleting ? 'Deleting...' : 'Permanently Delete'}
                 </button>
@@ -479,12 +451,12 @@ function SettingsSection({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       className={`bg-white rounded-2xl border ${
-        danger ? 'border-[#C17767]/30' : 'border-gray-100'
+        danger ? 'border-error/30' : 'border-gray-100'
       } p-6 space-y-4`}
     >
       <h2
         className={`text-lg font-bold ${
-          danger ? 'text-[#C17767]' : 'text-[#2D3142]'
+          danger ? 'text-error' : 'text-foreground'
         }`}
       >
         {title}
